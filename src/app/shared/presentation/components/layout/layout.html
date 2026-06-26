@@ -1,0 +1,12 @@
+<header class="layout-header">
+  <h1>AutoFinance</h1>
+  <nav class="layout-nav" aria-label="Navegación principal">
+    @for (option of options; track option.link) {
+      <a [routerLink]="option.link" routerLinkActive="active">{{ option.label }}</a>
+    }
+  </nav>
+</header>
+<main>
+  <router-outlet/>
+</main>
+<app-footer-content/>

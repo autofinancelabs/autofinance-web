@@ -1,0 +1,11 @@
+.layout-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.layout-nav {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
