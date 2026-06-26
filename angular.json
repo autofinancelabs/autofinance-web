@@ -25,6 +25,8 @@
               }
             ],
             "styles": [
+              "@fontsource-variable/geist/index.css",
+              "@fontsource-variable/geist-mono/index.css",
               "src/styles.css"
             ]
           },
