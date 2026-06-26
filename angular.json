@@ -56,6 +56,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4242
+          },
           "configurations": {
             "production": {
               "buildTarget": "autofinance-web:build:production"
