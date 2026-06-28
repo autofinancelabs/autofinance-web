@@ -3,7 +3,7 @@
 }
 
 .page {
-  max-width: 64rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 1.5rem;
   display: flex;
@@ -13,7 +13,7 @@
 
 .form-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 16rem;
+  grid-template-columns: minmax(0, 1fr) 20rem;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 0.25rem);
   overflow: hidden;
