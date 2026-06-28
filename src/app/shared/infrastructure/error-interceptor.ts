@@ -63,6 +63,22 @@ function messageFor(error: ApiError): string {
       return 'El precio de venta debe ser mayor que 0.';
     case ApiErrorCode.DuplicateClientDocument:
       return 'Ya existe un cliente registrado con este documento.';
+    case ApiErrorCode.InvalidSimulationConfiguration:
+      return 'La configuración de la simulación no es válida.';
+    case ApiErrorCode.PercentageOutOfRange:
+      return 'Un porcentaje está fuera del rango permitido.';
+    case ApiErrorCode.MissingCapitalization:
+      return 'Indica la capitalización para una tasa nominal.';
+    case ApiErrorCode.CurrencyMismatch:
+      return 'Las monedas de la operación no coinciden.';
+    case ApiErrorCode.ScheduleNotBalanced:
+      return 'El cronograma no cuadró; revisa la configuración.';
+    case ApiErrorCode.IrrNotBracketed:
+      return 'No se pudo calcular la TIR con estos flujos.';
+    case ApiErrorCode.ClientNotFound:
+      return 'El cliente seleccionado no existe.';
+    case ApiErrorCode.VehicleOfferNotFound:
+      return 'La oferta vehicular seleccionada no existe.';
     case ApiErrorCode.ValidationFailed:
       return 'Revisa los datos del formulario e inténtalo de nuevo.';
     case ApiErrorCode.Unauthenticated:
