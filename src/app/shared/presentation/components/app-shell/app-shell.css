@@ -104,6 +104,13 @@
   color: var(--sidebar-primary-foreground);
 }
 
+/* Hovering the active item keeps the brand color (slightly lighter), like the
+   primary button — not the light accent used for inactive items. */
+.sidebar__item--active:hover {
+  background: color-mix(in oklch, var(--sidebar-primary) 85%, transparent);
+  color: var(--sidebar-primary-foreground);
+}
+
 .sidebar__footer {
   display: flex;
   flex-direction: column;
