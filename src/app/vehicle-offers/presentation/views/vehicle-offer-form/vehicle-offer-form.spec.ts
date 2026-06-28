@@ -99,13 +99,6 @@ describe('VehicleOfferForm (create)', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('mayor que 0');
   });
 
-  it('maps a server INVALID_VEHICLE_OFFER to the salePrice field', () => {
-    const fixture = setup();
-    error.set(new ApiError({status: 400, code: 'INVALID_VEHICLE_OFFER'}));
-    fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('mayor que 0');
-  });
-
   it('navigates to the list once saved', () => {
     const fixture = setup();
     saved.set(true);

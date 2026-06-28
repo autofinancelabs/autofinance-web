@@ -95,28 +95,6 @@ describe('SignUp', () => {
     expect(arg.contactEmail).toBeNull();
   });
 
-  it('maps a DUPLICATE_RUC error to the ruc field', () => {
-    const fixture = setup();
-    error.set(new ApiError({status: 409, code: 'DUPLICATE_RUC'}));
-    fixture.detectChanges();
-    const el = (fixture.nativeElement as HTMLElement).querySelector('#ruc-error');
-    expect(el?.textContent).toContain('RUC');
-  });
-
-  it('maps VALIDATION_FAILED field errors to the matching field', () => {
-    const fixture = setup();
-    error.set(
-      new ApiError({
-        status: 400,
-        code: 'VALIDATION_FAILED',
-        errors: [{field: 'username', message: 'ya existe'}],
-      }),
-    );
-    fixture.detectChanges();
-    const el = (fixture.nativeElement as HTMLElement).querySelector('#username-error');
-    expect(el?.textContent).toContain('ya existe');
-  });
-
   it('navigates to /sign-in after a successful registration', () => {
     const fixture = setup();
     registeredDealership.set(

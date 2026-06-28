@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {
   applyWhenValue,
@@ -17,12 +17,12 @@ import {HlmError, HlmFormField} from '@spartan-ng/helm/form-field';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 import {AuthStore} from '../../../application/auth.store';
 import {DealershipRegistration} from '../../../domain/model/dealership-registration.command';
-import {describeAuthError} from '../../auth-error-messages';
 
 /**
  * Dealership registration screen. Creates the dealership + first user via
- * {@link AuthStore}; on success it does NOT authenticate (the backend returns no
- * token), so it routes to /sign-in with a success flag.
+ * {@link AuthStore}; on success it routes to /sign-in with a success flag (the
+ * backend returns no token). Server errors are surfaced as toasts; only
+ * client-side validation is shown inline.
  */
 @Component({
   selector: 'app-sign-up',
@@ -35,7 +35,6 @@ export class SignUp extends BaseForm {
   private readonly router = inject(Router);
 
   protected readonly loading = this.authStore.loading;
-  protected readonly serverError = computed(() => describeAuthError(this.authStore.error()));
 
   protected readonly model = signal({
     name: '',
@@ -55,7 +54,6 @@ export class SignUp extends BaseForm {
     required(path.username, {message: this.messageFor('usuario', 'required')});
     required(path.password, {message: this.messageFor('contraseña', 'required')});
     minLength(path.password, 8, {message: this.messageFor('contraseña', 'minLength')});
-    // contactEmail is optional: validate its format only when it is not blank.
     applyWhenValue(
       path.contactEmail,
       value => value.trim() !== '',

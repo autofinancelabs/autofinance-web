@@ -28,10 +28,10 @@ describe('guestGuard', () => {
     expect(runGuard()).toBe(true);
   });
 
-  it('redirects authenticated users to /home', () => {
+  it('redirects authenticated users to /dashboard', () => {
     authenticated = true;
     const result = runGuard();
     expect(result).toBeInstanceOf(UrlTree);
-    expect((result as UrlTree).toString()).toContain('/home');
+    expect((result as UrlTree).toString()).toContain('/dashboard');
   });
 });

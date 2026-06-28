@@ -49,7 +49,7 @@ describe('errorInterceptor', () => {
     expect(notification.error).toHaveBeenCalledTimes(1);
   });
 
-  it('does NOT clear, redirect or toast on a 401 INVALID_CREDENTIALS (failed login)', () => {
+  it('toasts a 401 INVALID_CREDENTIALS but does NOT clear or redirect (failed login)', () => {
     let caught: ApiError | undefined;
     http.post('/api/sign-in', {}).subscribe({error: (e: ApiError) => (caught = e)});
 
@@ -59,12 +59,12 @@ describe('errorInterceptor', () => {
     );
 
     expect(caught?.code).toBe('INVALID_CREDENTIALS');
+    expect(notification.error).toHaveBeenCalledTimes(1);
     expect(tokenStorage.clear).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
-    expect(notification.error).not.toHaveBeenCalled();
   });
 
-  it('populates fieldErrors on a 400 VALIDATION_FAILED without toasting', () => {
+  it('toasts a 400 VALIDATION_FAILED and rethrows the ApiError', () => {
     let caught: ApiError | undefined;
     http.post('/api/dealerships', {}).subscribe({error: (e: ApiError) => (caught = e)});
 
@@ -79,7 +79,7 @@ describe('errorInterceptor', () => {
 
     expect(caught?.code).toBe('VALIDATION_FAILED');
     expect(caught?.fieldErrors).toEqual([{field: 'ruc', message: 'must be 11 digits'}]);
-    expect(notification.error).not.toHaveBeenCalled();
+    expect(notification.error).toHaveBeenCalledTimes(1);
   });
 
   it('toasts an operational error (500) and rethrows it', () => {

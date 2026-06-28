@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+.page {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: block;
+}
+
+.card--link {
+  text-decoration: none;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.card--link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -12px rgb(0 0 0 / 0.2);
+}
+
+.card--link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.card--soon {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card--link {
+    transition: none;
+  }
+}

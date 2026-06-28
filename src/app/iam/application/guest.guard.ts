@@ -4,11 +4,11 @@ import {AuthStore} from './auth.store';
 
 /**
  * Route guard for the auth screens (sign-in, sign-up): keeps already-authenticated
- * users out of them, redirecting to `/home`.
+ * users out of them, redirecting to `/dashboard`.
  */
 export const guestGuard: CanActivateFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  return authStore.isAuthenticated() ? router.createUrlTree(['/home']) : true;
+  return authStore.isAuthenticated() ? router.createUrlTree(['/dashboard']) : true;
 };

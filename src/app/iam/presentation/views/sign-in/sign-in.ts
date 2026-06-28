@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {form, FormField, required, submit} from '@angular/forms/signals';
 import {HlmButton} from '@spartan-ng/helm/button';
@@ -8,11 +8,12 @@ import {HlmError, HlmFormField} from '@spartan-ng/helm/form-field';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 import {AuthStore} from '../../../application/auth.store';
 import {Credentials} from '../../../domain/model/credentials.command';
-import {describeAuthError} from '../../auth-error-messages';
 
 /**
  * Sign-in screen. Authenticates via {@link AuthStore} and, once authenticated,
- * navigates to the `redirectTo` query param (or `/home`).
+ * navigates to the `redirectTo` query param (or `/dashboard`). Server errors are
+ * surfaced as toasts (by the error interceptor); only client-side validation is
+ * shown inline.
  */
 @Component({
   selector: 'app-sign-in',
@@ -26,11 +27,10 @@ export class SignIn extends BaseForm {
   private readonly route = inject(ActivatedRoute);
 
   protected readonly loading = this.authStore.loading;
-  protected readonly serverError = computed(() => describeAuthError(this.authStore.error()));
   protected readonly justRegistered =
     this.route.snapshot.queryParamMap.get('registered') === 'true';
 
-  private readonly redirectTo = this.route.snapshot.queryParamMap.get('redirectTo') ?? '/home';
+  private readonly redirectTo = this.route.snapshot.queryParamMap.get('redirectTo') ?? '/dashboard';
 
   protected readonly model = signal({identifier: '', password: ''});
   protected readonly f = form(this.model, path => {
@@ -40,8 +40,6 @@ export class SignIn extends BaseForm {
 
   constructor() {
     super();
-    // Navigate away as soon as a session exists (covers a fresh sign-in and an
-    // already-authenticated visit to /sign-in).
     effect(() => {
       if (this.authStore.isAuthenticated()) {
         void this.router.navigateByUrl(this.redirectTo);

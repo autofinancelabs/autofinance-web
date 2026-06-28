@@ -53,15 +53,6 @@ describe('SignIn', () => {
     expect(arg.password).toBe('s3cret');
   });
 
-  it('shows the invalid-credentials banner', () => {
-    const fixture = setup();
-    error.set(new ApiError({status: 401, code: 'INVALID_CREDENTIALS'}));
-    fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
-      'Usuario o contraseña incorrectos.',
-    );
-  });
-
   it('navigates to the redirectTo target once authenticated', () => {
     const fixture = setup({redirectTo: '/clients'});
     isAuthenticated.set(true);
@@ -69,11 +60,11 @@ describe('SignIn', () => {
     expect(router.navigateByUrl).toHaveBeenCalledWith('/clients');
   });
 
-  it('defaults the post-login redirect to /home', () => {
+  it('defaults the post-login redirect to /dashboard', () => {
     const fixture = setup();
     isAuthenticated.set(true);
     fixture.detectChanges();
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
   });
 
   it('disables the submit button while loading', () => {

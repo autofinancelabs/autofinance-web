@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {form, FormField, min, required, submit, validate} from '@angular/forms/signals';
 import {HlmButton} from '@spartan-ng/helm/button';
@@ -9,7 +9,6 @@ import {Currency} from '../../../../shared/domain/model/currency';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 import {VehicleOffersStore} from '../../../application/vehicle-offers.store';
 import {VehicleOfferDraft} from '../../../domain/model/vehicle-offer-draft.command';
-import {describeVehicleOfferError} from '../../vehicle-offer-error-messages';
 
 interface VehicleOfferModel {
   make: string;
@@ -23,7 +22,8 @@ interface VehicleOfferModel {
 
 /**
  * Create / edit form for a vehicle offer (Signal Forms). With a route `:id` it
- * preloads the offer for editing; otherwise it creates a new one.
+ * preloads the offer for editing; otherwise it creates a new one. Server errors
+ * are surfaced as toasts; only client-side validation is shown inline.
  */
 @Component({
   selector: 'app-vehicle-offer-form',
@@ -38,7 +38,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
 
   protected readonly currencies = [Currency.PEN, Currency.USD];
   protected readonly saving = this.store.saving;
-  protected readonly serverError = computed(() => describeVehicleOfferError(this.store.error()));
 
   protected readonly id = this.route.snapshot.paramMap.get('id');
   protected readonly isEdit = this.id !== null;
@@ -82,7 +81,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
 
   constructor() {
     super();
-    // Prefill from the loaded offer when editing.
     effect(() => {
       const offer = this.store.selected();
       if (offer !== null) {
@@ -97,7 +95,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
         });
       }
     });
-    // Navigate back to the list once a save succeeds.
     effect(() => {
       if (this.store.saved()) {
         void this.router.navigate(['/vehicle-offers']);

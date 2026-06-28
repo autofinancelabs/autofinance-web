@@ -9,10 +9,6 @@
   </p>
 }
 
-@if (serverError().formMessage) {
-  <p hlmError role="alert" class="text-center mt-4">{{ serverError().formMessage }}</p>
-}
-
 <form class="auth-form" (submit)="onSubmit($event)" novalidate>
   <div hlmFormField>
     <label hlmLabel for="identifier">Usuario o correo</label>

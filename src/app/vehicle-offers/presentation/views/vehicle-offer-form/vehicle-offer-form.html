@@ -8,10 +8,6 @@
     </p>
   </header>
 
-  @if (serverError().formMessage) {
-    <p hlmError role="alert">{{ serverError().formMessage }}</p>
-  }
-
   <form class="offer-form" (submit)="onSubmit($event)" novalidate>
     <div class="grid">
       <div hlmFormField>
@@ -20,16 +16,10 @@
           hlmInput
           id="make"
           [formField]="f.make"
-          [attr.aria-invalid]="
-            (f.make().touched() && f.make().invalid()) || serverError().fieldMessages['make']
-              ? 'true'
-              : null
-          "
+          [attr.aria-invalid]="f.make().touched() && f.make().invalid() ? 'true' : null"
         />
         @if (f.make().touched() && f.make().errors().length) {
           <span hlmError>{{ f.make().errors()[0].message }}</span>
-        } @else if (serverError().fieldMessages['make']) {
-          <span hlmError>{{ serverError().fieldMessages['make'] }}</span>
         }
       </div>
 
@@ -39,16 +29,10 @@
           hlmInput
           id="model"
           [formField]="f.model"
-          [attr.aria-invalid]="
-            (f.model().touched() && f.model().invalid()) || serverError().fieldMessages['model']
-              ? 'true'
-              : null
-          "
+          [attr.aria-invalid]="f.model().touched() && f.model().invalid() ? 'true' : null"
         />
         @if (f.model().touched() && f.model().errors().length) {
           <span hlmError>{{ f.model().errors()[0].message }}</span>
-        } @else if (serverError().fieldMessages['model']) {
-          <span hlmError>{{ serverError().fieldMessages['model'] }}</span>
         }
       </div>
 
@@ -60,16 +44,10 @@
           type="number"
           inputmode="numeric"
           [formField]="f.year"
-          [attr.aria-invalid]="
-            (f.year().touched() && f.year().invalid()) || serverError().fieldMessages['year']
-              ? 'true'
-              : null
-          "
+          [attr.aria-invalid]="f.year().touched() && f.year().invalid() ? 'true' : null"
         />
         @if (f.year().touched() && f.year().errors().length) {
           <span hlmError>{{ f.year().errors()[0].message }}</span>
-        } @else if (serverError().fieldMessages['year']) {
-          <span hlmError>{{ serverError().fieldMessages['year'] }}</span>
         }
       </div>
 
@@ -92,16 +70,10 @@
           step="0.01"
           class="font-mono tabular-nums"
           [formField]="f.salePrice"
-          [attr.aria-invalid]="
-            (f.salePrice().touched() && f.salePrice().invalid()) || serverError().fieldMessages['salePrice']
-              ? 'true'
-              : null
-          "
+          [attr.aria-invalid]="f.salePrice().touched() && f.salePrice().invalid() ? 'true' : null"
         />
         @if (f.salePrice().touched() && f.salePrice().errors().length) {
           <span hlmError>{{ f.salePrice().errors()[0].message }}</span>
-        } @else if (serverError().fieldMessages['salePrice']) {
-          <span hlmError>{{ serverError().fieldMessages['salePrice'] }}</span>
         }
       </div>
 

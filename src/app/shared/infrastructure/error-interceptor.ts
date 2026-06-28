@@ -8,18 +8,12 @@ import {ApiErrorCode} from './api-error-code';
 import {NotificationService} from './notification.service';
 
 /**
- * Converts every failed HTTP response into a typed {@link ApiError} (parsed from
- * the RFC 9457 body) and rethrows it, so callers branch on the stable `code`.
+ * Converts every failed HTTP response into a typed {@link ApiError}, surfaces it
+ * as a global toast, and rethrows it.
  *
- * Error UX policy:
- *  - **Operational** failures (network, 5xx, 403/404/405, expired session) are
- *    surfaced as a global toast here — they aren't tied to a form field.
- *  - **Input/validation** failures (400 VALIDATION_FAILED / INVALID_*, 409
- *    duplicates, 401 INVALID_CREDENTIALS) are NOT toasted: the view renders them
- *    inline next to the offending field.
- *
- * On `401 UNAUTHENTICATED` it also clears the stored token and redirects to
- * `/sign-in`.
+ * Error UX policy: **all backend errors are toasts**; only client-side (Signal
+ * Forms) validation is shown inline next to the field. On `401 UNAUTHENTICATED`
+ * it also clears the stored token and redirects to `/sign-in`.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenStorage = inject(TokenStorage);
@@ -35,11 +29,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         void router.navigate(['/sign-in']);
       }
 
-      const operationalMessage = operationalMessageFor(apiError);
-      if (operationalMessage !== null) {
-        notification.error(operationalMessage);
-      }
-
+      notification.error(messageFor(apiError));
       return throwError(() => apiError);
     }),
   );
@@ -58,19 +48,29 @@ function toApiError(error: unknown): ApiError {
   });
 }
 
-/**
- * Returns the toast copy for an operational error, or `null` when the error is an
- * input/validation failure that the view handles inline.
- */
-function operationalMessageFor(error: ApiError): string | null {
+/** Maps an {@link ApiError} to Spanish toast copy (by stable code, then status). */
+function messageFor(error: ApiError): string {
+  switch (error.code) {
+    case ApiErrorCode.InvalidCredentials:
+      return 'Usuario o contraseña incorrectos.';
+    case ApiErrorCode.DuplicateRuc:
+      return 'Ya existe una concesionaria con este RUC.';
+    case ApiErrorCode.DuplicateEmail:
+      return 'Este correo electrónico ya está registrado.';
+    case ApiErrorCode.DuplicateUsername:
+      return 'Este nombre de usuario ya está en uso.';
+    case ApiErrorCode.InvalidVehicleOffer:
+      return 'El precio de venta debe ser mayor que 0.';
+    case ApiErrorCode.ValidationFailed:
+      return 'Revisa los datos del formulario e inténtalo de nuevo.';
+    case ApiErrorCode.Unauthenticated:
+      return 'Tu sesión expiró. Inicia sesión nuevamente.';
+    case ApiErrorCode.AccessDenied:
+      return 'No tienes permiso para realizar esta acción.';
+  }
+
   if (error.status === 0) {
     return 'No se pudo conectar con el servidor. Revisa tu conexión.';
-  }
-  if (error.status === 401 && error.is(ApiErrorCode.Unauthenticated)) {
-    return 'Tu sesión expiró. Inicia sesión nuevamente.';
-  }
-  if (error.status === 403) {
-    return 'No tienes permiso para realizar esta acción.';
   }
   if (error.status === 404) {
     return 'El recurso solicitado no existe.';
@@ -81,5 +81,5 @@ function operationalMessageFor(error: ApiError): string | null {
   if (error.status >= 500) {
     return 'Ocurrió un error en el servidor. Inténtalo de nuevo.';
   }
-  return null;
+  return 'Ocurrió un error. Inténtalo de nuevo.';
 }

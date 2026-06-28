@@ -3,10 +3,6 @@
   Registra tu concesionaria y tu usuario administrador.
 </p>
 
-@if (serverError().formMessage) {
-  <p hlmError role="alert" class="text-center mt-4">{{ serverError().formMessage }}</p>
-}
-
 <form class="auth-form" (submit)="onSubmit($event)" novalidate>
   <div hlmFormField>
     <label hlmLabel for="name">Nombre de la concesionaria</label>
@@ -15,21 +11,13 @@
       id="name"
       autocomplete="organization"
       [formField]="f.name"
-      [attr.aria-invalid]="
-        (f.name().touched() && f.name().invalid()) || serverError().fieldMessages['name']
-          ? 'true'
-          : null
-      "
+      [attr.aria-invalid]="f.name().touched() && f.name().invalid() ? 'true' : null"
       [attr.aria-describedby]="
-        (f.name().touched() && f.name().errors().length) || serverError().fieldMessages['name']
-          ? 'name-error'
-          : null
+        f.name().touched() && f.name().errors().length ? 'name-error' : null
       "
     />
     @if (f.name().touched() && f.name().errors().length) {
       <span hlmError id="name-error">{{ f.name().errors()[0].message }}</span>
-    } @else if (serverError().fieldMessages['name']) {
-      <span hlmError id="name-error">{{ serverError().fieldMessages['name'] }}</span>
     }
   </div>
 
@@ -41,21 +29,11 @@
       inputmode="numeric"
       autocomplete="off"
       [formField]="f.ruc"
-      [attr.aria-invalid]="
-        (f.ruc().touched() && f.ruc().invalid()) || serverError().fieldMessages['ruc']
-          ? 'true'
-          : null
-      "
-      [attr.aria-describedby]="
-        (f.ruc().touched() && f.ruc().errors().length) || serverError().fieldMessages['ruc']
-          ? 'ruc-error'
-          : null
-      "
+      [attr.aria-invalid]="f.ruc().touched() && f.ruc().invalid() ? 'true' : null"
+      [attr.aria-describedby]="f.ruc().touched() && f.ruc().errors().length ? 'ruc-error' : null"
     />
     @if (f.ruc().touched() && f.ruc().errors().length) {
       <span hlmError id="ruc-error">{{ f.ruc().errors()[0].message }}</span>
-    } @else if (serverError().fieldMessages['ruc']) {
-      <span hlmError id="ruc-error">{{ serverError().fieldMessages['ruc'] }}</span>
     }
   </div>
 
@@ -67,23 +45,13 @@
       type="email"
       autocomplete="email"
       [formField]="f.contactEmail"
-      [attr.aria-invalid]="
-        (f.contactEmail().touched() && f.contactEmail().invalid()) ||
-        serverError().fieldMessages['contactEmail']
-          ? 'true'
-          : null
-      "
+      [attr.aria-invalid]="f.contactEmail().touched() && f.contactEmail().invalid() ? 'true' : null"
       [attr.aria-describedby]="
-        (f.contactEmail().touched() && f.contactEmail().errors().length) ||
-        serverError().fieldMessages['contactEmail']
-          ? 'contactEmail-error'
-          : null
+        f.contactEmail().touched() && f.contactEmail().errors().length ? 'contactEmail-error' : null
       "
     />
     @if (f.contactEmail().touched() && f.contactEmail().errors().length) {
       <span hlmError id="contactEmail-error">{{ f.contactEmail().errors()[0].message }}</span>
-    } @else if (serverError().fieldMessages['contactEmail']) {
-      <span hlmError id="contactEmail-error">{{ serverError().fieldMessages['contactEmail'] }}</span>
     }
   </div>
 
@@ -95,23 +63,13 @@
       type="email"
       autocomplete="email"
       [formField]="f.userEmail"
-      [attr.aria-invalid]="
-        (f.userEmail().touched() && f.userEmail().invalid()) ||
-        serverError().fieldMessages['userEmail']
-          ? 'true'
-          : null
-      "
+      [attr.aria-invalid]="f.userEmail().touched() && f.userEmail().invalid() ? 'true' : null"
       [attr.aria-describedby]="
-        (f.userEmail().touched() && f.userEmail().errors().length) ||
-        serverError().fieldMessages['userEmail']
-          ? 'userEmail-error'
-          : null
+        f.userEmail().touched() && f.userEmail().errors().length ? 'userEmail-error' : null
       "
     />
     @if (f.userEmail().touched() && f.userEmail().errors().length) {
       <span hlmError id="userEmail-error">{{ f.userEmail().errors()[0].message }}</span>
-    } @else if (serverError().fieldMessages['userEmail']) {
-      <span hlmError id="userEmail-error">{{ serverError().fieldMessages['userEmail'] }}</span>
     }
   </div>
 
@@ -122,22 +80,13 @@
       id="username"
       autocomplete="username"
       [formField]="f.username"
-      [attr.aria-invalid]="
-        (f.username().touched() && f.username().invalid()) || serverError().fieldMessages['username']
-          ? 'true'
-          : null
-      "
+      [attr.aria-invalid]="f.username().touched() && f.username().invalid() ? 'true' : null"
       [attr.aria-describedby]="
-        (f.username().touched() && f.username().errors().length) ||
-        serverError().fieldMessages['username']
-          ? 'username-error'
-          : null
+        f.username().touched() && f.username().errors().length ? 'username-error' : null
       "
     />
     @if (f.username().touched() && f.username().errors().length) {
       <span hlmError id="username-error">{{ f.username().errors()[0].message }}</span>
-    } @else if (serverError().fieldMessages['username']) {
-      <span hlmError id="username-error">{{ serverError().fieldMessages['username'] }}</span>
     }
   </div>
 
@@ -149,22 +98,13 @@
       type="password"
       autocomplete="new-password"
       [formField]="f.password"
-      [attr.aria-invalid]="
-        (f.password().touched() && f.password().invalid()) || serverError().fieldMessages['password']
-          ? 'true'
-          : null
-      "
+      [attr.aria-invalid]="f.password().touched() && f.password().invalid() ? 'true' : null"
       [attr.aria-describedby]="
-        (f.password().touched() && f.password().errors().length) ||
-        serverError().fieldMessages['password']
-          ? 'password-error'
-          : null
+        f.password().touched() && f.password().errors().length ? 'password-error' : null
       "
     />
     @if (f.password().touched() && f.password().errors().length) {
       <span hlmError id="password-error">{{ f.password().errors()[0].message }}</span>
-    } @else if (serverError().fieldMessages['password']) {
-      <span hlmError id="password-error">{{ serverError().fieldMessages['password'] }}</span>
     }
   </div>
 

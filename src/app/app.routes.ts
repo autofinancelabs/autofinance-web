@@ -2,10 +2,10 @@ import {Routes} from '@angular/router';
 import {authGuard} from './iam/application/auth.guard';
 import {guestGuard} from './iam/application/guest.guard';
 
-const home = () => import('./shared/presentation/views/home/home').then(m => m.Home);
-const about = () => import('./shared/presentation/views/about/about').then(m => m.About);
-const layout = () =>
-  import('./shared/presentation/components/layout/layout').then(m => m.Layout);
+const dashboard = () =>
+  import('./shared/presentation/views/dashboard/dashboard').then(m => m.Dashboard);
+const appShell = () =>
+  import('./shared/presentation/components/app-shell/app-shell').then(m => m.AppShell);
 const authLayout = () =>
   import('./shared/presentation/components/auth-layout/auth-layout').then(m => m.AuthLayout);
 const iamRoutes = () => import('./iam/presentation/iam.routes').then(m => m.iamRoutes);
@@ -17,24 +17,20 @@ const pageNotFound = () =>
 /**
  * Root router with two layout shells:
  *  - the minimal {@link AuthLayout} for the IAM auth screens (guarded by
- *    `guestGuard`: authenticated users are redirected to /home);
- *  - the main {@link Layout} (nav + footer), guarded by `authGuard`, for the
+ *    `guestGuard`);
+ *  - the {@link AppShell} (topbar + sidebar), guarded by `authGuard`, for the
  *    authenticated app. Bounded contexts lazy-load their routes here.
- *
- * Both are empty-path parents: the router tries the auth shell first and falls
- * through to the main shell when no IAM child matches.
  */
 export const routes: Routes = [
   {path: '', loadComponent: authLayout, loadChildren: iamRoutes, canActivate: [guestGuard]},
   {
     path: '',
-    loadComponent: layout,
+    loadComponent: appShell,
     canActivate: [authGuard],
     children: [
-      {path: 'home', loadComponent: home},
-      {path: 'about', loadComponent: about},
+      {path: 'dashboard', loadComponent: dashboard},
       {path: 'vehicle-offers', loadChildren: vehicleOffersRoutes},
-      {path: '', redirectTo: 'home', pathMatch: 'full'},
+      {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
     ],
   },
   {path: '**', loadComponent: pageNotFound},
