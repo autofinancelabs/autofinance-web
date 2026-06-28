@@ -21,14 +21,14 @@ describe('Toaster', () => {
 
   it('renders the toast message', () => {
     const fixture = setup();
-    toasts.set([{id: 1, message: 'Algo falló', variant: 'error'}]);
+    toasts.set([{id: 1, message: 'Algo falló', variant: 'error', leaving: false}]);
     fixture.detectChanges();
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Algo falló');
   });
 
   it('dismiss button calls NotificationService.dismiss with the id', () => {
     const fixture = setup();
-    toasts.set([{id: 7, message: 'x', variant: 'info'}]);
+    toasts.set([{id: 7, message: 'x', variant: 'info', leaving: false}]);
     fixture.detectChanges();
     const close = (fixture.nativeElement as HTMLElement).querySelector(
       '.toast__close',
