@@ -1,0 +1,179 @@
+<h1 class="text-xl font-medium tracking-tight text-center">Crear cuenta</h1>
+<p class="text-muted-foreground text-sm text-center mt-1">
+  Registra tu concesionaria y tu usuario administrador.
+</p>
+
+@if (serverError().formMessage) {
+  <p hlmError role="alert" class="text-center mt-4">{{ serverError().formMessage }}</p>
+}
+
+<form class="auth-form" (submit)="onSubmit($event)" novalidate>
+  <div hlmFormField>
+    <label hlmLabel for="name">Nombre de la concesionaria</label>
+    <input
+      hlmInput
+      id="name"
+      autocomplete="organization"
+      [formField]="f.name"
+      [attr.aria-invalid]="
+        (f.name().touched() && f.name().invalid()) || serverError().fieldMessages['name']
+          ? 'true'
+          : null
+      "
+      [attr.aria-describedby]="
+        (f.name().touched() && f.name().errors().length) || serverError().fieldMessages['name']
+          ? 'name-error'
+          : null
+      "
+    />
+    @if (f.name().touched() && f.name().errors().length) {
+      <span hlmError id="name-error">{{ f.name().errors()[0].message }}</span>
+    } @else if (serverError().fieldMessages['name']) {
+      <span hlmError id="name-error">{{ serverError().fieldMessages['name'] }}</span>
+    }
+  </div>
+
+  <div hlmFormField>
+    <label hlmLabel for="ruc">RUC</label>
+    <input
+      hlmInput
+      id="ruc"
+      inputmode="numeric"
+      autocomplete="off"
+      [formField]="f.ruc"
+      [attr.aria-invalid]="
+        (f.ruc().touched() && f.ruc().invalid()) || serverError().fieldMessages['ruc']
+          ? 'true'
+          : null
+      "
+      [attr.aria-describedby]="
+        (f.ruc().touched() && f.ruc().errors().length) || serverError().fieldMessages['ruc']
+          ? 'ruc-error'
+          : null
+      "
+    />
+    @if (f.ruc().touched() && f.ruc().errors().length) {
+      <span hlmError id="ruc-error">{{ f.ruc().errors()[0].message }}</span>
+    } @else if (serverError().fieldMessages['ruc']) {
+      <span hlmError id="ruc-error">{{ serverError().fieldMessages['ruc'] }}</span>
+    }
+  </div>
+
+  <div hlmFormField>
+    <label hlmLabel for="contactEmail">Correo de contacto (opcional)</label>
+    <input
+      hlmInput
+      id="contactEmail"
+      type="email"
+      autocomplete="email"
+      [formField]="f.contactEmail"
+      [attr.aria-invalid]="
+        (f.contactEmail().touched() && f.contactEmail().invalid()) ||
+        serverError().fieldMessages['contactEmail']
+          ? 'true'
+          : null
+      "
+      [attr.aria-describedby]="
+        (f.contactEmail().touched() && f.contactEmail().errors().length) ||
+        serverError().fieldMessages['contactEmail']
+          ? 'contactEmail-error'
+          : null
+      "
+    />
+    @if (f.contactEmail().touched() && f.contactEmail().errors().length) {
+      <span hlmError id="contactEmail-error">{{ f.contactEmail().errors()[0].message }}</span>
+    } @else if (serverError().fieldMessages['contactEmail']) {
+      <span hlmError id="contactEmail-error">{{ serverError().fieldMessages['contactEmail'] }}</span>
+    }
+  </div>
+
+  <div hlmFormField>
+    <label hlmLabel for="userEmail">Correo del usuario</label>
+    <input
+      hlmInput
+      id="userEmail"
+      type="email"
+      autocomplete="email"
+      [formField]="f.userEmail"
+      [attr.aria-invalid]="
+        (f.userEmail().touched() && f.userEmail().invalid()) ||
+        serverError().fieldMessages['userEmail']
+          ? 'true'
+          : null
+      "
+      [attr.aria-describedby]="
+        (f.userEmail().touched() && f.userEmail().errors().length) ||
+        serverError().fieldMessages['userEmail']
+          ? 'userEmail-error'
+          : null
+      "
+    />
+    @if (f.userEmail().touched() && f.userEmail().errors().length) {
+      <span hlmError id="userEmail-error">{{ f.userEmail().errors()[0].message }}</span>
+    } @else if (serverError().fieldMessages['userEmail']) {
+      <span hlmError id="userEmail-error">{{ serverError().fieldMessages['userEmail'] }}</span>
+    }
+  </div>
+
+  <div hlmFormField>
+    <label hlmLabel for="username">Nombre de usuario</label>
+    <input
+      hlmInput
+      id="username"
+      autocomplete="username"
+      [formField]="f.username"
+      [attr.aria-invalid]="
+        (f.username().touched() && f.username().invalid()) || serverError().fieldMessages['username']
+          ? 'true'
+          : null
+      "
+      [attr.aria-describedby]="
+        (f.username().touched() && f.username().errors().length) ||
+        serverError().fieldMessages['username']
+          ? 'username-error'
+          : null
+      "
+    />
+    @if (f.username().touched() && f.username().errors().length) {
+      <span hlmError id="username-error">{{ f.username().errors()[0].message }}</span>
+    } @else if (serverError().fieldMessages['username']) {
+      <span hlmError id="username-error">{{ serverError().fieldMessages['username'] }}</span>
+    }
+  </div>
+
+  <div hlmFormField>
+    <label hlmLabel for="password">Contraseña</label>
+    <input
+      hlmInput
+      id="password"
+      type="password"
+      autocomplete="new-password"
+      [formField]="f.password"
+      [attr.aria-invalid]="
+        (f.password().touched() && f.password().invalid()) || serverError().fieldMessages['password']
+          ? 'true'
+          : null
+      "
+      [attr.aria-describedby]="
+        (f.password().touched() && f.password().errors().length) ||
+        serverError().fieldMessages['password']
+          ? 'password-error'
+          : null
+      "
+    />
+    @if (f.password().touched() && f.password().errors().length) {
+      <span hlmError id="password-error">{{ f.password().errors()[0].message }}</span>
+    } @else if (serverError().fieldMessages['password']) {
+      <span hlmError id="password-error">{{ serverError().fieldMessages['password'] }}</span>
+    }
+  </div>
+
+  <button hlmBtn type="submit" [disabled]="loading()">
+    {{ loading() ? 'Registrando…' : 'Crear cuenta' }}
+  </button>
+</form>
+
+<p class="text-sm text-center mt-4">
+  ¿Ya tienes cuenta?
+  <a routerLink="/sign-in" class="text-primary underline-offset-4 hover:underline">Inicia sesión</a>
+</p>

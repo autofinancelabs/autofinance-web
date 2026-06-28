@@ -1,0 +1,122 @@
+:host {
+  display: block;
+}
+
+.auth-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Brand panel: a fixed deep-teal gradient surface (independent of light/dark
+   theme) so the dark-variant logo and light copy always read with strong
+   contrast. The gradient is derived from the brand --primary token. */
+.brand-panel {
+  color: oklch(0.985 0.005 200);
+  background-image: linear-gradient(
+    155deg,
+    color-mix(in oklch, var(--primary) 82%, black),
+    color-mix(in oklch, var(--primary) 34%, black)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.brand-content {
+  width: 100%;
+  max-width: 26rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  height: auto;
+}
+
+.brand-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.brand-tagline {
+  margin: 0;
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brand-points {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.brand-points li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  opacity: 0.92;
+}
+
+.brand-points li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: oklch(0.985 0.005 200 / 0.85);
+}
+
+.form-panel {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: var(--background);
+}
+
+.form-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.form-content {
+  width: 100%;
+  max-width: 22rem;
+}
+
+/* Dark mode: deepen the panel so the dark-variant logo (esp. its lower chevron)
+   stands out instead of blending into a mid-teal background. */
+:host-context(.dark) .brand-panel {
+  background-image: linear-gradient(
+    155deg,
+    color-mix(in oklch, var(--primary) 62%, black),
+    color-mix(in oklch, var(--primary) 32%, black)
+  );
+}
+
+/* Desktop: two columns side by side, each full height. */
+@media (min-width: 768px) {
+  .auth-shell {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+  }
+
+  .brand-panel {
+    padding: 3rem;
+  }
+
+  .brand-points {
+    display: flex;
+  }
+}

@@ -14,7 +14,10 @@
     "paths": {
       "@spartan-ng/helm/button": ["./src/app/shared/presentation/ui/button/src/index.ts"],
       "@spartan-ng/helm/utils": ["./src/app/shared/presentation/ui/utils/src/index.ts"],
-      "@spartan-ng/helm/card": ["./src/app/shared/presentation/ui/card/src/index.ts"]
+      "@spartan-ng/helm/card": ["./src/app/shared/presentation/ui/card/src/index.ts"],
+      "@spartan-ng/helm/input": ["./src/app/shared/presentation/ui/input/src/index.ts"],
+      "@spartan-ng/helm/label": ["./src/app/shared/presentation/ui/label/src/index.ts"],
+      "@spartan-ng/helm/form-field": ["./src/app/shared/presentation/ui/form-field/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

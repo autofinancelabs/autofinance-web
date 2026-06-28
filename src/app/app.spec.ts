@@ -15,10 +15,10 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the AutoFinance shell', () => {
+  it('should render the routed outlet shell', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('AutoFinance');
+    expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 });

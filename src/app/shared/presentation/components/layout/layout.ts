@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {FooterContent} from '../footer-content/footer-content';
+import {ThemeToggle} from '../theme-toggle/theme-toggle';
 
 /**
  * Application shell of the shared kernel: top navigation, the routed content
@@ -9,7 +10,7 @@ import {FooterContent} from '../footer-content/footer-content';
  */
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, FooterContent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, FooterContent, ThemeToggle],
   templateUrl: './layout.html',
   styleUrl: './layout.css'
 })

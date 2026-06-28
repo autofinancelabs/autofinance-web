@@ -1,11 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>AutofinanceWeb</title>
+  <title>AutoFinance</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    // Apply the persisted/system theme before bootstrap to avoid a flash.
+    (function () {
+      try {
+        var stored = localStorage.getItem('autofinance.theme');
+        var dark = stored ? stored === 'dark'
+          : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.classList.add('dark');
+      } catch (e) { /* no-op */ }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>
