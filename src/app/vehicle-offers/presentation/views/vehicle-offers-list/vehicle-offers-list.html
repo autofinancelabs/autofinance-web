@@ -1,4 +1,6 @@
 <div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
   <header class="page-header">
     <div>
       <h1 class="text-2xl font-medium tracking-tight">Ofertas vehiculares</h1>
@@ -6,7 +8,23 @@
         Vehículos disponibles para financiar.
       </p>
     </div>
-    <a hlmBtn routerLink="/vehicle-offers/new">Nueva oferta</a>
+    <a hlmBtn routerLink="/vehicle-offers/new">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nueva oferta
+    </a>
   </header>
 
   @if (loading()) {
@@ -17,60 +35,88 @@
       <a hlmBtn variant="outline" routerLink="/vehicle-offers/new">Registrar la primera</a>
     </div>
   } @else {
-    <div class="table-wrapper">
-      <table class="offers-table">
-        <thead>
-          <tr>
-            <th scope="col">Vehículo</th>
-            <th scope="col">Año</th>
-            <th scope="col" class="num">Precio de venta</th>
-            <th scope="col">Plan</th>
-            <th scope="col" class="actions">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (offer of offers(); track offer.id) {
+    <div class="content-grid">
+      <div class="table-wrapper">
+        <table class="offers-table">
+          <thead>
             <tr>
-              <td>{{ offer.make }} {{ offer.model }}</td>
-              <td class="num">{{ offer.year }}</td>
-              <td class="num font-mono tabular-nums">{{ offer.salePrice | money }}</td>
-              <td>
-                @if (offer.plan; as plan) {
-                  {{ plan.name }} ({{ plan.installments }})
-                } @else {
-                  <span class="text-muted-foreground">—</span>
-                }
-              </td>
-              <td class="actions">
-                <a
-                  hlmBtn
-                  variant="ghost"
-                  size="icon-sm"
-                  [routerLink]="['/vehicle-offers', offer.id, 'edit']"
-                  brnTooltip="Editar"
-                  aria-label="Editar oferta"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                  </svg>
-                </a>
-              </td>
+              <th scope="col">Vehículo</th>
+              <th scope="col">Año</th>
+              <th scope="col" class="num">Precio de venta</th>
+              <th scope="col">Plan</th>
+              <th scope="col" class="num">Cuotas</th>
+              <th scope="col" class="actions">Acciones</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (offer of offers(); track offer.id) {
+              <tr>
+                <td>{{ offer.make }} {{ offer.model }}</td>
+                <td class="num">{{ offer.year }}</td>
+                <td class="num font-mono tabular-nums">{{ offer.salePrice | money }}</td>
+                <td>
+                  @if (offer.plan; as plan) {
+                    {{ plan.name }}
+                  } @else {
+                    <span class="text-muted-foreground">—</span>
+                  }
+                </td>
+                <td class="num">
+                  @if (offer.plan; as plan) {
+                    <span class="font-mono tabular-nums">{{ plan.installments }}</span>
+                  } @else {
+                    <span class="text-muted-foreground">—</span>
+                  }
+                </td>
+                <td class="actions">
+                  <a
+                    hlmBtn
+                    variant="ghost"
+                    size="icon-sm"
+                    [routerLink]="['/vehicle-offers', offer.id, 'edit']"
+                    brnTooltip="Editar"
+                    aria-label="Editar oferta"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="summary" aria-label="Resumen">
+        <div class="metric">
+          <span class="metric__label">Ofertas registradas</span>
+          <span class="metric__value tabular-nums">{{ total() }}</span>
+        </div>
+        <div class="metric metric--list">
+          <span class="metric__label">Por moneda</span>
+          <div class="metric__row">
+            <span>PEN</span>
+            <span class="tabular-nums">{{ penCount() }}</span>
+          </div>
+          <div class="metric__row">
+            <span>USD</span>
+            <span class="tabular-nums">{{ usdCount() }}</span>
+          </div>
+        </div>
+      </aside>
     </div>
   }
 </div>

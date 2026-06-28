@@ -1,4 +1,4 @@
-import {Component, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {form, FormField, min, required, submit, validate} from '@angular/forms/signals';
 import {HlmButton} from '@spartan-ng/helm/button';
@@ -6,7 +6,10 @@ import {HlmInput} from '@spartan-ng/helm/input';
 import {HlmLabel} from '@spartan-ng/helm/label';
 import {HlmError, HlmFormField} from '@spartan-ng/helm/form-field';
 import {Currency} from '../../../../shared/domain/model/currency';
+import {Money} from '../../../../shared/domain/model/money';
+import {Breadcrumbs} from '../../../../shared/presentation/components/breadcrumbs/breadcrumbs';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
+import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
 import {VehicleOffersStore} from '../../../application/vehicle-offers.store';
 import {VehicleOfferDraft} from '../../../domain/model/vehicle-offer-draft.command';
 
@@ -27,7 +30,17 @@ interface VehicleOfferModel {
  */
 @Component({
   selector: 'app-vehicle-offer-form',
-  imports: [FormField, RouterLink, HlmInput, HlmLabel, HlmError, HlmFormField, HlmButton],
+  imports: [
+    FormField,
+    RouterLink,
+    HlmInput,
+    HlmLabel,
+    HlmError,
+    HlmFormField,
+    HlmButton,
+    MoneyPipe,
+    Breadcrumbs,
+  ],
   templateUrl: './vehicle-offer-form.html',
   styleUrl: './vehicle-offer-form.css',
 })
@@ -41,6 +54,28 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
 
   protected readonly id = this.route.snapshot.paramMap.get('id');
   protected readonly isEdit = this.id !== null;
+
+  protected readonly breadcrumbs = [
+    {label: 'Dashboard', link: '/dashboard'},
+    {label: 'Vehículos', link: '/vehicle-offers'},
+    {label: this.id !== null ? 'Editar oferta' : 'Nueva oferta'},
+  ];
+
+  /** Live preview of the offer, derived from the form model. */
+  protected readonly preview = computed(() => {
+    const value = this.model();
+    const title = `${value.make} ${value.model}`.trim();
+    const hasPlan = value.planName.trim() !== '' && value.planInstallments !== null;
+    return {
+      title: title === '' ? 'Nueva oferta' : title,
+      year: value.year,
+      price:
+        value.salePrice !== null
+          ? new Money({amount: value.salePrice, currency: value.currency})
+          : null,
+      planLabel: hasPlan ? `${value.planName.trim()} · ${value.planInstallments} cuotas` : null,
+    };
+  });
 
   protected readonly model = signal<VehicleOfferModel>({
     make: '',
