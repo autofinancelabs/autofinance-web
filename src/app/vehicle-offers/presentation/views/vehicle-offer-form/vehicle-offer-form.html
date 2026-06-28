@@ -1,0 +1,138 @@
+<div class="page">
+  <header>
+    <h1 class="text-2xl font-medium tracking-tight">
+      {{ isEdit ? 'Editar oferta' : 'Nueva oferta' }}
+    </h1>
+    <p class="text-muted-foreground text-sm">
+      Datos del vehículo y su precio de venta.
+    </p>
+  </header>
+
+  @if (serverError().formMessage) {
+    <p hlmError role="alert">{{ serverError().formMessage }}</p>
+  }
+
+  <form class="offer-form" (submit)="onSubmit($event)" novalidate>
+    <div class="grid">
+      <div hlmFormField>
+        <label hlmLabel for="make">Marca</label>
+        <input
+          hlmInput
+          id="make"
+          [formField]="f.make"
+          [attr.aria-invalid]="
+            (f.make().touched() && f.make().invalid()) || serverError().fieldMessages['make']
+              ? 'true'
+              : null
+          "
+        />
+        @if (f.make().touched() && f.make().errors().length) {
+          <span hlmError>{{ f.make().errors()[0].message }}</span>
+        } @else if (serverError().fieldMessages['make']) {
+          <span hlmError>{{ serverError().fieldMessages['make'] }}</span>
+        }
+      </div>
+
+      <div hlmFormField>
+        <label hlmLabel for="model">Modelo</label>
+        <input
+          hlmInput
+          id="model"
+          [formField]="f.model"
+          [attr.aria-invalid]="
+            (f.model().touched() && f.model().invalid()) || serverError().fieldMessages['model']
+              ? 'true'
+              : null
+          "
+        />
+        @if (f.model().touched() && f.model().errors().length) {
+          <span hlmError>{{ f.model().errors()[0].message }}</span>
+        } @else if (serverError().fieldMessages['model']) {
+          <span hlmError>{{ serverError().fieldMessages['model'] }}</span>
+        }
+      </div>
+
+      <div hlmFormField>
+        <label hlmLabel for="year">Año</label>
+        <input
+          hlmInput
+          id="year"
+          type="number"
+          inputmode="numeric"
+          [formField]="f.year"
+          [attr.aria-invalid]="
+            (f.year().touched() && f.year().invalid()) || serverError().fieldMessages['year']
+              ? 'true'
+              : null
+          "
+        />
+        @if (f.year().touched() && f.year().errors().length) {
+          <span hlmError>{{ f.year().errors()[0].message }}</span>
+        } @else if (serverError().fieldMessages['year']) {
+          <span hlmError>{{ serverError().fieldMessages['year'] }}</span>
+        }
+      </div>
+
+      <div hlmFormField>
+        <label hlmLabel for="currency">Moneda</label>
+        <select hlmInput id="currency" [formField]="f.currency">
+          @for (option of currencies; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
+
+      <div hlmFormField class="col-span-full">
+        <label hlmLabel for="salePrice">Precio de venta</label>
+        <input
+          hlmInput
+          id="salePrice"
+          type="number"
+          inputmode="decimal"
+          step="0.01"
+          class="font-mono tabular-nums"
+          [formField]="f.salePrice"
+          [attr.aria-invalid]="
+            (f.salePrice().touched() && f.salePrice().invalid()) || serverError().fieldMessages['salePrice']
+              ? 'true'
+              : null
+          "
+        />
+        @if (f.salePrice().touched() && f.salePrice().errors().length) {
+          <span hlmError>{{ f.salePrice().errors()[0].message }}</span>
+        } @else if (serverError().fieldMessages['salePrice']) {
+          <span hlmError>{{ serverError().fieldMessages['salePrice'] }}</span>
+        }
+      </div>
+
+      <div hlmFormField>
+        <label hlmLabel for="planName">Plan (opcional)</label>
+        <input hlmInput id="planName" placeholder="Plan 36" [formField]="f.planName" />
+        @if (f.planName().touched() && f.planName().errors().length) {
+          <span hlmError>{{ f.planName().errors()[0].message }}</span>
+        }
+      </div>
+
+      <div hlmFormField>
+        <label hlmLabel for="planInstallments">Cuotas del plan</label>
+        <input
+          hlmInput
+          id="planInstallments"
+          type="number"
+          inputmode="numeric"
+          [formField]="f.planInstallments"
+        />
+        @if (f.planInstallments().touched() && f.planInstallments().errors().length) {
+          <span hlmError>{{ f.planInstallments().errors()[0].message }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="actions">
+      <a hlmBtn variant="outline" routerLink="/vehicle-offers">Cancelar</a>
+      <button hlmBtn type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear oferta' }}
+      </button>
+    </div>
+  </form>
+</div>

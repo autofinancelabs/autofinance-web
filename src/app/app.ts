@@ -1,10 +1,11 @@
 import {Component, inject} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
+import {Toaster} from './shared/presentation/components/toaster/toaster';
 import {ThemeStore} from './shared/presentation/theme/theme.store';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Toaster],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -6,7 +6,7 @@ import { classes } from '@spartan-ng/helm/utils';
  * Pairs with the Signal Forms `[formField]` directive for binding.
  */
 @Directive({
-  selector: 'input[hlmInput], textarea[hlmInput]',
+  selector: 'input[hlmInput], textarea[hlmInput], select[hlmInput]',
   exportAs: 'hlmInput',
   host: { 'data-slot': 'input' },
 })

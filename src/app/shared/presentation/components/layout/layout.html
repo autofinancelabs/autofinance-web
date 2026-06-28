@@ -5,7 +5,15 @@
       <a [routerLink]="option.link" routerLinkActive="active">{{ option.label }}</a>
     }
   </nav>
-  <app-theme-toggle/>
+  <div class="layout-actions">
+    @if (currentUser(); as user) {
+      <span class="layout-user">{{ user.username }}</span>
+      <button hlmBtn variant="ghost" size="sm" type="button" (click)="signOut()">
+        Cerrar sesión
+      </button>
+    }
+    <app-theme-toggle/>
+  </div>
 </header>
 <main>
   <router-outlet/>

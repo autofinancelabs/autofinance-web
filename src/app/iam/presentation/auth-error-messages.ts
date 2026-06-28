@@ -37,12 +37,11 @@ export function describeAuthError(error: ApiError | null): AuthErrorView {
     fieldMessages['userEmail'] = 'Este correo electrónico ya está registrado.';
   }
 
-  let formMessage: string | null = null;
-  if (error.is(ApiErrorCode.InvalidCredentials)) {
-    formMessage = 'Usuario o contraseña incorrectos.';
-  } else if (Object.keys(fieldMessages).length === 0) {
-    formMessage = 'No se pudo completar la operación. Inténtalo de nuevo.';
-  }
+  // Only invalid-credentials shows a form-level banner; operational failures are
+  // surfaced as a global toast by the error interceptor, not inline here.
+  const formMessage = error.is(ApiErrorCode.InvalidCredentials)
+    ? 'Usuario o contraseña incorrectos.'
+    : null;
 
   return {formMessage, fieldMessages};
 }

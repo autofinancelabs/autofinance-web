@@ -5,22 +5,26 @@ import {Router} from '@angular/router';
 import {TokenStorage} from '../../iam/infrastructure/token-storage';
 import {ApiError} from './api-error';
 import {errorInterceptor} from './error-interceptor';
+import {NotificationService} from './notification.service';
 
 describe('errorInterceptor', () => {
   let http: HttpClient;
   let httpMock: HttpTestingController;
   let tokenStorage: {clear: ReturnType<typeof vi.fn>};
   let router: {navigate: ReturnType<typeof vi.fn>};
+  let notification: {error: ReturnType<typeof vi.fn>};
 
   beforeEach(() => {
     tokenStorage = {clear: vi.fn()};
     router = {navigate: vi.fn()};
+    notification = {error: vi.fn()};
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([errorInterceptor])),
         provideHttpClientTesting(),
         {provide: TokenStorage, useValue: tokenStorage},
         {provide: Router, useValue: router},
+        {provide: NotificationService, useValue: notification},
       ],
     });
     http = TestBed.inject(HttpClient);
@@ -42,9 +46,10 @@ describe('errorInterceptor', () => {
     expect(caught?.code).toBe('UNAUTHENTICATED');
     expect(tokenStorage.clear).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/sign-in']);
+    expect(notification.error).toHaveBeenCalledTimes(1);
   });
 
-  it('does NOT clear or redirect on a 401 INVALID_CREDENTIALS (failed login)', () => {
+  it('does NOT clear, redirect or toast on a 401 INVALID_CREDENTIALS (failed login)', () => {
     let caught: ApiError | undefined;
     http.post('/api/sign-in', {}).subscribe({error: (e: ApiError) => (caught = e)});
 
@@ -56,9 +61,10 @@ describe('errorInterceptor', () => {
     expect(caught?.code).toBe('INVALID_CREDENTIALS');
     expect(tokenStorage.clear).not.toHaveBeenCalled();
     expect(router.navigate).not.toHaveBeenCalled();
+    expect(notification.error).not.toHaveBeenCalled();
   });
 
-  it('populates fieldErrors on a 400 VALIDATION_FAILED', () => {
+  it('populates fieldErrors on a 400 VALIDATION_FAILED without toasting', () => {
     let caught: ApiError | undefined;
     http.post('/api/dealerships', {}).subscribe({error: (e: ApiError) => (caught = e)});
 
@@ -73,5 +79,29 @@ describe('errorInterceptor', () => {
 
     expect(caught?.code).toBe('VALIDATION_FAILED');
     expect(caught?.fieldErrors).toEqual([{field: 'ruc', message: 'must be 11 digits'}]);
+    expect(notification.error).not.toHaveBeenCalled();
+  });
+
+  it('toasts an operational error (500) and rethrows it', () => {
+    let caught: ApiError | undefined;
+    http.get('/api/vehicle-offers').subscribe({error: (e: ApiError) => (caught = e)});
+
+    httpMock.expectOne('/api/vehicle-offers').flush(
+      {status: 500, code: 'INTERNAL_ERROR', detail: 'boom'},
+      {status: 500, statusText: 'Internal Server Error'},
+    );
+
+    expect(caught?.status).toBe(500);
+    expect(notification.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('toasts a network failure (status 0)', () => {
+    let caught: ApiError | undefined;
+    http.get('/api/vehicle-offers').subscribe({error: (e: ApiError) => (caught = e)});
+
+    httpMock.expectOne('/api/vehicle-offers').error(new ProgressEvent('network'));
+
+    expect(caught?.status).toBe(0);
+    expect(notification.error).toHaveBeenCalledTimes(1);
   });
 });

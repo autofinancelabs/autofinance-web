@@ -1,0 +1,55 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="text-2xl font-medium tracking-tight">Ofertas vehiculares</h1>
+      <p class="text-muted-foreground text-sm">
+        Vehículos disponibles para financiar.
+      </p>
+    </div>
+    <a hlmBtn routerLink="/vehicle-offers/new">Nueva oferta</a>
+  </header>
+
+  @if (loading()) {
+    <p class="text-muted-foreground text-sm" role="status">Cargando ofertas…</p>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p class="text-muted-foreground">Aún no has registrado ofertas vehiculares.</p>
+      <a hlmBtn variant="outline" routerLink="/vehicle-offers/new">Registrar la primera</a>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="offers-table">
+        <thead>
+          <tr>
+            <th scope="col">Vehículo</th>
+            <th scope="col">Año</th>
+            <th scope="col" class="num">Precio de venta</th>
+            <th scope="col">Plan</th>
+            <th scope="col"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (offer of offers(); track offer.id) {
+            <tr>
+              <td>{{ offer.make }} {{ offer.model }}</td>
+              <td class="num">{{ offer.year }}</td>
+              <td class="num font-mono tabular-nums">{{ offer.salePrice | money }}</td>
+              <td>
+                @if (offer.plan; as plan) {
+                  {{ plan.name }} ({{ plan.installments }})
+                } @else {
+                  <span class="text-muted-foreground">—</span>
+                }
+              </td>
+              <td class="actions">
+                <a hlmBtn variant="ghost" size="sm" [routerLink]="['/vehicle-offers', offer.id, 'edit']">
+                  Editar
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

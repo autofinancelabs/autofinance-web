@@ -40,8 +40,9 @@ describe('describeAuthError', () => {
     expect(view.formMessage).toBeNull();
   });
 
-  it('falls back to a generic banner for an unmapped error without field errors', () => {
+  it('does not produce a banner for an operational error (handled by toast)', () => {
     const view = describeAuthError(new ApiError({status: 500, code: 'INTERNAL_ERROR'}));
-    expect(view.formMessage).toContain('No se pudo');
+    expect(view.formMessage).toBeNull();
+    expect(view.fieldMessages).toEqual({});
   });
 });

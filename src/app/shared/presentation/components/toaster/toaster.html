@@ -1,0 +1,35 @@
+<div class="toaster" aria-live="polite" aria-atomic="false">
+  @for (toast of notifications.toasts(); track toast.id) {
+    <div
+      class="toast"
+      [class.toast--error]="toast.variant === 'error'"
+      [class.toast--success]="toast.variant === 'success'"
+      [class.toast--info]="toast.variant === 'info'"
+      [attr.role]="toast.variant === 'error' ? 'alert' : 'status'"
+    >
+      <span class="toast__accent" aria-hidden="true"></span>
+      <p class="toast__message">{{ toast.message }}</p>
+      <button
+        type="button"
+        class="toast__close"
+        (click)="notifications.dismiss(toast.id)"
+        aria-label="Cerrar notificación"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  }
+</div>

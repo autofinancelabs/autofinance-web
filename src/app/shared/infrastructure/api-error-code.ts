@@ -11,6 +11,7 @@ export const ApiErrorCode = {
   DuplicateRuc: 'DUPLICATE_RUC',
   DuplicateEmail: 'DUPLICATE_EMAIL',
   DuplicateUsername: 'DUPLICATE_USERNAME',
+  InvalidVehicleOffer: 'INVALID_VEHICLE_OFFER',
   Unauthenticated: 'UNAUTHENTICATED',
   AccessDenied: 'ACCESS_DENIED',
 } as const;
