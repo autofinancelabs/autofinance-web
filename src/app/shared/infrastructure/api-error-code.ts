@@ -12,6 +12,7 @@ export const ApiErrorCode = {
   DuplicateEmail: 'DUPLICATE_EMAIL',
   DuplicateUsername: 'DUPLICATE_USERNAME',
   InvalidVehicleOffer: 'INVALID_VEHICLE_OFFER',
+  DuplicateClientDocument: 'DUPLICATE_CLIENT_DOCUMENT',
   Unauthenticated: 'UNAUTHENTICATED',
   AccessDenied: 'ACCESS_DENIED',
 } as const;

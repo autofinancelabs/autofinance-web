@@ -11,6 +11,8 @@ const authLayout = () =>
 const iamRoutes = () => import('./iam/presentation/iam.routes').then(m => m.iamRoutes);
 const vehicleOffersRoutes = () =>
   import('./vehicle-offers/presentation/vehicle-offers.routes').then(m => m.vehicleOffersRoutes);
+const clientsRoutes = () =>
+  import('./clients/presentation/clients.routes').then(m => m.clientsRoutes);
 const pageNotFound = () =>
   import('./shared/presentation/views/page-not-found/page-not-found').then(m => m.PageNotFound);
 
@@ -30,6 +32,7 @@ export const routes: Routes = [
     children: [
       {path: 'dashboard', loadComponent: dashboard},
       {path: 'vehicle-offers', loadChildren: vehicleOffersRoutes},
+      {path: 'clients', loadChildren: clientsRoutes},
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
     ],
   },

@@ -61,6 +61,8 @@ function messageFor(error: ApiError): string {
       return 'Este nombre de usuario ya está en uso.';
     case ApiErrorCode.InvalidVehicleOffer:
       return 'El precio de venta debe ser mayor que 0.';
+    case ApiErrorCode.DuplicateClientDocument:
+      return 'Ya existe un cliente registrado con este documento.';
     case ApiErrorCode.ValidationFailed:
       return 'Revisa los datos del formulario e inténtalo de nuevo.';
     case ApiErrorCode.Unauthenticated:
