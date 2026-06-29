@@ -1,0 +1,261 @@
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
+import {applyEach, form, FormField, min, required, submit, validate} from '@angular/forms/signals';
+import {HlmButton} from '@spartan-ng/helm/button';
+import {HlmInput} from '@spartan-ng/helm/input';
+import {HlmLabel} from '@spartan-ng/helm/label';
+import {HlmError, HlmFormField} from '@spartan-ng/helm/form-field';
+import {Breadcrumbs} from '../../../../shared/presentation/components/breadcrumbs/breadcrumbs';
+import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
+import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
+import {ClientsStore} from '../../../../clients/application/clients.store';
+import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
+import {CreditSimulationStore} from '../../../application/credit-simulation.store';
+import {SimulationDraft} from '../../../domain/model/simulation-draft.command';
+import {Capitalization, capitalizations} from '../../../domain/model/capitalization';
+import {Cost} from '../../../domain/model/cost.value-object';
+import {CostBasis, costBases} from '../../../domain/model/cost-basis';
+import {CostTiming, costTimings} from '../../../domain/model/cost-timing';
+import {GraceType} from '../../../domain/model/grace-type';
+import {RateType, rateTypes} from '../../../domain/model/rate-type';
+
+interface CostRow {
+  name: string;
+  value: number | null;
+  basis: CostBasis;
+  timing: CostTiming;
+  embedded: boolean;
+}
+
+interface ConfigModel {
+  clientId: string;
+  vehicleOfferId: string;
+  rateType: RateType;
+  rateValue: number | null;
+  capitalization: Capitalization | '';
+  initialPercentage: number | null;
+  balloonPercentage: number | null;
+  costOfCapitalAnnual: number | null;
+  numberOfInstallments: number | null;
+  frequencyDays: number | null;
+  daysPerYear: number | null;
+  totalGrace: number;
+  partialGrace: number;
+  costs: CostRow[];
+}
+
+/**
+ * Configures a credit simulation and generates it (the backend computes the
+ * schedule + indicators). Two panes: the form, and a live configuration summary.
+ * Rates/percentages are entered as numbers (20 = 20%) and converted to fractions
+ * on submit. Grace is entered compactly as counts of total/partial periods.
+ */
+@Component({
+  selector: 'app-simulation-config',
+  imports: [FormField, RouterLink, HlmInput, HlmLabel, HlmError, HlmFormField, HlmButton, MoneyPipe, Breadcrumbs],
+  templateUrl: './simulation-config.html',
+  styleUrl: './simulation-config.css',
+})
+export class SimulationConfig extends BaseForm implements OnInit {
+  private readonly store = inject(CreditSimulationStore);
+  private readonly clientsStore = inject(ClientsStore);
+  private readonly offersStore = inject(VehicleOffersStore);
+  private readonly router = inject(Router);
+
+  protected readonly clients = this.clientsStore.clients;
+  protected readonly offers = this.offersStore.offers;
+  protected readonly generating = this.store.generating;
+
+  protected readonly rateTypes = rateTypes;
+  protected readonly capitalizations = capitalizations;
+  protected readonly costBases = costBases;
+  protected readonly costTimings = costTimings;
+  protected readonly RateType = RateType;
+  protected readonly CostBasis = CostBasis;
+
+  protected readonly capitalizationLabels: Record<string, string> = {
+    DAILY: 'Diaria',
+    MONTHLY: 'Mensual',
+    QUARTERLY: 'Trimestral',
+    SEMIANNUAL: 'Semestral',
+    ANNUAL: 'Anual',
+  };
+  protected readonly costBasisLabels: Record<string, string> = {
+    FIXED: 'Monto fijo',
+    ON_BALANCE: '% sobre saldo',
+    ON_SALE_PRICE: '% sobre precio',
+  };
+  protected readonly costTimingLabels: Record<string, string> = {
+    INITIAL: 'Inicial',
+    PERIODIC: 'Periódico',
+  };
+
+  protected readonly breadcrumbs = [
+    {label: 'Dashboard', link: '/dashboard'},
+    {label: 'Cotizaciones', link: '/credit-simulations'},
+    {label: 'Nueva cotización'},
+  ];
+
+  protected readonly model = signal<ConfigModel>({
+    clientId: '',
+    vehicleOfferId: '',
+    rateType: RateType.NOMINAL,
+    rateValue: null,
+    capitalization: '',
+    initialPercentage: null,
+    balloonPercentage: null,
+    costOfCapitalAnnual: null,
+    numberOfInstallments: null,
+    frequencyDays: 30,
+    daysPerYear: 360,
+    totalGrace: 0,
+    partialGrace: 0,
+    costs: [],
+  });
+
+  protected readonly f = form(this.model, path => {
+    required(path.clientId, {message: this.messageFor('cliente', 'required')});
+    required(path.vehicleOfferId, {message: this.messageFor('oferta', 'required')});
+    required(path.rateType, {message: this.messageFor('tipo de tasa', 'required')});
+    required(path.rateValue, {message: this.messageFor('tasa', 'required')});
+    min(path.rateValue, 0, {message: 'La tasa no puede ser negativa.'});
+    required(path.numberOfInstallments, {message: this.messageFor('plazo', 'required')});
+    min(path.numberOfInstallments, 1, {message: 'El plazo debe ser al menos 1 cuota.'});
+    required(path.frequencyDays, {message: this.messageFor('frecuencia', 'required')});
+    min(path.frequencyDays, 1, {message: 'La frecuencia debe ser mayor que 0.'});
+    required(path.daysPerYear, {message: this.messageFor('días por año', 'required')});
+    min(path.daysPerYear, 1, {message: 'Los días por año deben ser mayores que 0.'});
+    required(path.initialPercentage, {message: this.messageFor('% de cuota inicial', 'required')});
+    min(path.initialPercentage, 0, {message: 'El porcentaje no puede ser negativo.'});
+    required(path.balloonPercentage, {message: this.messageFor('% de cuotón', 'required')});
+    min(path.balloonPercentage, 0, {message: 'El porcentaje no puede ser negativo.'});
+    required(path.costOfCapitalAnnual, {message: this.messageFor('COK anual', 'required')});
+    min(path.costOfCapitalAnnual, 0, {message: 'El COK no puede ser negativo.'});
+    min(path.totalGrace, 0, {message: 'No puede ser negativo.'});
+    min(path.partialGrace, 0, {message: 'No puede ser negativo.'});
+
+    // Capitalization is required only for a nominal rate.
+    validate(path.capitalization, ctx => {
+      const rateType = ctx.valueOf(path.rateType);
+      if (rateType === RateType.NOMINAL && ctx.value() === '') {
+        return {kind: 'required', message: 'Indica la capitalización para una tasa nominal.'};
+      }
+      return undefined;
+    });
+
+    // initial % + balloon % must be below 100.
+    validate(path.balloonPercentage, ctx => {
+      const initial = ctx.valueOf(path.initialPercentage) ?? 0;
+      const balloon = ctx.value() ?? 0;
+      if (initial + balloon >= 100) {
+        return {kind: 'max', message: 'La suma de % inicial y % cuotón debe ser menor a 100.'};
+      }
+      return undefined;
+    });
+
+    // Grace periods must be fewer than the number of installments.
+    validate(path.partialGrace, ctx => {
+      const total = ctx.valueOf(path.totalGrace) ?? 0;
+      const partial = ctx.value() ?? 0;
+      const installments = ctx.valueOf(path.numberOfInstallments) ?? 0;
+      if (installments > 0 && total + partial >= installments) {
+        return {kind: 'max', message: 'Los periodos de gracia deben ser menos que el plazo.'};
+      }
+      return undefined;
+    });
+
+    applyEach(path.costs, cost => {
+      required(cost.name, {message: 'Indica el nombre del costo.'});
+      required(cost.value, {message: 'Indica el valor del costo.'});
+      min(cost.value, 0, {message: 'El valor no puede ser negativo.'});
+    });
+  });
+
+  /** The picked offer (for the summary aside). */
+  protected readonly selectedOffer = computed(() =>
+    this.offers().find(offer => offer.id === this.model().vehicleOfferId) ?? null,
+  );
+  /** The picked client (for the summary aside). */
+  protected readonly selectedClient = computed(() =>
+    this.clients().find(client => client.id === this.model().clientId) ?? null,
+  );
+
+  constructor() {
+    super();
+    effect(() => {
+      if (this.store.generated()) {
+        const id = this.store.selected()?.id;
+        if (id) {
+          void this.router.navigate(['/credit-simulations', id]);
+        }
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.store.resetWriteState();
+    this.clientsStore.load();
+    this.offersStore.load();
+  }
+
+  protected addCost(): void {
+    this.model.update(model => ({
+      ...model,
+      costs: [
+        ...model.costs,
+        {name: '', value: null, basis: CostBasis.FIXED, timing: CostTiming.PERIODIC, embedded: false},
+      ],
+    }));
+  }
+
+  protected removeCost(index: number): void {
+    this.model.update(model => ({
+      ...model,
+      costs: model.costs.filter((_, i) => i !== index),
+    }));
+  }
+
+  protected onSubmit(event: Event): void {
+    event.preventDefault();
+    void submit(this.f, async () => {
+      const value = this.model();
+      const installments = value.numberOfInstallments ?? 0;
+      const total = value.totalGrace ?? 0;
+      const partial = value.partialGrace ?? 0;
+      const gracePlan: GraceType[] = [
+        ...Array<GraceType>(total).fill(GraceType.TOTAL),
+        ...Array<GraceType>(partial).fill(GraceType.PARTIAL),
+        ...Array<GraceType>(Math.max(0, installments - total - partial)).fill(GraceType.NONE),
+      ];
+      const draft = new SimulationDraft({
+        clientId: value.clientId,
+        vehicleOfferId: value.vehicleOfferId,
+        rateValue: (value.rateValue ?? 0) / 100,
+        rateType: value.rateType,
+        capitalization:
+          value.rateType === RateType.NOMINAL && value.capitalization !== ''
+            ? value.capitalization
+            : null,
+        initialPercentage: (value.initialPercentage ?? 0) / 100,
+        balloonPercentage: (value.balloonPercentage ?? 0) / 100,
+        numberOfInstallments: installments,
+        frequencyDays: value.frequencyDays ?? 30,
+        daysPerYear: value.daysPerYear ?? 360,
+        gracePlan,
+        costs: value.costs.map(
+          cost =>
+            new Cost({
+              name: cost.name,
+              value: cost.value ?? 0,
+              basis: cost.basis,
+              timing: cost.timing,
+              embedded: cost.embedded,
+            }),
+        ),
+        costOfCapitalAnnual: (value.costOfCapitalAnnual ?? 0) / 100,
+      });
+      this.store.generate(draft);
+      return undefined;
+    });
+  }
+}

@@ -13,6 +13,10 @@ const vehicleOffersRoutes = () =>
   import('./vehicle-offers/presentation/vehicle-offers.routes').then(m => m.vehicleOffersRoutes);
 const clientsRoutes = () =>
   import('./clients/presentation/clients.routes').then(m => m.clientsRoutes);
+const creditSimulationRoutes = () =>
+  import('./credit-simulation/presentation/credit-simulation.routes').then(
+    m => m.creditSimulationRoutes,
+  );
 const pageNotFound = () =>
   import('./shared/presentation/views/page-not-found/page-not-found').then(m => m.PageNotFound);
 
@@ -33,6 +37,7 @@ export const routes: Routes = [
       {path: 'dashboard', loadComponent: dashboard},
       {path: 'vehicle-offers', loadChildren: vehicleOffersRoutes},
       {path: 'clients', loadChildren: clientsRoutes},
+      {path: 'credit-simulations', loadChildren: creditSimulationRoutes},
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
     ],
   },
