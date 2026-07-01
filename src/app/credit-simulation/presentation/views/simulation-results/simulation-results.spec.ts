@@ -60,6 +60,7 @@ function makeSim(id: string, npv: number, clientId = 'cl-1'): CreditSimulation {
     },
     state: 'GENERATED',
     createdAt: '2026-06-01T12:00:00Z',
+    updatedAt: '2026-06-01T12:00:00Z',
   };
   return assembler.toEntityFromResource(resource);
 }

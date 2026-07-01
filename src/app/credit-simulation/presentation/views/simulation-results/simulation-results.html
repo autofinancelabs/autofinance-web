@@ -11,7 +11,10 @@
           Cronograma e indicadores de transparencia (óptica del deudor).
         </p>
       </div>
-      <a hlmBtn variant="outline" routerLink="/credit-simulations/new">Nueva cotización</a>
+      <div class="header-actions">
+        <a hlmBtn variant="outline" [routerLink]="['/credit-simulations', sim.id, 'edit']">Editar</a>
+        <a hlmBtn variant="outline" routerLink="/credit-simulations/new">Nueva cotización</a>
+      </div>
     </header>
 
     <!-- SBS transparency indicators -->

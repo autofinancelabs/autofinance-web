@@ -87,6 +87,7 @@ function makeResource(): SimulationResource {
     },
     state: 'GENERATED',
     createdAt: '2026-06-01T12:00:00Z',
+    updatedAt: '2026-06-03T09:30:00Z',
   };
 }
 
@@ -133,6 +134,21 @@ describe('SimulationAssembler', () => {
     expect(sim.grace).toEqual([GraceType.TOTAL, GraceType.PARTIAL, GraceType.NONE]);
     expect(sim.indicators.npv).toBe(4436.18);
     expect(sim.state).toBe(SimulationState.GENERATED);
+  });
+
+  it('maps the timestamps and flags a simulation edited after creation', () => {
+    const sim = assembler.toEntityFromResource(makeResource());
+    expect(sim.createdAt?.toISOString()).toBe(new Date('2026-06-01T12:00:00Z').toISOString());
+    expect(sim.updatedAt?.toISOString()).toBe(new Date('2026-06-03T09:30:00Z').toISOString());
+    expect(sim.edited).toBe(true); // updatedAt is well after createdAt
+  });
+
+  it('does not flag as edited when updatedAt equals createdAt', () => {
+    const sim = assembler.toEntityFromResource({
+      ...makeResource(),
+      updatedAt: '2026-06-01T12:00:00Z',
+    });
+    expect(sim.edited).toBe(false);
   });
 
   it('maps a schedule row with its applied costs', () => {

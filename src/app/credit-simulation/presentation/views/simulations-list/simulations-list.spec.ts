@@ -19,7 +19,7 @@ import {SimulationsList} from './simulations-list';
 
 const assembler = new SimulationAssembler();
 
-function makeSim(id: string, clientId: string, state = 'GENERATED'): CreditSimulation {
+function makeSim(id: string, clientId: string, updatedAt = '2026-06-01T12:00:00Z'): CreditSimulation {
   const resource: SimulationResource = {
     id,
     clientId,
@@ -50,8 +50,9 @@ function makeSim(id: string, clientId: string, state = 'GENERATED'): CreditSimul
       totalToPay: 20000,
       totalsPerCost: {},
     },
-    state,
+    state: 'GENERATED',
     createdAt: '2026-06-01T12:00:00Z',
+    updatedAt,
   };
   return assembler.toEntityFromResource(resource);
 }
@@ -130,18 +131,24 @@ describe('SimulationsList', () => {
     expect(detail?.getAttribute('href')).toContain('/credit-simulations/s-1');
   });
 
-  it('filters the rows by state', () => {
+  it('shows the SBS indicator chips, an edit link and the "Editada" badge for modified rows', () => {
     const fixture = setup();
-    simulations.set([makeSim('s-1', 'cl-1', 'GENERATED'), makeSim('s-2', 'cl-1', 'SAVED')]);
+    simulations.set([makeSim('s-1', 'cl-1', '2026-06-02T12:00:00Z')]); // updatedAt > createdAt → edited
     fixture.detectChanges();
-    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.sim-table tbody tr')).toHaveLength(2);
+    const el = fixture.nativeElement as HTMLElement;
 
-    const instance = fixture.componentInstance as unknown as {stateFilter: WritableSignal<string>};
-    instance.stateFilter.set('SAVED');
+    expect(el.querySelector('.cell-chip--positive')).not.toBeNull();          // VAN positive
+    expect(el.querySelectorAll('.cell-chip--primary')).toHaveLength(2);       // TCEA + TIR
+    expect(el.textContent).toContain('Editada');
+    const editLink = el.querySelector<HTMLAnchorElement>('.sim-table tbody a[href$="/edit"]');
+    expect(editLink?.getAttribute('href')).toContain('/credit-simulations/s-1/edit');
+  });
+
+  it('does not mark an unedited row as "Editada"', () => {
+    const fixture = setup();
+    simulations.set([makeSim('s-1', 'cl-1')]); // updatedAt === createdAt
     fixture.detectChanges();
-    const rows = (fixture.nativeElement as HTMLElement).querySelectorAll('.sim-table tbody tr');
-    expect(rows).toHaveLength(1);
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('SAVED');
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Editada');
   });
 
   it('shows the empty state with a CTA when there are no simulations', () => {

@@ -26,6 +26,12 @@ export class CreditSimulationsApiEndpoint {
       .pipe(map(resource => this.assembler.toEntityFromResource(resource)));
   }
 
+  update(id: string, draft: SimulationDraft): Observable<CreditSimulation> {
+    return this.http
+      .put<SimulationResource>(`${this.endpointUrl}/${id}`, this.assembler.toGenerateRequest(draft))
+      .pipe(map(resource => this.assembler.toEntityFromResource(resource)));
+  }
+
   getById(id: string): Observable<CreditSimulation> {
     return this.http
       .get<SimulationResource>(`${this.endpointUrl}/${id}`)

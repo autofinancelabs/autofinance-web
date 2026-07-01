@@ -19,6 +19,10 @@ export class CreditSimulationsApi extends BaseApi {
     return this.endpoint.generate(draft);
   }
 
+  update(id: string, draft: SimulationDraft): Observable<CreditSimulation> {
+    return this.endpoint.update(id, draft);
+  }
+
   getById(id: string): Observable<CreditSimulation> {
     return this.endpoint.getById(id);
   }

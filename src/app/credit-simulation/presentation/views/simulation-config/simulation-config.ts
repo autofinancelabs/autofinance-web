@@ -11,6 +11,7 @@ import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
 import {ClientsStore} from '../../../../clients/application/clients.store';
 import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
+import {CreditSimulation} from '../../../domain/model/credit-simulation.entity';
 import {SimulationDraft} from '../../../domain/model/simulation-draft.command';
 import {
   capitalizationLabel,
@@ -96,10 +97,14 @@ export class SimulationConfig extends BaseForm implements OnInit {
     PERIODIC: 'Periódico',
   };
 
+  protected readonly id = this.route.snapshot.paramMap.get('id');
+  protected readonly isEdit = this.id !== null;
+  private hydrated = false;
+
   protected readonly breadcrumbs = [
     {label: 'Dashboard', link: '/dashboard'},
     {label: 'Cotizaciones', link: '/credit-simulations'},
-    {label: 'Nueva cotización'},
+    {label: this.isEdit ? 'Editar cotización' : 'Nueva cotización'},
   ];
 
   protected readonly model = signal<ConfigModel>({
@@ -239,17 +244,79 @@ export class SimulationConfig extends BaseForm implements OnInit {
         }
       }
     });
+    // In edit mode, hydrate the form once the simulation loads.
+    effect(() => {
+      const sim = this.store.selected();
+      if (this.isEdit && sim !== null && !this.hydrated) {
+        this.hydrated = true;
+        this.hydrate(sim);
+      }
+    });
   }
 
   ngOnInit(): void {
     this.store.resetWriteState();
     this.clientsStore.load();
     this.offersStore.load();
+    if (this.id !== null) {
+      this.store.loadOne(this.id);
+      return;
+    }
     // Preselect the client when arriving from the client's history ("Nueva cotización").
     const clientId = this.route.snapshot.queryParamMap.get('clientId');
     if (clientId) {
       this.model.update(model => ({...model, clientId}));
     }
+  }
+
+  /** Fills the form from an existing simulation (inverse of the transforms in onSubmit). */
+  private hydrate(sim: CreditSimulation): void {
+    const cap = this.choiceFromDays(sim.rate.capitalization, this.capitalizationPresets);
+    const period = this.choiceFromDays(sim.rate.ratePeriod, this.ratePeriodPresets);
+    this.model.set({
+      clientId: sim.clientId,
+      vehicleOfferId: sim.vehicleOfferId,
+      rateType: sim.rate.type,
+      rateValue: this.toPercent(sim.rate.value),
+      capitalizationChoice: cap.choice,
+      capitalizationDays: cap.days,
+      ratePeriodChoice: period.choice,
+      ratePeriodDays: period.days,
+      initialPercentage: this.toPercent(sim.initialPercentage.value),
+      balloonPercentage: this.toPercent(sim.balloonPercentage.value),
+      costOfCapitalAnnual: this.toPercent(sim.costOfCapital.value),
+      numberOfInstallments: sim.term.numberOfInstallments,
+      frequencyDays: sim.term.frequencyDays,
+      daysPerYear: sim.term.daysPerYear,
+      totalGrace: sim.grace.filter(g => g === GraceType.TOTAL).length,
+      partialGrace: sim.grace.filter(g => g === GraceType.PARTIAL).length,
+      costs: sim.costs.map(c => ({
+        name: c.name,
+        value: c.value,
+        basis: c.basis,
+        timing: c.timing,
+        embedded: c.embedded,
+      })),
+    });
+  }
+
+  /** Fraction → percent number (e.g. 0.2 → 20), rounded to avoid float noise in the input. */
+  private toPercent(fraction: number): number {
+    return Math.round(fraction * 100 * 1e6) / 1e6;
+  }
+
+  /** Maps a period in days back to a select choice: '' (none), the preset's days, or 'OTHER' + days. */
+  private choiceFromDays(
+    days: number | null,
+    presets: readonly {days: number}[],
+  ): {choice: string; days: number | null} {
+    if (days === null) {
+      return {choice: '', days: null};
+    }
+    if (presets.some(preset => preset.days === days)) {
+      return {choice: String(days), days: null};
+    }
+    return {choice: 'OTHER', days};
   }
 
   /** Renders a period choice ('' → emptyLabel, 'OTHER'/preset → label or "N días"). */
@@ -332,7 +399,11 @@ export class SimulationConfig extends BaseForm implements OnInit {
         ),
         costOfCapitalAnnual: (value.costOfCapitalAnnual ?? 0) / 100,
       });
-      this.store.generate(draft);
+      if (this.id !== null) {
+        this.store.update(this.id, draft);
+      } else {
+        this.store.generate(draft);
+      }
       return undefined;
     });
   }

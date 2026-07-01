@@ -1,9 +1,12 @@
+import {DatePipe} from '@angular/common';
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {HlmButton} from '@spartan-ng/helm/button';
+import {HlmTooltipImports} from '@spartan-ng/helm/tooltip';
 import {Breadcrumbs} from '../../../../shared/presentation/components/breadcrumbs/breadcrumbs';
 import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
 import {AmountPipe} from '../../../../shared/presentation/amount.pipe';
+import {RatePipe} from '../../../../shared/presentation/rate.pipe';
 import {ClientsStore} from '../../../../clients/application/clients.store';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
 
@@ -14,7 +17,7 @@ import {CreditSimulationStore} from '../../../application/credit-simulation.stor
  */
 @Component({
   selector: 'app-simulation-history',
-  imports: [RouterLink, HlmButton, Breadcrumbs, MoneyPipe, AmountPipe],
+  imports: [RouterLink, HlmButton, HlmTooltipImports, Breadcrumbs, MoneyPipe, AmountPipe, RatePipe, DatePipe],
   templateUrl: './simulation-history.html',
   styleUrl: './simulation-history.css',
 })

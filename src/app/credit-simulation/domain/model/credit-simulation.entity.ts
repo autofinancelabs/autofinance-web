@@ -35,6 +35,7 @@ export class CreditSimulation implements BaseEntity {
   private readonly _summary: SimulationSummary;
   private readonly _state: SimulationState;
   private readonly _createdAt: Date | null;
+  private readonly _updatedAt: Date | null;
 
   constructor(options: {
     id: string;
@@ -55,6 +56,7 @@ export class CreditSimulation implements BaseEntity {
     summary: SimulationSummary;
     state: SimulationState;
     createdAt: Date | null;
+    updatedAt: Date | null;
   }) {
     this._id = options.id;
     this._clientId = options.clientId;
@@ -74,6 +76,7 @@ export class CreditSimulation implements BaseEntity {
     this._summary = options.summary;
     this._state = options.state;
     this._createdAt = options.createdAt;
+    this._updatedAt = options.updatedAt;
   }
 
   get id(): string {
@@ -147,5 +150,22 @@ export class CreditSimulation implements BaseEntity {
   /** Creation timestamp (null if not yet persisted). */
   get createdAt(): Date | null {
     return this._createdAt;
+  }
+
+  /** Last-modification timestamp (null if not yet persisted). */
+  get updatedAt(): Date | null {
+    return this._updatedAt;
+  }
+
+  /**
+   * True when the simulation has been edited after its initial generation, i.e.
+   * `updatedAt` is meaningfully later than `createdAt` (1s tolerance for the
+   * insert, where both timestamps are set together).
+   */
+  get edited(): boolean {
+    if (this._createdAt === null || this._updatedAt === null) {
+      return false;
+    }
+    return this._updatedAt.getTime() - this._createdAt.getTime() > 1000;
   }
 }

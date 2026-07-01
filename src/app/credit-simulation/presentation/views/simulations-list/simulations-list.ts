@@ -3,15 +3,16 @@ import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {HlmButton} from '@spartan-ng/helm/button';
 import {HlmInput} from '@spartan-ng/helm/input';
+import {HlmTooltipImports} from '@spartan-ng/helm/tooltip';
 import {Breadcrumbs} from '../../../../shared/presentation/components/breadcrumbs/breadcrumbs';
 import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
 import {AmountPipe} from '../../../../shared/presentation/amount.pipe';
+import {RatePipe} from '../../../../shared/presentation/rate.pipe';
 import {Client} from '../../../../clients/domain/model/client.entity';
 import {ClientsStore} from '../../../../clients/application/clients.store';
 import {VehicleOffer} from '../../../../vehicle-offers/domain/model/vehicle-offer.entity';
 import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
 import {CreditSimulation} from '../../../domain/model/credit-simulation.entity';
-import {SimulationState} from '../../../domain/model/simulation-state';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
 
 interface SimulationRow {
@@ -22,13 +23,13 @@ interface SimulationRow {
 
 /**
  * Tenant-wide list of the advisor's credit simulations. Loads all simulations plus
- * the clients and vehicle offers to resolve each row's labels (document + vehicle)
- * by id. Offers a client/state filter and a summary aside; rows link to the detail
- * and a header button starts a new quotation.
+ * the clients and vehicle offers to resolve each row's labels (name + vehicle) by id.
+ * Offers a client filter; rows show the SBS indicators (VAN/TCEA/TIR) and link to the
+ * detail or the edit form, and a header button starts a new quotation.
  */
 @Component({
   selector: 'app-simulations-list',
-  imports: [RouterLink, HlmButton, HlmInput, Breadcrumbs, MoneyPipe, AmountPipe, DatePipe],
+  imports: [RouterLink, HlmButton, HlmInput, HlmTooltipImports, Breadcrumbs, MoneyPipe, AmountPipe, RatePipe, DatePipe],
   templateUrl: './simulations-list.html',
   styleUrl: './simulations-list.css',
 })
@@ -40,10 +41,8 @@ export class SimulationsList implements OnInit {
   protected readonly loading = this.store.loading;
   protected readonly isEmpty = this.store.isEmpty;
   protected readonly clients = this.clientsStore.clients;
-  protected readonly states = Object.values(SimulationState);
 
   protected readonly clientFilter = signal('');
-  protected readonly stateFilter = signal('');
 
   protected readonly breadcrumbs = [
     {label: 'Dashboard', link: '/dashboard'},
@@ -64,37 +63,10 @@ export class SimulationsList implements OnInit {
       .sort((a, b) => (b.sim.createdAt?.getTime() ?? 0) - (a.sim.createdAt?.getTime() ?? 0));
   });
 
-  /** Rows after applying the client and state filters. */
+  /** Rows after applying the client filter. */
   protected readonly filteredRows = computed<SimulationRow[]>(() => {
     const client = this.clientFilter();
-    const state = this.stateFilter();
-    return this.rows().filter(
-      row =>
-        (client === '' || row.sim.clientId === client) &&
-        (state === '' || row.sim.state === state),
-    );
-  });
-
-  protected readonly total = computed(() => this.filteredRows().length);
-
-  /** Count per state over the filtered rows, in lifecycle order. */
-  protected readonly byState = computed(() =>
-    this.states
-      .map(state => ({
-        state,
-        count: this.filteredRows().filter(row => row.sim.state === state).length,
-      }))
-      .filter(row => row.count > 0),
-  );
-
-  /** Total financed (loan amount) grouped by currency over the filtered rows. */
-  protected readonly financedByCurrency = computed(() => {
-    const totals = new Map<string, number>();
-    for (const {sim} of this.filteredRows()) {
-      const currency = sim.salePrice.currency;
-      totals.set(currency, (totals.get(currency) ?? 0) + sim.loanAmount.amount);
-    }
-    return [...totals.entries()].map(([currency, total]) => ({currency, total}));
+    return this.rows().filter(row => client === '' || row.sim.clientId === client);
   });
 
   ngOnInit(): void {

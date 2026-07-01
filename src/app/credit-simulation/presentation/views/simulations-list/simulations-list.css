@@ -60,19 +60,6 @@
   border-radius: var(--radius);
 }
 
-.content-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 14rem;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .table-wrapper {
   overflow-x: auto;
   border: 1px solid var(--border);
@@ -119,49 +106,45 @@
   text-align: right;
 }
 
-.state-badge {
+/* Compact indicator chips for table cells (VAN sign-colored; TCEA/TIR primary). */
+.cell-chip {
   display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
   padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.cell-chip--positive {
+  background: color-mix(in oklch, var(--success) 12%, transparent);
+  color: var(--success);
+}
+
+.cell-chip--negative {
+  background: color-mix(in oklch, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+.cell-chip--primary {
+  background: color-mix(in oklch, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.cell-chip__glyph {
+  font-size: 0.8rem;
+}
+
+.edited-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.4rem;
   border-radius: 999px;
   background: var(--muted);
   color: var(--muted-foreground);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-}
-
-.summary {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.metric {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.9rem 1rem;
-  background: var(--muted);
-  border-radius: var(--radius);
-}
-
-.metric__label {
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-}
-
-.metric__value {
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.metric--list {
-  gap: 0.5rem;
-}
-
-.metric__row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
 }

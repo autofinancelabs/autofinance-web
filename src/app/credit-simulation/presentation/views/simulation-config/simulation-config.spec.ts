@@ -4,10 +4,43 @@ import {ActivatedRoute, convertToParamMap, Router} from '@angular/router';
 import {ClientsStore} from '../../../../clients/application/clients.store';
 import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
+import {CreditSimulation} from '../../../domain/model/credit-simulation.entity';
 import {GraceType} from '../../../domain/model/grace-type';
 import {RateType} from '../../../domain/model/rate-type';
+import {SimulationAssembler} from '../../../infrastructure/simulation-assembler';
+import {SimulationResource} from '../../../infrastructure/simulation-response';
 import {SimulationDraft} from '../../../domain/model/simulation-draft.command';
 import {SimulationConfig} from './simulation-config';
+
+/** A persisted simulation (nominal 15% daily, 30-day period, balloon 40%, 3T+3P grace) for edit tests. */
+function makeSimEntity(): CreditSimulation {
+  const resource: SimulationResource = {
+    id: 's-1',
+    clientId: 'cl-1',
+    vehicleOfferId: 'vo-1',
+    salePrice: {amount: 16000, currency: 'PEN'},
+    rate: {value: 0.15, type: 'NOMINAL', capitalization: 1, ratePeriod: 30},
+    initialPercentage: 0.2,
+    balloonPercentage: 0.4,
+    term: {numberOfInstallments: 36, frequencyDays: 30, installmentsPerYear: 12, daysPerYear: 360},
+    grace: [
+      ...Array<string>(3).fill('TOTAL'),
+      ...Array<string>(3).fill('PARTIAL'),
+      ...Array<string>(30).fill('NONE'),
+    ],
+    costs: [],
+    costOfCapital: {value: 0.5, type: 'EFFECTIVE', capitalization: null, ratePeriod: null},
+    loanAmount: {amount: 12975, currency: 'PEN'},
+    financedBalance: {amount: 9015.99, currency: 'PEN'},
+    indicators: {npv: 1, periodicIrr: 0.01, tcea: 0.2, effectiveAnnualRate: 0.16, periodicRate: 0.01, periodicCostOfCapital: 0.03},
+    schedule: [],
+    summary: {totalInterest: 0, totalAmortization: 0, totalLoanInstallments: 0, totalToPay: 0, totalsPerCost: {}},
+    state: 'GENERATED',
+    createdAt: '2026-06-01T12:00:00Z',
+    updatedAt: '2026-06-01T12:00:00Z',
+  };
+  return new SimulationAssembler().toEntityFromResource(resource);
+}
 
 const flush = () => new Promise(resolve => setTimeout(resolve));
 
@@ -54,15 +87,32 @@ const validModel: FormModel = {
 describe('SimulationConfig', () => {
   let generating: WritableSignal<boolean>;
   let generated: WritableSignal<boolean>;
-  let selected: WritableSignal<{id: string} | null>;
-  let store: {generate: ReturnType<typeof vi.fn>; resetWriteState: ReturnType<typeof vi.fn>};
+  let selected: WritableSignal<CreditSimulation | null>;
+  let store: {
+    generate: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    loadOne: ReturnType<typeof vi.fn>;
+    resetWriteState: ReturnType<typeof vi.fn>;
+  };
   let router: {navigate: ReturnType<typeof vi.fn>};
 
-  function setup(queryParams: Record<string, string> = {}): ComponentFixture<SimulationConfig> {
+  function setup(
+    queryParams: Record<string, string> = {},
+    routeParams: Record<string, string> = {},
+    selectedSim: CreditSimulation | null = null,
+  ): ComponentFixture<SimulationConfig> {
     generating = signal(false);
     generated = signal(false);
-    selected = signal<{id: string} | null>(null);
-    store = {generate: vi.fn(), resetWriteState: vi.fn(), generating, generated, selected} as never;
+    selected = signal<CreditSimulation | null>(selectedSim);
+    store = {
+      generate: vi.fn(),
+      update: vi.fn(),
+      loadOne: vi.fn(),
+      resetWriteState: vi.fn(),
+      generating,
+      generated,
+      selected,
+    } as never;
     router = {navigate: vi.fn()};
 
     TestBed.configureTestingModule({
@@ -76,7 +126,7 @@ describe('SimulationConfig', () => {
           provide: ActivatedRoute,
           useValue: {
             snapshot: {
-              paramMap: convertToParamMap({}),
+              paramMap: convertToParamMap(routeParams),
               queryParamMap: convertToParamMap(queryParams),
             },
           },
@@ -237,9 +287,34 @@ describe('SimulationConfig', () => {
 
   it('navigates to the result once generated', () => {
     const fixture = setup();
-    selected.set({id: 's-1'});
+    selected.set(makeSimEntity());
     generated.set(true);
     fixture.detectChanges();
     expect(router.navigate).toHaveBeenCalledWith(['/credit-simulations', 's-1']);
+  });
+
+  it('in edit mode loads the simulation, hydrates the form and submits via update()', async () => {
+    const fixture = setup({}, {id: 's-1'}, makeSimEntity());
+    fixture.detectChanges();
+    const inst = instance(fixture);
+
+    expect(store.loadOne).toHaveBeenCalledWith('s-1');
+    // Hydrated from the loaded aggregate (fractions → percents, days → preset choices, grace → counts).
+    expect(inst.model().clientId).toBe('cl-1');
+    expect(inst.model().rateValue).toBeCloseTo(15, 6);
+    expect(inst.model().rateType).toBe(RateType.NOMINAL);
+    expect(inst.model().capitalizationChoice).toBe('1');
+    expect(inst.model().ratePeriodChoice).toBe('30');
+    expect(inst.model().initialPercentage).toBeCloseTo(20, 6);
+    expect(inst.model().balloonPercentage).toBeCloseTo(40, 6);
+    expect(inst.model().totalGrace).toBe(3);
+    expect(inst.model().partialGrace).toBe(3);
+
+    inst.onSubmit(new Event('submit'));
+    await flush();
+
+    expect(store.update).toHaveBeenCalledTimes(1);
+    expect(store.update.mock.calls[0][0]).toBe('s-1');
+    expect(store.generate).not.toHaveBeenCalled();
   });
 });

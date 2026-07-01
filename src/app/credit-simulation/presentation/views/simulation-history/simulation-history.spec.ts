@@ -43,6 +43,7 @@ function makeSim(id: string, clientId = 'cl-1'): CreditSimulation {
     },
     state: 'GENERATED',
     createdAt: '2026-06-01T12:00:00Z',
+    updatedAt: '2026-06-01T12:00:00Z',
   };
   return assembler.toEntityFromResource(resource);
 }
@@ -88,16 +89,18 @@ describe('SimulationHistory', () => {
     expect(clientsStore.loadOne).toHaveBeenCalledWith('cl-1');
   });
 
-  it('renders each simulation with its state, loan amount and a link to the detail', () => {
+  it('renders each simulation with its indicators, a detail link and an edit link', () => {
     const fixture = setup('cl-1');
     history.set([makeSim('s-1'), makeSim('s-2')]);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     const rows = el.querySelectorAll('.history-table tbody tr');
     expect(rows).toHaveLength(2);
-    expect(el.textContent).toContain('GENERATED');
-    const detailLink = el.querySelector<HTMLAnchorElement>('.history-table tbody a[href]');
+    expect(el.querySelectorAll('.cell-chip--primary').length).toBeGreaterThan(0); // TCEA/TIR chips
+    const detailLink = el.querySelector<HTMLAnchorElement>('.history-table tbody a[href$="/s-1"]');
     expect(detailLink?.getAttribute('href')).toContain('/credit-simulations/s-1');
+    const editLink = el.querySelector<HTMLAnchorElement>('.history-table tbody a[href$="/edit"]');
+    expect(editLink?.getAttribute('href')).toContain('/credit-simulations/s-1/edit');
   });
 
   it('shows the empty state with a CTA carrying the clientId when there is no history', () => {

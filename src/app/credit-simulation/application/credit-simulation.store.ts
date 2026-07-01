@@ -54,6 +54,24 @@ export class CreditSimulationStore {
     });
   }
 
+  /** Edits an existing simulation; the backend reconfigures + regenerates. Result lands in `selected`. */
+  update(id: string, draft: SimulationDraft): void {
+    this.generatingSignal.set(true);
+    this.generatedSignal.set(false);
+    this.errorSignal.set(null);
+    this.api.update(id, draft).subscribe({
+      next: simulation => {
+        this.selectedSignal.set(simulation);
+        this.generatedSignal.set(true);
+        this.generatingSignal.set(false);
+      },
+      error: (error: ApiError) => {
+        this.errorSignal.set(error);
+        this.generatingSignal.set(false);
+      },
+    });
+  }
+
   /** Loads a single simulation (e.g. to reopen/show results), exposed via `selected`. */
   loadOne(id: string): void {
     this.loadingSignal.set(true);

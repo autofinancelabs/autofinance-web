@@ -110,4 +110,5 @@ export interface SimulationResource extends BaseResource {
   summary: SummaryResource;
   state: string;
   createdAt: string | null;
+  updatedAt: string | null;
 }

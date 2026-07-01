@@ -49,6 +49,7 @@ function makeSimulation(id = 's-1'): CreditSimulation {
     }),
     state: SimulationState.GENERATED,
     createdAt: null,
+    updatedAt: null,
   });
 }
 
@@ -74,6 +75,7 @@ function makeDraft(): SimulationDraft {
 describe('CreditSimulationStore', () => {
   let api: {
     generate: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
     getById: ReturnType<typeof vi.fn>;
     listByClient: ReturnType<typeof vi.fn>;
   };
@@ -86,7 +88,7 @@ describe('CreditSimulationStore', () => {
   }
 
   beforeEach(() => {
-    api = {generate: vi.fn(), getById: vi.fn(), listByClient: vi.fn()};
+    api = {generate: vi.fn(), update: vi.fn(), getById: vi.fn(), listByClient: vi.fn()};
   });
 
   it('generate success holds the result in selected and flips generated', () => {
@@ -103,6 +105,26 @@ describe('CreditSimulationStore', () => {
     api.generate.mockReturnValue(throwError(() => error));
     const store = createStore();
     store.generate(makeDraft());
+    expect(store.error()).toBe(error);
+    expect(store.generated()).toBe(false);
+    expect(store.generating()).toBe(false);
+  });
+
+  it('update success holds the reconfigured result in selected and flips generated', () => {
+    api.update.mockReturnValue(of(makeSimulation('s-1')));
+    const store = createStore();
+    store.update('s-1', makeDraft());
+    expect(api.update).toHaveBeenCalledWith('s-1', expect.anything());
+    expect(store.selected()?.id).toBe('s-1');
+    expect(store.generated()).toBe(true);
+    expect(store.generating()).toBe(false);
+  });
+
+  it('update failure sets error and does not flip generated', () => {
+    const error = new ApiError({status: 400, code: 'INVALID_SIMULATION_CONFIGURATION'});
+    api.update.mockReturnValue(throwError(() => error));
+    const store = createStore();
+    store.update('s-1', makeDraft());
     expect(store.error()).toBe(error);
     expect(store.generated()).toBe(false);
     expect(store.generating()).toBe(false);
