@@ -253,6 +253,50 @@
   text-align: right;
 }
 
+/* Collapsible costs breakdown (open on desktop, collapsed on mobile). */
+.costs-accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.costs-accordion__summary::-webkit-details-marker {
+  display: none;
+}
+
+.costs-accordion__summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.costs-accordion__summary .recap-card__subtitle {
+  margin: 0;
+}
+
+.costs-accordion__chevron {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: transform 150ms ease;
+}
+
+.costs-accordion[open] .costs-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.costs-accordion__list {
+  margin-top: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .costs-accordion__chevron {
+    transition: none;
+  }
+}
+
 .history-list {
   list-style: none;
   margin: 0;

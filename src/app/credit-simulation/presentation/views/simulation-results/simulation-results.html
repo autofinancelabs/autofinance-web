@@ -142,15 +142,36 @@
         </dl>
 
         @if (sim.summary.totalsPerCost.length) {
-          <h3 class="recap-card__subtitle">Costos acumulados</h3>
-          <dl class="recap-list">
-            @for (cost of sim.summary.totalsPerCost; track cost.name) {
-              <div class="recap-list__row">
-                <dt>{{ cost.name }}</dt>
-                <dd class="font-mono tabular-nums">{{ cost.total | amount }}</dd>
-              </div>
-            }
-          </dl>
+          <details class="costs-accordion" [open]="costsOpen()" (toggle)="onCostsToggle($event)">
+            <summary class="costs-accordion__summary">
+              <span class="recap-card__subtitle">
+                Costos acumulados ({{ sim.summary.totalsPerCost.length }})
+              </span>
+              <svg
+                class="costs-accordion__chevron"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <dl class="recap-list costs-accordion__list">
+              @for (cost of sim.summary.totalsPerCost; track cost.name) {
+                <div class="recap-list__row">
+                  <dt>{{ cost.name }}</dt>
+                  <dd class="font-mono tabular-nums">{{ cost.total | amount }}</dd>
+                </div>
+              }
+            </dl>
+          </details>
         }
       </section>
 

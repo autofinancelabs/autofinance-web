@@ -44,6 +44,9 @@ export class SimulationResults implements OnInit {
     {label: 'Resultado'},
   ];
 
+  /** Costs breakdown accordion: open by default on desktop, collapsed on mobile. */
+  protected readonly costsOpen = signal(this.isDesktop());
+
   /** VAN as Money (in the operation's currency) for the indicator chip. */
   protected readonly van = computed(() => {
     const sim = this.simulation();
@@ -91,5 +94,19 @@ export class SimulationResults implements OnInit {
   protected isSettlement(period: number): boolean {
     const installments = this.simulation()?.term.numberOfInstallments ?? 0;
     return period > installments;
+  }
+
+  /** Keeps the accordion signal in sync when the user expands/collapses it. */
+  protected onCostsToggle(event: Event): void {
+    this.costsOpen.set((event.target as HTMLDetailsElement).open);
+  }
+
+  /** Viewport ≥ 768px (desktop). Falls back to open when matchMedia is unavailable (tests). */
+  private isDesktop(): boolean {
+    try {
+      return window.matchMedia('(min-width: 768px)').matches;
+    } catch {
+      return true;
+    }
   }
 }
