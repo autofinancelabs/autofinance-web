@@ -6,6 +6,7 @@ import {ClientDraft} from '../domain/model/client-draft.command';
 import {ContactInfo} from '../domain/model/contact-info.value-object';
 import {DocumentId} from '../domain/model/document-id.value-object';
 import {DocumentType} from '../domain/model/document-type';
+import {PersonName} from '../domain/model/person-name.value-object';
 import {ClientsApi} from '../infrastructure/clients-api';
 import {ClientsStore} from './clients.store';
 
@@ -13,6 +14,7 @@ function makeClient(id = 'c-1'): Client {
   return new Client({
     id,
     documentId: new DocumentId({type: DocumentType.DNI, number: '12345678'}),
+    name: new PersonName({firstName: 'Ana María', lastName: 'Pérez García'}),
     contactInfo: ContactInfo.of('ana@example.com', null, null),
   });
 }
@@ -21,6 +23,8 @@ function makeDraft(): ClientDraft {
   return new ClientDraft({
     documentType: DocumentType.DNI,
     documentNumber: '12345678',
+    firstName: 'Ana María',
+    lastName: 'Pérez García',
     email: 'ana@example.com',
     phone: null,
     address: null,

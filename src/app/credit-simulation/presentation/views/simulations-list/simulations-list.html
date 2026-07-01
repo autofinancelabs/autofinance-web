@@ -41,9 +41,7 @@
         <select hlmInput [value]="clientFilter()" (change)="clientFilter.set(pick($event))">
           <option value="">Todos</option>
           @for (client of clients(); track client.id) {
-            <option [value]="client.id">
-              {{ client.documentId.type }} {{ client.documentId.number }}
-            </option>
+            <option [value]="client.id">{{ client.displayName }}</option>
           }
         </select>
       </label>
@@ -78,8 +76,7 @@
               <tr>
                 <td>
                   @if (row.client; as c) {
-                    <span class="doc__badge">{{ c.documentId.type }}</span>
-                    <span class="font-mono tabular-nums">{{ c.documentId.number }}</span>
+                    {{ c.displayName }}
                   } @else {
                     <span class="text-muted-foreground">—</span>
                   }

@@ -185,6 +185,15 @@
   font-weight: 500;
 }
 
+.summary-card__hint {
+  margin: 0.25rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: oklch(0.985 0.005 200 / 0.6);
+}
+
 .summary-badge {
   padding: 0.1rem 0.45rem;
   border-radius: 999px;

@@ -8,6 +8,8 @@ import {DocumentType} from './document-type';
 export class ClientDraft {
   private readonly _documentType: DocumentType;
   private readonly _documentNumber: string;
+  private readonly _firstName: string;
+  private readonly _lastName: string;
   private readonly _email: string | null;
   private readonly _phone: string | null;
   private readonly _address: string | null;
@@ -15,12 +17,16 @@ export class ClientDraft {
   constructor(options: {
     documentType: DocumentType;
     documentNumber: string;
+    firstName: string;
+    lastName: string;
     email: string | null;
     phone: string | null;
     address: string | null;
   }) {
     this._documentType = options.documentType;
     this._documentNumber = options.documentNumber;
+    this._firstName = options.firstName;
+    this._lastName = options.lastName;
     this._email = options.email;
     this._phone = options.phone;
     this._address = options.address;
@@ -32,6 +38,14 @@ export class ClientDraft {
 
   get documentNumber(): string {
     return this._documentNumber;
+  }
+
+  get firstName(): string {
+    return this._firstName;
+  }
+
+  get lastName(): string {
+    return this._lastName;
   }
 
   get email(): string | null {

@@ -3,6 +3,7 @@ import {ClientDraft} from '../domain/model/client-draft.command';
 import {ContactInfo} from '../domain/model/contact-info.value-object';
 import {DocumentId} from '../domain/model/document-id.value-object';
 import {DocumentType} from '../domain/model/document-type';
+import {PersonName} from '../domain/model/person-name.value-object';
 import {ClientResource, RegisterClientResource, UpdateClientResource} from './client-response';
 
 /**
@@ -15,12 +16,18 @@ export class ClientAssembler {
     const resource: RegisterClientResource = {
       documentType: draft.documentType,
       documentNumber: draft.documentNumber,
+      firstName: draft.firstName.trim(),
+      lastName: draft.lastName.trim(),
     };
     return ClientAssembler.withContact(resource, draft);
   }
 
   toUpdateRequest(draft: ClientDraft): UpdateClientResource {
-    return ClientAssembler.withContact({}, draft);
+    const resource: UpdateClientResource = {
+      firstName: draft.firstName.trim(),
+      lastName: draft.lastName.trim(),
+    };
+    return ClientAssembler.withContact(resource, draft);
   }
 
   toEntityFromResource(resource: ClientResource): Client {
@@ -30,6 +37,7 @@ export class ClientAssembler {
         type: resource.documentType as DocumentType,
         number: resource.documentNumber,
       }),
+      name: PersonName.of(resource.firstName, resource.lastName),
       contactInfo: ContactInfo.of(resource.email, resource.phone, resource.address),
     });
   }

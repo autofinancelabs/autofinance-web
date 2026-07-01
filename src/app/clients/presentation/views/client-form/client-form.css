@@ -154,17 +154,31 @@
   letter-spacing: 0.02em;
 }
 
-.card__number {
+.card__name {
   margin: 0;
-  font-family: var(--font-mono);
   font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.card__name--empty {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: oklch(0.985 0.005 200 / 0.5);
+}
+
+.card__number {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.01em;
+  color: oklch(0.985 0.005 200 / 0.7);
 }
 
 .card__number--empty {
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 400;
   color: oklch(0.985 0.005 200 / 0.5);
 }

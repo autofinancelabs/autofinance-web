@@ -5,6 +5,7 @@ import {Client} from '../../../../clients/domain/model/client.entity';
 import {ContactInfo} from '../../../../clients/domain/model/contact-info.value-object';
 import {DocumentId} from '../../../../clients/domain/model/document-id.value-object';
 import {DocumentType} from '../../../../clients/domain/model/document-type';
+import {PersonName} from '../../../../clients/domain/model/person-name.value-object';
 import {ClientsStore} from '../../../../clients/application/clients.store';
 import {Currency} from '../../../../shared/domain/model/currency';
 import {Money} from '../../../../shared/domain/model/money';
@@ -102,6 +103,7 @@ describe('SimulationsList', () => {
       new Client({
         id: 'cl-1',
         documentId: new DocumentId({type: DocumentType.DNI, number: '12345678'}),
+        name: new PersonName({firstName: 'Ana María', lastName: 'Pérez García'}),
         contactInfo: ContactInfo.of('ana@example.com', null, null),
       }),
     ]);
@@ -121,7 +123,7 @@ describe('SimulationsList', () => {
     const rows = el.querySelectorAll('.sim-table tbody tr');
     expect(rows).toHaveLength(1);
     const text = el.textContent ?? '';
-    expect(text).toContain('12345678');
+    expect(text).toContain('Ana Pérez');
     expect(text).toContain('Toyota');
     expect(text).toContain('Corolla');
     const detail = el.querySelector<HTMLAnchorElement>('.sim-table tbody a[href]');

@@ -64,6 +64,34 @@
             </div>
           }
 
+          <div hlmFormField>
+            <label hlmLabel for="firstName">Nombres</label>
+            <input
+              hlmInput
+              id="firstName"
+              autocomplete="given-name"
+              [formField]="f.firstName"
+              [attr.aria-invalid]="f.firstName().touched() && f.firstName().invalid() ? 'true' : null"
+            />
+            @if (f.firstName().touched() && f.firstName().errors().length) {
+              <span hlmError>{{ f.firstName().errors()[0].message }}</span>
+            }
+          </div>
+
+          <div hlmFormField>
+            <label hlmLabel for="lastName">Apellidos</label>
+            <input
+              hlmInput
+              id="lastName"
+              autocomplete="family-name"
+              [formField]="f.lastName"
+              [attr.aria-invalid]="f.lastName().touched() && f.lastName().invalid() ? 'true' : null"
+            />
+            @if (f.lastName().touched() && f.lastName().errors().length) {
+              <span hlmError>{{ f.lastName().errors()[0].message }}</span>
+            }
+          </div>
+
           <div hlmFormField class="col-span-full">
             <label hlmLabel for="email">Correo electrónico</label>
             <input
@@ -139,8 +167,13 @@
             <span class="card__badge">{{ type }}</span>
           }
         </div>
+        @if (preview().name; as name) {
+          <p class="card__name">{{ name }}</p>
+        } @else {
+          <p class="card__name card__name--empty">Sin nombre</p>
+        }
         @if (preview().number; as number) {
-          <p class="card__number">{{ number }}</p>
+          <p class="card__number">{{ preview().type }} {{ number }}</p>
         } @else {
           <p class="card__number card__number--empty">Sin documento</p>
         }

@@ -5,6 +5,7 @@ import {Client} from '../../../domain/model/client.entity';
 import {ContactInfo} from '../../../domain/model/contact-info.value-object';
 import {DocumentId} from '../../../domain/model/document-id.value-object';
 import {DocumentType} from '../../../domain/model/document-type';
+import {PersonName} from '../../../domain/model/person-name.value-object';
 import {ClientsStore} from '../../../application/clients.store';
 import {ClientsList} from './clients-list';
 
@@ -34,12 +35,13 @@ describe('ClientsList', () => {
     expect(store.load).toHaveBeenCalledTimes(1);
   });
 
-  it('renders clients with their document and contact', () => {
+  it('renders clients with their name, document and contact', () => {
     const fixture = setup();
     clients.set([
       new Client({
         id: 'c-1',
         documentId: new DocumentId({type: DocumentType.DNI, number: '12345678'}),
+        name: new PersonName({firstName: 'Ana María', lastName: 'Pérez García'}),
         contactInfo: ContactInfo.of('ana@example.com', '999111222', null),
       }),
     ]);
@@ -47,6 +49,7 @@ describe('ClientsList', () => {
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Ana Pérez');
     expect(text).toContain('DNI');
     expect(text).toContain('12345678');
     expect(text).toContain('ana@example.com');

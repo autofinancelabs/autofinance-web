@@ -25,9 +25,7 @@
               >
                 <option value="" disabled>— Selecciona un cliente —</option>
                 @for (client of clients(); track client.id) {
-                  <option [value]="client.id">
-                    {{ client.documentId.type }} {{ client.documentId.number }}
-                  </option>
+                  <option [value]="client.id">{{ client.displayName }}</option>
                 }
               </select>
               @if (clients().length === 0) {
@@ -460,7 +458,8 @@
       <div class="summary-card">
         <p class="summary-card__label">Cliente</p>
         @if (selectedClient(); as client) {
-          <p class="summary-card__value">
+          <p class="summary-card__value">{{ client.displayName }}</p>
+          <p class="summary-card__hint">
             <span class="summary-badge">{{ client.documentId.type }}</span>
             <span class="font-mono tabular-nums">{{ client.documentId.number }}</span>
           </p>

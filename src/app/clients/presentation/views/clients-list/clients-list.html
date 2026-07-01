@@ -40,6 +40,7 @@
         <table class="clients-table">
           <thead>
             <tr>
+              <th scope="col">Nombre</th>
               <th scope="col">Documento</th>
               <th scope="col">Email</th>
               <th scope="col">Teléfono</th>
@@ -49,6 +50,13 @@
           <tbody>
             @for (client of clients(); track client.id) {
               <tr>
+                <td>
+                  @if (client.name; as name) {
+                    {{ name.shortName }}
+                  } @else {
+                    <span class="text-muted-foreground">—</span>
+                  }
+                </td>
                 <td>
                   <span class="doc">
                     <span class="doc__badge">{{ client.documentId.type }}</span>

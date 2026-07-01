@@ -7,6 +7,7 @@ import {ClientDraft} from '../../../domain/model/client-draft.command';
 import {ContactInfo} from '../../../domain/model/contact-info.value-object';
 import {DocumentId} from '../../../domain/model/document-id.value-object';
 import {DocumentType} from '../../../domain/model/document-type';
+import {PersonName} from '../../../domain/model/person-name.value-object';
 import {ClientsStore} from '../../../application/clients.store';
 import {ClientForm} from './client-form';
 
@@ -15,6 +16,8 @@ const flush = () => new Promise(resolve => setTimeout(resolve));
 interface FormModel {
   documentType: string;
   documentNumber: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   address: string;
@@ -23,6 +26,8 @@ interface FormModel {
 const validModel: FormModel = {
   documentType: 'DNI',
   documentNumber: '12345678',
+  firstName: 'Ana María',
+  lastName: 'Pérez García',
   email: '',
   phone: '',
   address: '',
@@ -87,8 +92,21 @@ describe('ClientForm', () => {
     expect(draft).toBeInstanceOf(ClientDraft);
     expect(draft.documentType).toBe(DocumentType.DNI);
     expect(draft.documentNumber).toBe('12345678');
+    expect(draft.firstName).toBe('Ana María');
+    expect(draft.lastName).toBe('Pérez García');
     expect(draft.email).toBe('ana@example.com');
     expect(draft.phone).toBeNull();
+  });
+
+  it('blocks submit and shows an error when the names are missing', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({...validModel, firstName: '', lastName: ''});
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+    fixture.detectChanges();
+
+    expect(store.create).not.toHaveBeenCalled();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('obligatorio');
   });
 
   it('blocks submit and shows an error when the document number is missing', async () => {
@@ -117,6 +135,7 @@ describe('ClientForm', () => {
       new Client({
         id: 'c-9',
         documentId: new DocumentId({type: DocumentType.CE, number: 'X123'}),
+        name: new PersonName({firstName: 'Ana María', lastName: 'Pérez García'}),
         contactInfo: ContactInfo.of('old@example.com', null, null),
       }),
     );
@@ -129,6 +148,8 @@ describe('ClientForm', () => {
     const [id, draft] = store.update.mock.calls[0] as [string, ClientDraft];
     expect(id).toBe('c-9');
     expect(draft.documentNumber).toBe('X123');
+    expect(draft.firstName).toBe('Ana María');
+    expect(draft.lastName).toBe('Pérez García');
     expect(draft.email).toBe('new@example.com');
   });
 

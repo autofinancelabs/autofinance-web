@@ -14,6 +14,8 @@ import {DocumentType, documentTypes} from '../../../domain/model/document-type';
 interface ClientModel {
   documentType: string;
   documentNumber: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   address: string;
@@ -60,10 +62,14 @@ export class ClientForm extends BaseForm implements OnInit {
   protected readonly preview = computed(() => {
     const value = this.model();
     const number = value.documentNumber.trim();
-    const monogram = number.slice(0, 2).toUpperCase();
+    const firstName = value.firstName.trim();
+    const lastName = value.lastName.trim();
+    const fullName = `${firstName} ${lastName}`.trim();
+    const monogram = (firstName.slice(0, 1) + lastName.slice(0, 1)).toUpperCase();
     return {
       type: value.documentType === '' ? null : value.documentType,
       number: number === '' ? null : number,
+      name: fullName === '' ? null : fullName,
       monogram: monogram === '' ? null : monogram,
       email: value.email.trim() === '' ? null : value.email.trim(),
       phone: value.phone.trim() === '' ? null : value.phone.trim(),
@@ -74,6 +80,8 @@ export class ClientForm extends BaseForm implements OnInit {
   protected readonly model = signal<ClientModel>({
     documentType: '',
     documentNumber: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     address: '',
@@ -82,6 +90,8 @@ export class ClientForm extends BaseForm implements OnInit {
   protected readonly f = form(this.model, path => {
     required(path.documentType, {message: this.messageFor('tipo de documento', 'required')});
     required(path.documentNumber, {message: this.messageFor('número de documento', 'required')});
+    required(path.firstName, {message: this.messageFor('nombres', 'required')});
+    required(path.lastName, {message: this.messageFor('apellidos', 'required')});
     // Contact fields are optional; validate format only when provided.
     applyWhenValue(
       path.email,
@@ -109,6 +119,8 @@ export class ClientForm extends BaseForm implements OnInit {
         this.model.set({
           documentType: client.documentId.type,
           documentNumber: client.documentId.number,
+          firstName: client.name?.firstName ?? '',
+          lastName: client.name?.lastName ?? '',
           email: client.contactInfo?.email ?? '',
           phone: client.contactInfo?.phone ?? '',
           address: client.contactInfo?.address ?? '',
@@ -136,6 +148,8 @@ export class ClientForm extends BaseForm implements OnInit {
       const draft = new ClientDraft({
         documentType: value.documentType as DocumentType,
         documentNumber: value.documentNumber.trim(),
+        firstName: value.firstName.trim(),
+        lastName: value.lastName.trim(),
         email: value.email.trim() === '' ? null : value.email.trim(),
         phone: value.phone.trim() === '' ? null : value.phone.trim(),
         address: value.address.trim() === '' ? null : value.address.trim(),
