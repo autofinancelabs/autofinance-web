@@ -65,6 +65,12 @@ Reglas de aplicación:
 Donde `m = 360/días_capitalización` y, para el camino directo nominal,
 `n = días_periodo/días_capitalización`. El **interés simple no se usa** (fuera de alcance).
 
+**Periodo arbitrario (importante).** `m` (y el exponente en general) **no tiene que ser entero**: se
+admite cualquier periodo en días — mensual (30), semestral (180), 45, 100, etc. Para la tasa
+**nominal** el periodo es la **capitalización**; para la **efectiva** es el **periodo de la tasa**
+(p. ej. TEM = 30 días, TES = 180; ausente ⇒ anual/TEA). El motor usa un exponente fraccional cuando el
+periodo no divide al año (p. ej. 100 → `m = 3.6`), y el camino exacto entero cuando sí lo divide.
+
 ## 4. Cálculo del préstamo
 
 ```text

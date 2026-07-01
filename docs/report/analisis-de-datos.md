@@ -52,7 +52,7 @@ Las divisiones y potencias usan `MathContext` con redondeo `HALF_UP`.
 |------------------|------------------------------------------------|--------------------------|-----------|-----------|---------|-------------------------------------------------------------|
 | `tipoTasa`       | Naturaleza de la tasa ingresada                | enum {NOMINAL, EFECTIVA} | —         | "NOMINAL" | —       | obligatorio                                                 |
 | `valorTasa`      | Valor de la tasa (TNA o TEA), en fracción      | BigDecimal               | scale 10  | 0.1500    | —       | obligatorio; `≥ 0`                                          |
-| `capitalizacion` | Días de capitalización (1=diaria, 30=mensual, 90=trimestral, 180=semestral, 360=anual, o cualquier valor) | int (días)               | —         | 1         | —       | **obligatorio si `tipoTasa=NOMINAL`**; ignorado si EFECTIVA; `> 0` |
+| `capitalizacion` | Periodo en días (1=diaria, 30=mensual, 180=semestral, 360=anual, o cualquier valor como 100). NOMINAL: capitalización. EFECTIVA: período de la tasa (TEM=30, TES=180…) | int (días)               | —         | 1         | —       | **obligatorio si `tipoTasa=NOMINAL`**; si EFECTIVA opcional (ausente = anual/TEA); `> 0` |
 | `diasAnio`       | Días por año (convención)                      | int                      | —         | 360       | 360     | fijo 360 en v1                                              |
 
 ### 4.3 Estructura del crédito

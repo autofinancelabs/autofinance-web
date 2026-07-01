@@ -139,14 +139,12 @@ export class SimulationConfig extends BaseForm implements OnInit {
       }
       return undefined;
     });
-    // Custom capitalization days are required (and > 0) when "Otro" is chosen for a nominal rate.
+    // Custom days are required (and > 0) when "Otro" is chosen (nominal capitalization or effective period).
     validate(path.capitalizationDays, ctx => {
-      const rateType = ctx.valueOf(path.rateType);
-      const choice = ctx.valueOf(path.capitalizationChoice);
-      if (rateType === RateType.NOMINAL && choice === 'OTHER') {
+      if (ctx.valueOf(path.capitalizationChoice) === 'OTHER') {
         const days = ctx.value();
         if (days === null || days <= 0) {
-          return {kind: 'min', message: 'Indica los días de capitalización (mayor que 0).'};
+          return {kind: 'min', message: 'Indica los días del período (mayor que 0).'};
         }
       }
       return undefined;
@@ -241,12 +239,13 @@ export class SimulationConfig extends BaseForm implements OnInit {
         ...Array<GraceType>(partial).fill(GraceType.PARTIAL),
         ...Array<GraceType>(Math.max(0, installments - total - partial)).fill(GraceType.NONE),
       ];
+      // Nominal: capitalization (required). Effective: rate period ('' = annual TEA → null).
       const capitalization =
-        value.rateType === RateType.NOMINAL && value.capitalizationChoice !== ''
-          ? value.capitalizationChoice === 'OTHER'
+        value.capitalizationChoice === ''
+          ? null
+          : value.capitalizationChoice === 'OTHER'
             ? value.capitalizationDays
-            : Number(value.capitalizationChoice)
-          : null;
+            : Number(value.capitalizationChoice);
       const draft = new SimulationDraft({
         clientId: value.clientId,
         vehicleOfferId: value.vehicleOfferId,

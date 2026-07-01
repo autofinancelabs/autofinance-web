@@ -124,30 +124,37 @@
                   <span hlmError>{{ f.capitalizationChoice().errors()[0].message }}</span>
                 }
               </div>
+            } @else {
+              <div hlmFormField>
+                <label hlmLabel for="capitalization">Período de la tasa</label>
+                <select hlmInput id="capitalization" [formField]="f.capitalizationChoice">
+                  <option value="">TEA (anual)</option>
+                  <option value="30">TEM (mensual)</option>
+                  <option value="OTHER">Otro (días)…</option>
+                </select>
+              </div>
+            }
 
-              @if (showCustomCapitalization()) {
-                <div hlmFormField>
-                  <label hlmLabel for="capitalizationDays">Días de capitalización</label>
-                  <input
-                    hlmInput
-                    id="capitalizationDays"
-                    type="number"
-                    inputmode="numeric"
-                    class="font-mono tabular-nums"
-                    [formField]="f.capitalizationDays"
-                    [attr.aria-invalid]="
-                      f.capitalizationDays().touched() && f.capitalizationDays().invalid()
-                        ? 'true'
-                        : null
-                    "
-                  />
-                  @if (
-                    f.capitalizationDays().touched() && f.capitalizationDays().errors().length
-                  ) {
-                    <span hlmError>{{ f.capitalizationDays().errors()[0].message }}</span>
-                  }
-                </div>
-              }
+            @if (showCustomCapitalization()) {
+              <div hlmFormField>
+                <label hlmLabel for="capitalizationDays">Días del período</label>
+                <input
+                  hlmInput
+                  id="capitalizationDays"
+                  type="number"
+                  inputmode="numeric"
+                  class="font-mono tabular-nums"
+                  [formField]="f.capitalizationDays"
+                  [attr.aria-invalid]="
+                    f.capitalizationDays().touched() && f.capitalizationDays().invalid()
+                      ? 'true'
+                      : null
+                  "
+                />
+                @if (f.capitalizationDays().touched() && f.capitalizationDays().errors().length) {
+                  <span hlmError>{{ f.capitalizationDays().errors()[0].message }}</span>
+                }
+              </div>
             }
           </div>
         </fieldset>

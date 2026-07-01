@@ -138,6 +138,35 @@ describe('SimulationConfig', () => {
     expect(draft.capitalization).toBe(15);
   });
 
+  it('sends the effective rate period (TEM) as days', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      rateType: RateType.EFFECTIVE,
+      capitalizationChoice: '30',
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.capitalization).toBe(30);
+  });
+
+  it('sends a custom effective period (100 days) via "Otro"', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      rateType: RateType.EFFECTIVE,
+      capitalizationChoice: 'OTHER',
+      capitalizationDays: 100,
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.capitalization).toBe(100);
+  });
+
   it('blocks submit when a nominal rate has no capitalization', async () => {
     const fixture = setup();
     instance(fixture).model.set({
