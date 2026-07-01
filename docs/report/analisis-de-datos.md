@@ -51,8 +51,9 @@ Las divisiones y potencias usan `MathContext` con redondeo `HALF_UP`.
 | nombre           | descripción                                    | tipo                     | precisión | formato   | default | restricciones                                               |
 |------------------|------------------------------------------------|--------------------------|-----------|-----------|---------|-------------------------------------------------------------|
 | `tipoTasa`       | Naturaleza de la tasa ingresada                | enum {NOMINAL, EFECTIVA} | —         | "NOMINAL" | —       | obligatorio                                                 |
-| `valorTasa`      | Valor de la tasa (TNA o TEA), en fracción      | BigDecimal               | scale 10  | 0.1500    | —       | obligatorio; `≥ 0`                                          |
-| `capitalizacion` | Periodo en días (1=diaria, 30=mensual, 180=semestral, 360=anual, o cualquier valor como 100). NOMINAL: capitalización. EFECTIVA: período de la tasa (TEM=30, TES=180…) | int (días)               | —         | 1         | —       | **obligatorio si `tipoTasa=NOMINAL`**; si EFECTIVA opcional (ausente = anual/TEA); `> 0` |
+| `valorTasa`      | Valor de la tasa, en fracción, cotizado sobre `periodoTasa` | BigDecimal   | scale 10  | 0.1500    | —       | obligatorio; `≥ 0`                                          |
+| `capitalizacion` | Frecuencia de **capitalización** (composición) en días (1=diaria, 30=mensual, 90=trimestral, 180=semestral, 360=anual, o cualquier valor como 100). Solo NOMINAL. | int (días)               | —         | 30        | —       | **obligatorio si `tipoTasa=NOMINAL`**; omitir si EFECTIVA; `> 0` |
+| `periodoTasa`    | **Período de la tasa** en días: período sobre el que se cotiza `valorTasa` (ambos tipos; independiente de la capitalización). Ausente ⇒ anual (TNA/TEA). | int (días)               | —         | 360       | null    | opcional (ausente = anual); `> 0`                          |
 | `diasAnio`       | Días por año (convención)                      | int                      | —         | 360       | 360     | fijo 360 en v1                                              |
 
 ### 4.3 Estructura del crédito

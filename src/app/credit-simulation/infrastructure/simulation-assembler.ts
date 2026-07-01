@@ -50,6 +50,10 @@ export class SimulationAssembler {
     if (draft.capitalization !== null) {
       resource.capitalization = draft.capitalization;
     }
+    // Rate period is optional (omitted = annual) for both types.
+    if (draft.ratePeriod !== null) {
+      resource.ratePeriod = draft.ratePeriod;
+    }
     return resource;
   }
 
@@ -108,6 +112,7 @@ export class SimulationAssembler {
       value: resource.value,
       type: resource.type as RateType,
       capitalization: resource.capitalization,
+      ratePeriod: resource.ratePeriod,
     });
   }
 

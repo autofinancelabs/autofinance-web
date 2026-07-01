@@ -16,6 +16,17 @@ export const capitalizationPresets: readonly CapitalizationPreset[] = [
   {label: 'Anual', days: 360},
 ];
 
+/**
+ * Common presets for the **rate period** (the period a rate value is quoted over). "Annual" is
+ * offered separately as the default (empty) choice, so it is not repeated here. Any positive integer
+ * is valid via the "Otro (días)" option.
+ */
+export const ratePeriodPresets: readonly CapitalizationPreset[] = [
+  {label: 'Mensual', days: 30},
+  {label: 'Trimestral', days: 90},
+  {label: 'Semestral', days: 180},
+];
+
 /** The preset label for a given day count, or null if it doesn't match a common preset. */
 export function capitalizationLabel(days: number | null): string | null {
   if (days === null) {

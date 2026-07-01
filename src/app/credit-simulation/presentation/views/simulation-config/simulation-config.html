@@ -77,7 +77,7 @@
               <label hlmLabel for="rateType">Tipo de tasa</label>
               <select hlmInput id="rateType" [formField]="f.rateType">
                 @for (type of rateTypes; track type) {
-                  <option [value]="type">{{ type === 'NOMINAL' ? 'Nominal (TNA)' : 'Efectiva (TEA)' }}</option>
+                  <option [value]="type">{{ type === 'NOMINAL' ? 'Tasa Nominal' : 'Tasa Efectiva' }}</option>
                 }
               </select>
             </div>
@@ -99,6 +99,39 @@
               }
             </div>
 
+            <!-- Período de la tasa: aplica a ambos tipos (ausente = anual). -->
+            <div hlmFormField>
+              <label hlmLabel for="ratePeriod">Período de la tasa</label>
+              <select hlmInput id="ratePeriod" [formField]="f.ratePeriodChoice">
+                <option value="">Anual</option>
+                @for (preset of ratePeriodPresets; track preset.days) {
+                  <option [value]="preset.days">{{ preset.label }} ({{ preset.days }}d)</option>
+                }
+                <option value="OTHER">Otro (días)…</option>
+              </select>
+            </div>
+
+            @if (showCustomRatePeriod()) {
+              <div hlmFormField>
+                <label hlmLabel for="ratePeriodDays">Días del período</label>
+                <input
+                  hlmInput
+                  id="ratePeriodDays"
+                  type="number"
+                  inputmode="numeric"
+                  class="font-mono tabular-nums"
+                  [formField]="f.ratePeriodDays"
+                  [attr.aria-invalid]="
+                    f.ratePeriodDays().touched() && f.ratePeriodDays().invalid() ? 'true' : null
+                  "
+                />
+                @if (f.ratePeriodDays().touched() && f.ratePeriodDays().errors().length) {
+                  <span hlmError>{{ f.ratePeriodDays().errors()[0].message }}</span>
+                }
+              </div>
+            }
+
+            <!-- Capitalización: solo para tasa nominal (obligatoria). -->
             @if (model().rateType === RateType.NOMINAL) {
               <div hlmFormField>
                 <label hlmLabel for="capitalization">Capitalización</label>
@@ -124,37 +157,28 @@
                   <span hlmError>{{ f.capitalizationChoice().errors()[0].message }}</span>
                 }
               </div>
-            } @else {
-              <div hlmFormField>
-                <label hlmLabel for="capitalization">Período de la tasa</label>
-                <select hlmInput id="capitalization" [formField]="f.capitalizationChoice">
-                  <option value="">TEA (anual)</option>
-                  <option value="30">TEM (mensual)</option>
-                  <option value="OTHER">Otro (días)…</option>
-                </select>
-              </div>
-            }
 
-            @if (showCustomCapitalization()) {
-              <div hlmFormField>
-                <label hlmLabel for="capitalizationDays">Días del período</label>
-                <input
-                  hlmInput
-                  id="capitalizationDays"
-                  type="number"
-                  inputmode="numeric"
-                  class="font-mono tabular-nums"
-                  [formField]="f.capitalizationDays"
-                  [attr.aria-invalid]="
-                    f.capitalizationDays().touched() && f.capitalizationDays().invalid()
-                      ? 'true'
-                      : null
-                  "
-                />
-                @if (f.capitalizationDays().touched() && f.capitalizationDays().errors().length) {
-                  <span hlmError>{{ f.capitalizationDays().errors()[0].message }}</span>
-                }
-              </div>
+              @if (showCustomCapitalization()) {
+                <div hlmFormField>
+                  <label hlmLabel for="capitalizationDays">Días de capitalización</label>
+                  <input
+                    hlmInput
+                    id="capitalizationDays"
+                    type="number"
+                    inputmode="numeric"
+                    class="font-mono tabular-nums"
+                    [formField]="f.capitalizationDays"
+                    [attr.aria-invalid]="
+                      f.capitalizationDays().touched() && f.capitalizationDays().invalid()
+                        ? 'true'
+                        : null
+                    "
+                  />
+                  @if (f.capitalizationDays().touched() && f.capitalizationDays().errors().length) {
+                    <span hlmError>{{ f.capitalizationDays().errors()[0].message }}</span>
+                  }
+                </div>
+              }
             }
           </div>
         </fieldset>
@@ -183,7 +207,7 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="balloonPercentage">% Cuotón</label>
+              <label hlmLabel for="balloonPercentage">% Cuota balloon (V. Futuro)</label>
               <input
                 hlmInput
                 id="balloonPercentage"
@@ -449,15 +473,25 @@
         <div class="recap__row">
           <dt>Tasa</dt>
           <dd class="font-mono tabular-nums">
-            {{ model().rateValue ?? '—' }}% {{ model().rateType === 'NOMINAL' ? 'TNA' : 'TEA' }}
+            {{ model().rateValue ?? '—' }}% {{ model().rateType === 'NOMINAL' ? 'nominal' : 'efectiva' }}
           </dd>
         </div>
+        <div class="recap__row">
+          <dt>Período de la tasa</dt>
+          <dd class="font-mono tabular-nums">{{ ratePeriodSummary() }}</dd>
+        </div>
+        @if (model().rateType === RateType.NOMINAL) {
+          <div class="recap__row">
+            <dt>Capitalización</dt>
+            <dd class="font-mono tabular-nums">{{ capitalizationSummary() }}</dd>
+          </div>
+        }
         <div class="recap__row">
           <dt>Plazo</dt>
           <dd class="font-mono tabular-nums">{{ model().numberOfInstallments ?? '—' }} cuotas</dd>
         </div>
         <div class="recap__row">
-          <dt>Inicial / Cuotón</dt>
+          <dt>Inicial / Cuota balloon</dt>
           <dd class="font-mono tabular-nums">
             {{ model().initialPercentage ?? '—' }}% / {{ model().balloonPercentage ?? '—' }}%
           </dd>
@@ -469,7 +503,7 @@
       </dl>
 
       <p class="form-aside__note">
-        Al generar se calcula el cronograma (método francés + cuotón) y los indicadores de
+        Al generar se calcula el cronograma (método francés + cuota balloon) y los indicadores de
         transparencia: TCEA, VAN y TIR.
       </p>
     </aside>

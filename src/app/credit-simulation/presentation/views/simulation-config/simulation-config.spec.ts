@@ -18,6 +18,8 @@ interface FormModel {
   rateValue: number | null;
   capitalizationChoice: string;
   capitalizationDays: number | null;
+  ratePeriodChoice: string;
+  ratePeriodDays: number | null;
   initialPercentage: number | null;
   balloonPercentage: number | null;
   costOfCapitalAnnual: number | null;
@@ -36,6 +38,8 @@ const validModel: FormModel = {
   rateValue: 9,
   capitalizationChoice: '',
   capitalizationDays: null,
+  ratePeriodChoice: '',
+  ratePeriodDays: null,
   initialPercentage: 20,
   balloonPercentage: 40,
   costOfCapitalAnnual: 50,
@@ -105,6 +109,7 @@ describe('SimulationConfig', () => {
     expect(draft.balloonPercentage).toBeCloseTo(0.4, 10);
     expect(draft.costOfCapitalAnnual).toBeCloseTo(0.5, 10);
     expect(draft.capitalization).toBeNull();
+    expect(draft.ratePeriod).toBeNull();
     expect(draft.gracePlan).toHaveLength(36);
     expect(draft.gracePlan.slice(0, 3)).toEqual([GraceType.TOTAL, GraceType.TOTAL, GraceType.TOTAL]);
     expect(draft.gracePlan.slice(3, 6)).toEqual([
@@ -128,6 +133,23 @@ describe('SimulationConfig', () => {
     expect(store.generate).toHaveBeenCalledTimes(1);
     const draft = store.generate.mock.calls[0][0] as SimulationDraft;
     expect(draft.capitalization).toBe(30);
+    expect(draft.ratePeriod).toBeNull();
+  });
+
+  it('sends the nominal rate period alongside the capitalization', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      rateType: RateType.NOMINAL,
+      capitalizationChoice: '1',
+      ratePeriodChoice: '30',
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.capitalization).toBe(1);
+    expect(draft.ratePeriod).toBe(30);
   });
 
   it('sends the custom capitalization days when "Otro" is chosen', async () => {
@@ -146,18 +168,19 @@ describe('SimulationConfig', () => {
     expect(draft.capitalization).toBe(15);
   });
 
-  it('sends the effective rate period (TEM) as days', async () => {
+  it('sends the effective rate period (monthly) as days and no capitalization', async () => {
     const fixture = setup();
     instance(fixture).model.set({
       ...validModel,
       rateType: RateType.EFFECTIVE,
-      capitalizationChoice: '30',
+      ratePeriodChoice: '30',
     });
     instance(fixture).onSubmit(new Event('submit'));
     await flush();
 
     const draft = store.generate.mock.calls[0][0] as SimulationDraft;
-    expect(draft.capitalization).toBe(30);
+    expect(draft.ratePeriod).toBe(30);
+    expect(draft.capitalization).toBeNull();
   });
 
   it('sends a custom effective period (100 days) via "Otro"', async () => {
@@ -165,14 +188,15 @@ describe('SimulationConfig', () => {
     instance(fixture).model.set({
       ...validModel,
       rateType: RateType.EFFECTIVE,
-      capitalizationChoice: 'OTHER',
-      capitalizationDays: 100,
+      ratePeriodChoice: 'OTHER',
+      ratePeriodDays: 100,
     });
     instance(fixture).onSubmit(new Event('submit'));
     await flush();
 
     const draft = store.generate.mock.calls[0][0] as SimulationDraft;
-    expect(draft.capitalization).toBe(100);
+    expect(draft.ratePeriod).toBe(100);
+    expect(draft.capitalization).toBeNull();
   });
 
   it('blocks submit when a nominal rate has no capitalization', async () => {

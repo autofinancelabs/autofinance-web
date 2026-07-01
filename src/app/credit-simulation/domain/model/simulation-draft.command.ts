@@ -15,6 +15,7 @@ export class SimulationDraft {
   private readonly _rateValue: number;
   private readonly _rateType: RateType;
   private readonly _capitalization: number | null;
+  private readonly _ratePeriod: number | null;
   private readonly _initialPercentage: number;
   private readonly _balloonPercentage: number;
   private readonly _numberOfInstallments: number;
@@ -30,6 +31,7 @@ export class SimulationDraft {
     rateValue: number;
     rateType: RateType;
     capitalization: number | null;
+    ratePeriod: number | null;
     initialPercentage: number;
     balloonPercentage: number;
     numberOfInstallments: number;
@@ -44,6 +46,7 @@ export class SimulationDraft {
     this._rateValue = options.rateValue;
     this._rateType = options.rateType;
     this._capitalization = options.capitalization;
+    this._ratePeriod = options.ratePeriod;
     this._initialPercentage = options.initialPercentage;
     this._balloonPercentage = options.balloonPercentage;
     this._numberOfInstallments = options.numberOfInstallments;
@@ -73,6 +76,11 @@ export class SimulationDraft {
   /** Capitalization frequency in days (null for effective rates). */
   get capitalization(): number | null {
     return this._capitalization;
+  }
+
+  /** Period in days the rate value is quoted over (null = annual). */
+  get ratePeriod(): number | null {
+    return this._ratePeriod;
   }
 
   get initialPercentage(): number {

@@ -49,27 +49,27 @@ Convención de días: `m = 360/días_capitalización`; al pasar de anual a perio
 ## 3. Conversión de tasas
 
 ```text
-TEA  = (1 + TNA/m)^m − 1                       (nominal → efectiva anual)
-TEP  = (1 + TNA/m)^n − 1                        (nominal → efectiva del periodo, directo)
-TEP  = (1 + TEA)^(días_periodo/días_año) − 1    (efectiva anual → efectiva del periodo)
-TEP2 = (1 + TEP1)^(n2/n1) − 1                   (tasas equivalentes)
+TEA  = (1 + TN·(D/R)/m)^m − 1 = (1 + TN·C/R)^(D/C) − 1   (nominal → efectiva anual)
+TEP  = (1 + TEA)^(días_periodo/días_año) − 1              (efectiva anual → efectiva del periodo)
+TEP2 = (1 + TEP1)^(n2/n1) − 1                             (tasas equivalentes)
 ```
 
 Reglas de aplicación:
 
-| Entrada                                 | Camino                                        | Resultado               |
-|-----------------------------------------|-----------------------------------------------|-------------------------|
-| Tasa **nominal** (TNA + capitalización) | `TEA = (1 + TNA/m)^m − 1`, luego a TEP        | requiere capitalización |
-| Tasa **efectiva** (TEA)                 | `TEP = (1 + TEA)^(días_periodo/días_año) − 1` | directo                 |
+| Entrada                                          | Camino                                              | Resultado                          |
+|--------------------------------------------------|-----------------------------------------------------|------------------------------------|
+| Tasa **nominal** (TN + capitalización + período) | `TEA = (1 + TN·C/R)^(D/C) − 1`, luego a TEP         | requiere capitalización            |
+| Tasa **efectiva** (período)                      | `TEA = (1 + value)^(D/R) − 1`, luego a TEP          | período opcional (ausente ⇒ anual) |
 
-Donde `m = 360/días_capitalización` y, para el camino directo nominal,
-`n = días_periodo/días_capitalización`. El **interés simple no se usa** (fuera de alcance).
+Donde `D = días_año`, `C = días_capitalización`, `m = D/C`, y `R = período de la tasa` en días
+(**ausente ⇒ anual**, `R = D`). El **interés simple no se usa** (fuera de alcance).
 
-**Periodo arbitrario (importante).** `m` (y el exponente en general) **no tiene que ser entero**: se
-admite cualquier periodo en días — mensual (30), semestral (180), 45, 100, etc. Para la tasa
-**nominal** el periodo es la **capitalización**; para la **efectiva** es el **periodo de la tasa**
-(p. ej. TEM = 30 días, TES = 180; ausente ⇒ anual/TEA). El motor usa un exponente fraccional cuando el
-periodo no divide al año (p. ej. 100 → `m = 3.6`), y el camino exacto entero cuando sí lo divide.
+**Período de la tasa (importante).** Toda tasa se cotiza sobre un **período** `R` en días (`ausente ⇒
+anual`). Para la **nominal**, `R` (p. ej. mensual = 30 ⇒ TNM) es **independiente** de la
+**capitalización** `C` (la frecuencia de composición); el `value` anualizado es `TN·(D/R)`. Para la
+**efectiva**, `R` es el período de la tasa (p. ej. TEM = 30, TES = 180). Los exponentes **no tienen que
+ser enteros**: se admite cualquier período (45, 100, …); el motor usa el camino exacto entero cuando el
+período divide al año y un exponente fraccional cuando no (p. ej. 100 → `m = 3.6`).
 
 ## 4. Cálculo del préstamo
 

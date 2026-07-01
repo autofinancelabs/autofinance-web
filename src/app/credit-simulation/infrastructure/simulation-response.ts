@@ -13,6 +13,7 @@ export interface GenerateSimulationResource {
   rateValue: number;
   rateType: string;
   capitalization?: number;
+  ratePeriod?: number;
   initialPercentage: number;
   balloonPercentage: number;
   numberOfInstallments: number;
@@ -37,6 +38,7 @@ export interface RateResource {
   value: number;
   type: string;
   capitalization: number | null;
+  ratePeriod: number | null;
 }
 
 /** The loan term. */

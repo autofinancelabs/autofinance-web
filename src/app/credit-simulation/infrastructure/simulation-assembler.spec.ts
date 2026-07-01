@@ -8,13 +8,16 @@ import {SimulationState} from '../domain/model/simulation-state';
 import {SimulationAssembler} from './simulation-assembler';
 import {SimulationResource} from './simulation-response';
 
-function makeDraft(overrides: Partial<{rateType: RateType; capitalization: number | null}> = {}): SimulationDraft {
+function makeDraft(
+  overrides: Partial<{rateType: RateType; capitalization: number | null; ratePeriod: number | null}> = {},
+): SimulationDraft {
   return new SimulationDraft({
     clientId: 'cl-1',
     vehicleOfferId: 'vo-1',
     rateValue: 0.15,
     rateType: RateType.NOMINAL,
     capitalization: 1,
+    ratePeriod: null,
     initialPercentage: 0.2,
     balloonPercentage: 0.4,
     numberOfInstallments: 36,
@@ -41,13 +44,13 @@ function makeResource(): SimulationResource {
     clientId: 'cl-1',
     vehicleOfferId: 'vo-1',
     salePrice: {amount: 16000, currency: 'PEN'},
-    rate: {value: 0.15, type: 'NOMINAL', capitalization: 1},
+    rate: {value: 0.15, type: 'NOMINAL', capitalization: 1, ratePeriod: 30},
     initialPercentage: 0.2,
     balloonPercentage: 0.4,
     term: {numberOfInstallments: 36, frequencyDays: 30, installmentsPerYear: 12, daysPerYear: 360},
     grace: ['TOTAL', 'PARTIAL', 'NONE'],
     costs: [{name: 'GPS', value: 20, basis: 'FIXED', timing: 'PERIODIC', embedded: false}],
-    costOfCapital: {value: 0.5, type: 'EFFECTIVE', capitalization: null},
+    costOfCapital: {value: 0.5, type: 'EFFECTIVE', capitalization: null, ratePeriod: null},
     loanAmount: {amount: 12975, currency: 'PEN'},
     financedBalance: {amount: 9015.99, currency: 'PEN'},
     indicators: {
@@ -108,6 +111,12 @@ describe('SimulationAssembler', () => {
     expect('capitalization' in request).toBe(false);
   });
 
+  it('includes ratePeriod when set and omits it when null (annual)', () => {
+    expect('ratePeriod' in assembler.toGenerateRequest(makeDraft())).toBe(false);
+    const withPeriod = assembler.toGenerateRequest(makeDraft({ratePeriod: 30}));
+    expect(withPeriod.ratePeriod).toBe(30);
+  });
+
   it('maps a response to the aggregate (money, rate, term, schedule, indicators)', () => {
     const sim = assembler.toEntityFromResource(makeResource());
     expect(sim.id).toBe('s-1');
@@ -115,8 +124,10 @@ describe('SimulationAssembler', () => {
     expect(sim.salePrice.currency).toBe('PEN');
     expect(sim.rate.type).toBe(RateType.NOMINAL);
     expect(sim.rate.capitalization).toBe(1);
+    expect(sim.rate.ratePeriod).toBe(30);
     expect(sim.rate.isNominal).toBe(true);
     expect(sim.costOfCapital.capitalization).toBeNull();
+    expect(sim.costOfCapital.ratePeriod).toBeNull();
     expect(sim.term.installmentsPerYear).toBe(12);
     expect(sim.grace).toEqual([GraceType.TOTAL, GraceType.PARTIAL, GraceType.NONE]);
     expect(sim.indicators.npv).toBe(4436.18);

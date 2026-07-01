@@ -12,7 +12,11 @@ import {ClientsStore} from '../../../../clients/application/clients.store';
 import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
 import {SimulationDraft} from '../../../domain/model/simulation-draft.command';
-import {capitalizationPresets} from '../../../domain/model/capitalization';
+import {
+  capitalizationLabel,
+  capitalizationPresets,
+  ratePeriodPresets,
+} from '../../../domain/model/capitalization';
 import {Cost} from '../../../domain/model/cost.value-object';
 import {CostBasis, costBases} from '../../../domain/model/cost-basis';
 import {CostTiming, costTimings} from '../../../domain/model/cost-timing';
@@ -32,10 +36,14 @@ interface ConfigModel {
   vehicleOfferId: string;
   rateType: RateType;
   rateValue: number | null;
-  /** Capitalization select: '' (none), a preset's days as string, or 'OTHER'. */
+  /** Capitalization select (nominal only): '' (none), a preset's days as string, or 'OTHER'. */
   capitalizationChoice: string;
   /** Custom capitalization in days (used only when capitalizationChoice === 'OTHER'). */
   capitalizationDays: number | null;
+  /** Rate-period select (both types): '' (annual), a preset's days as string, or 'OTHER'. */
+  ratePeriodChoice: string;
+  /** Custom rate period in days (used only when ratePeriodChoice === 'OTHER'). */
+  ratePeriodDays: number | null;
   initialPercentage: number | null;
   balloonPercentage: number | null;
   costOfCapitalAnnual: number | null;
@@ -72,6 +80,7 @@ export class SimulationConfig extends BaseForm implements OnInit {
 
   protected readonly rateTypes = rateTypes;
   protected readonly capitalizationPresets = capitalizationPresets;
+  protected readonly ratePeriodPresets = ratePeriodPresets;
   protected readonly costBases = costBases;
   protected readonly costTimings = costTimings;
   protected readonly RateType = RateType;
@@ -100,6 +109,8 @@ export class SimulationConfig extends BaseForm implements OnInit {
     rateValue: null,
     capitalizationChoice: '',
     capitalizationDays: null,
+    ratePeriodChoice: '',
+    ratePeriodDays: null,
     initialPercentage: null,
     balloonPercentage: null,
     costOfCapitalAnnual: null,
@@ -140,9 +151,19 @@ export class SimulationConfig extends BaseForm implements OnInit {
       }
       return undefined;
     });
-    // Custom days are required (and > 0) when "Otro" is chosen (nominal capitalization or effective period).
+    // Custom capitalization days are required (and > 0) when "Otro" is chosen.
     validate(path.capitalizationDays, ctx => {
       if (ctx.valueOf(path.capitalizationChoice) === 'OTHER') {
+        const days = ctx.value();
+        if (days === null || days <= 0) {
+          return {kind: 'min', message: 'Indica los días de capitalización (mayor que 0).'};
+        }
+      }
+      return undefined;
+    });
+    // Custom rate-period days are required (and > 0) when "Otro" is chosen (both types).
+    validate(path.ratePeriodDays, ctx => {
+      if (ctx.valueOf(path.ratePeriodChoice) === 'OTHER') {
         const days = ctx.value();
         if (days === null || days <= 0) {
           return {kind: 'min', message: 'Indica los días del período (mayor que 0).'};
@@ -184,6 +205,21 @@ export class SimulationConfig extends BaseForm implements OnInit {
     () => this.model().capitalizationChoice === 'OTHER',
   );
 
+  /** Whether the custom "días del período" input should be shown. */
+  protected readonly showCustomRatePeriod = computed(
+    () => this.model().ratePeriodChoice === 'OTHER',
+  );
+
+  /** Human recap of the rate period ("Anual", a preset label, or "N días"). */
+  protected readonly ratePeriodSummary = computed(() =>
+    this.periodText(this.model().ratePeriodChoice, this.model().ratePeriodDays, 'Anual'),
+  );
+
+  /** Human recap of the nominal capitalization ("—", a preset label, or "N días"). */
+  protected readonly capitalizationSummary = computed(() =>
+    this.periodText(this.model().capitalizationChoice, this.model().capitalizationDays, '—'),
+  );
+
   /** The picked offer (for the summary aside). */
   protected readonly selectedOffer = computed(() =>
     this.offers().find(offer => offer.id === this.model().vehicleOfferId) ?? null,
@@ -216,6 +252,18 @@ export class SimulationConfig extends BaseForm implements OnInit {
     }
   }
 
+  /** Renders a period choice ('' → emptyLabel, 'OTHER'/preset → label or "N días"). */
+  private periodText(choice: string, days: number | null, emptyLabel: string): string {
+    if (choice === '') {
+      return emptyLabel;
+    }
+    const value = choice === 'OTHER' ? days : Number(choice);
+    if (value === null) {
+      return '—';
+    }
+    return capitalizationLabel(value) ?? `${value} días`;
+  }
+
   protected addCost(): void {
     this.model.update(model => ({
       ...model,
@@ -245,19 +293,27 @@ export class SimulationConfig extends BaseForm implements OnInit {
         ...Array<GraceType>(partial).fill(GraceType.PARTIAL),
         ...Array<GraceType>(Math.max(0, installments - total - partial)).fill(GraceType.NONE),
       ];
-      // Nominal: capitalization (required). Effective: rate period ('' = annual TEA → null).
+      // Capitalization applies only to nominal rates (required there).
       const capitalization =
-        value.capitalizationChoice === ''
+        value.rateType !== RateType.NOMINAL || value.capitalizationChoice === ''
           ? null
           : value.capitalizationChoice === 'OTHER'
             ? value.capitalizationDays
             : Number(value.capitalizationChoice);
+      // Rate period applies to both types; '' = annual (null).
+      const ratePeriod =
+        value.ratePeriodChoice === ''
+          ? null
+          : value.ratePeriodChoice === 'OTHER'
+            ? value.ratePeriodDays
+            : Number(value.ratePeriodChoice);
       const draft = new SimulationDraft({
         clientId: value.clientId,
         vehicleOfferId: value.vehicleOfferId,
         rateValue: (value.rateValue ?? 0) / 100,
         rateType: value.rateType,
         capitalization,
+        ratePeriod,
         initialPercentage: (value.initialPercentage ?? 0) / 100,
         balloonPercentage: (value.balloonPercentage ?? 0) / 100,
         numberOfInstallments: installments,
