@@ -54,7 +54,7 @@ describe('SimulationConfig', () => {
   let store: {generate: ReturnType<typeof vi.fn>; resetWriteState: ReturnType<typeof vi.fn>};
   let router: {navigate: ReturnType<typeof vi.fn>};
 
-  function setup(): ComponentFixture<SimulationConfig> {
+  function setup(queryParams: Record<string, string> = {}): ComponentFixture<SimulationConfig> {
     generating = signal(false);
     generated = signal(false);
     selected = signal<{id: string} | null>(null);
@@ -68,7 +68,15 @@ describe('SimulationConfig', () => {
         {provide: ClientsStore, useValue: {clients: signal([]), load: vi.fn()}},
         {provide: VehicleOffersStore, useValue: {offers: signal([]), load: vi.fn()}},
         {provide: Router, useValue: router},
-        {provide: ActivatedRoute, useValue: {snapshot: {paramMap: convertToParamMap({})}}},
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: convertToParamMap({}),
+              queryParamMap: convertToParamMap(queryParams),
+            },
+          },
+        },
       ],
     });
     const fixture = TestBed.createComponent(SimulationConfig);
@@ -196,6 +204,11 @@ describe('SimulationConfig', () => {
     await flush();
 
     expect(store.generate).not.toHaveBeenCalled();
+  });
+
+  it('preselects the client from the ?clientId query param', () => {
+    const fixture = setup({clientId: 'cl-42'});
+    expect(instance(fixture).model().clientId).toBe('cl-42');
   });
 
   it('navigates to the result once generated', () => {

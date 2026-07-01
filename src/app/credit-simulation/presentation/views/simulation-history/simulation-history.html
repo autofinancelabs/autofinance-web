@@ -1,0 +1,77 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  <header class="page-header">
+    <div>
+      <h1 class="text-2xl font-medium tracking-tight">Cotizaciones del cliente</h1>
+      @if (client(); as c) {
+        <p class="text-muted-foreground text-sm">
+          <span class="doc__badge">{{ c.documentId.type }}</span>
+          <span class="font-mono tabular-nums">{{ c.documentId.number }}</span>
+        </p>
+      }
+    </div>
+    <a hlmBtn routerLink="/credit-simulations/new" [queryParams]="{clientId}">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nueva cotización
+    </a>
+  </header>
+
+  @if (loading()) {
+    <p class="text-muted-foreground text-sm" role="status">Cargando cotizaciones…</p>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p class="text-muted-foreground">Este cliente aún no tiene cotizaciones.</p>
+      <a hlmBtn variant="outline" routerLink="/credit-simulations/new" [queryParams]="{clientId}">
+        Generar la primera
+      </a>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th scope="col">Estado</th>
+            <th scope="col" class="num">Préstamo</th>
+            <th scope="col" class="num">Total a pagar</th>
+            <th scope="col" class="actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sim of history(); track sim.id) {
+            <tr>
+              <td><span class="state-badge">{{ sim.state }}</span></td>
+              <td class="num font-mono tabular-nums">{{ sim.loanAmount | money }}</td>
+              <td class="num font-mono tabular-nums">
+                {{ sim.salePrice.currency }} {{ sim.summary.totalToPay | amount }}
+              </td>
+              <td class="actions">
+                <a
+                  hlmBtn
+                  variant="ghost"
+                  size="sm"
+                  [routerLink]="['/credit-simulations', sim.id]"
+                >
+                  Ver
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

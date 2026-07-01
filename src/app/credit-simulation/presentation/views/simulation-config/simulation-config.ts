@@ -1,5 +1,5 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
-import {Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {applyEach, form, FormField, min, required, submit, validate} from '@angular/forms/signals';
 import {HlmButton} from '@spartan-ng/helm/button';
 import {HlmInput} from '@spartan-ng/helm/input';
@@ -64,6 +64,7 @@ export class SimulationConfig extends BaseForm implements OnInit {
   private readonly clientsStore = inject(ClientsStore);
   private readonly offersStore = inject(VehicleOffersStore);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly clients = this.clientsStore.clients;
   protected readonly offers = this.offersStore.offers;
@@ -208,6 +209,11 @@ export class SimulationConfig extends BaseForm implements OnInit {
     this.store.resetWriteState();
     this.clientsStore.load();
     this.offersStore.load();
+    // Preselect the client when arriving from the client's history ("Nueva cotización").
+    const clientId = this.route.snapshot.queryParamMap.get('clientId');
+    if (clientId) {
+      this.model.update(model => ({...model, clientId}));
+    }
   }
 
   protected addCost(): void {

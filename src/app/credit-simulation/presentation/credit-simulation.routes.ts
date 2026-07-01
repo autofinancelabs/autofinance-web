@@ -4,6 +4,8 @@ const config = () =>
   import('./views/simulation-config/simulation-config').then(m => m.SimulationConfig);
 const results = () =>
   import('./views/simulation-results/simulation-results').then(m => m.SimulationResults);
+const history = () =>
+  import('./views/simulation-history/simulation-history').then(m => m.SimulationHistory);
 
 /**
  * Credit Simulation routes, mounted under `/credit-simulations` in the main shell.
@@ -12,6 +14,7 @@ const results = () =>
  */
 export const creditSimulationRoutes: Routes = [
   {path: 'new', loadComponent: config},
+  {path: 'by-client/:clientId', loadComponent: history},
   {path: ':id', loadComponent: results},
   {path: '', redirectTo: 'new', pathMatch: 'full'},
 ];
