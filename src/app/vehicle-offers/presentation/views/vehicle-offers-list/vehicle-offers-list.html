@@ -43,8 +43,6 @@
               <th scope="col">Vehículo</th>
               <th scope="col">Año</th>
               <th scope="col" class="num">Precio de venta</th>
-              <th scope="col">Plan</th>
-              <th scope="col" class="num">Cuotas</th>
               <th scope="col" class="actions">Acciones</th>
             </tr>
           </thead>
@@ -54,20 +52,6 @@
                 <td>{{ offer.make }} {{ offer.model }}</td>
                 <td class="num">{{ offer.year }}</td>
                 <td class="num font-mono tabular-nums">{{ offer.salePrice | money }}</td>
-                <td>
-                  @if (offer.plan; as plan) {
-                    {{ plan.name }}
-                  } @else {
-                    <span class="text-muted-foreground">—</span>
-                  }
-                </td>
-                <td class="num">
-                  @if (offer.plan; as plan) {
-                    <span class="font-mono tabular-nums">{{ plan.installments }}</span>
-                  } @else {
-                    <span class="text-muted-foreground">—</span>
-                  }
-                </td>
                 <td class="actions">
                   <a
                     hlmBtn

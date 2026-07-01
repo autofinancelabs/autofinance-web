@@ -42,7 +42,6 @@ describe('VehicleOffersList', () => {
         model: 'Camry',
         year: 2023,
         salePrice: new Money({amount: 25000, currency: Currency.PEN}),
-        plan: null,
       }),
     ]);
     isEmpty.set(false);

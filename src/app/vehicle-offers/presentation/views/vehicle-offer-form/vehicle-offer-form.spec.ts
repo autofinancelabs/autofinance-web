@@ -15,8 +15,6 @@ interface FormModel {
   year: number | null;
   salePrice: number | null;
   currency: string;
-  planName: string;
-  planInstallments: number | null;
 }
 
 const validModel: FormModel = {
@@ -25,8 +23,6 @@ const validModel: FormModel = {
   year: 2023,
   salePrice: 25000,
   currency: 'PEN',
-  planName: '',
-  planInstallments: null,
 };
 
 describe('VehicleOfferForm (create)', () => {
@@ -85,7 +81,6 @@ describe('VehicleOfferForm (create)', () => {
     expect(draft).toBeInstanceOf(VehicleOfferDraft);
     expect(draft.make).toBe('Toyota');
     expect(draft.salePrice).toBe(25000);
-    expect(draft.planName).toBeNull();
   });
 
   it('blocks submit and shows an error when salePrice is 0', async () => {

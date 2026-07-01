@@ -80,28 +80,6 @@
               <span hlmError>{{ f.salePrice().errors()[0].message }}</span>
             }
           </div>
-
-          <div hlmFormField>
-            <label hlmLabel for="planName">Nombre del plan</label>
-            <input hlmInput id="planName" [formField]="f.planName" />
-            @if (f.planName().touched() && f.planName().errors().length) {
-              <span hlmError>{{ f.planName().errors()[0].message }}</span>
-            }
-          </div>
-
-          <div hlmFormField>
-            <label hlmLabel for="planInstallments">Cuotas del plan</label>
-            <input
-              hlmInput
-              id="planInstallments"
-              type="number"
-              inputmode="numeric"
-              [formField]="f.planInstallments"
-            />
-            @if (f.planInstallments().touched() && f.planInstallments().errors().length) {
-              <span hlmError>{{ f.planInstallments().errors()[0].message }}</span>
-            }
-          </div>
         </div>
 
         <div class="actions">
@@ -124,9 +102,6 @@
           <p class="preview__price">{{ price | money }}</p>
         } @else {
           <p class="preview__price preview__price--empty">—</p>
-        }
-        @if (preview().planLabel; as planLabel) {
-          <span class="preview__chip">{{ planLabel }}</span>
         }
       </div>
       <p class="form-aside__note">

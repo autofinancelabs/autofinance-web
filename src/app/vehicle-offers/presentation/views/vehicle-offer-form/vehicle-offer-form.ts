@@ -1,6 +1,6 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {form, FormField, min, required, submit, validate} from '@angular/forms/signals';
+import {form, FormField, min, required, submit} from '@angular/forms/signals';
 import {HlmButton} from '@spartan-ng/helm/button';
 import {HlmInput} from '@spartan-ng/helm/input';
 import {HlmLabel} from '@spartan-ng/helm/label';
@@ -19,8 +19,6 @@ interface VehicleOfferModel {
   year: number | null;
   salePrice: number | null;
   currency: Currency;
-  planName: string;
-  planInstallments: number | null;
 }
 
 /**
@@ -65,7 +63,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
   protected readonly preview = computed(() => {
     const value = this.model();
     const title = `${value.make} ${value.model}`.trim();
-    const hasPlan = value.planName.trim() !== '' && value.planInstallments !== null;
     return {
       title: title === '' ? 'Nueva oferta' : title,
       year: value.year,
@@ -73,7 +70,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
         value.salePrice !== null
           ? new Money({amount: value.salePrice, currency: value.currency})
           : null,
-      planLabel: hasPlan ? `${value.planName.trim()} · ${value.planInstallments} cuotas` : null,
     };
   });
 
@@ -83,8 +79,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
     year: null,
     salePrice: null,
     currency: Currency.PEN,
-    planName: '',
-    planInstallments: null,
   });
 
   protected readonly f = form(this.model, path => {
@@ -95,23 +89,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
     required(path.salePrice, {message: this.messageFor('precio de venta', 'required')});
     min(path.salePrice, 1, {message: 'El precio de venta debe ser mayor que 0.'});
     required(path.currency, {message: this.messageFor('moneda', 'required')});
-    // Plan is all-or-nothing.
-    validate(path.planName, ctx => {
-      const installments = ctx.valueOf(path.planInstallments);
-      const name = ctx.value().trim();
-      if (installments !== null && name === '') {
-        return {kind: 'required', message: 'Indica el nombre del plan.'};
-      }
-      return undefined;
-    });
-    validate(path.planInstallments, ctx => {
-      const name = ctx.valueOf(path.planName).trim();
-      const installments = ctx.value();
-      if (name !== '' && (installments === null || installments <= 0)) {
-        return {kind: 'min', message: 'Indica las cuotas del plan (mayor que 0).'};
-      }
-      return undefined;
-    });
   });
 
   constructor() {
@@ -125,8 +102,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
           year: offer.year,
           salePrice: offer.salePrice.amount,
           currency: offer.salePrice.currency,
-          planName: offer.plan?.name ?? '',
-          planInstallments: offer.plan?.installments ?? null,
         });
       }
     });
@@ -154,8 +129,6 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
         year: value.year ?? 0,
         salePrice: value.salePrice ?? 0,
         currency: value.currency,
-        planName: value.planName.trim() === '' ? null : value.planName.trim(),
-        planInstallments: value.planInstallments,
       });
       if (this.id !== null) {
         this.store.update(this.id, draft);
