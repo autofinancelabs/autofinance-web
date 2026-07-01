@@ -15,6 +15,7 @@ import {HlmInput} from '@spartan-ng/helm/input';
 import {HlmLabel} from '@spartan-ng/helm/label';
 import {HlmError, HlmFormField} from '@spartan-ng/helm/form-field';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
+import {Brand} from '../../../../shared/presentation/components/brand/brand';
 import {AuthStore} from '../../../application/auth.store';
 import {DealershipRegistration} from '../../../domain/model/dealership-registration.command';
 
@@ -26,7 +27,7 @@ import {DealershipRegistration} from '../../../domain/model/dealership-registrat
  */
 @Component({
   selector: 'app-sign-up',
-  imports: [FormField, RouterLink, HlmInput, HlmLabel, HlmError, HlmFormField, HlmButton],
+  imports: [FormField, RouterLink, HlmInput, HlmLabel, HlmError, HlmFormField, HlmButton, Brand],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
 })
