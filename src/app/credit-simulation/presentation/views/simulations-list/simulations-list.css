@@ -3,7 +3,7 @@
 }
 
 .page {
-  max-width: 72rem;
+  max-width: 76rem;
   margin: 0 auto;
   padding: 1.5rem;
   display: flex;
@@ -147,4 +147,10 @@
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+/* Time part of a date cell: a softer tone than the date, without going full muted. */
+.cell-time {
+  margin-left: 0.35rem;
+  color: color-mix(in oklch, var(--foreground) 60%, var(--muted-foreground));
 }

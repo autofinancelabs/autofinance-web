@@ -28,7 +28,7 @@ function makeSimEntity(): CreditSimulation {
       ...Array<string>(3).fill('PARTIAL'),
       ...Array<string>(30).fill('NONE'),
     ],
-    costs: [],
+    costs: [{name: 'desgravamen', value: 0.00049, basis: 'ON_BALANCE', timing: 'PERIODIC', embedded: false}],
     costOfCapital: {value: 0.5, type: 'EFFECTIVE', capitalization: null, ratePeriod: null},
     loanAmount: {amount: 12975, currency: 'PEN'},
     financedBalance: {amount: 9015.99, currency: 'PEN'},
@@ -280,6 +280,32 @@ describe('SimulationConfig', () => {
     expect(store.generate).not.toHaveBeenCalled();
   });
 
+  it('converts a percentage-based cost value to a fraction on submit', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      costs: [{name: 'desgravamen', value: 0.049, basis: 'ON_BALANCE', timing: 'PERIODIC', embedded: false}],
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.costs[0].value).toBeCloseTo(0.00049, 10);
+  });
+
+  it('keeps a fixed cost value as an amount on submit', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      costs: [{name: 'portes', value: 3.5, basis: 'FIXED', timing: 'PERIODIC', embedded: false}],
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.costs[0].value).toBe(3.5);
+  });
+
   it('preselects the client from the ?clientId query param', () => {
     const fixture = setup({clientId: 'cl-42'});
     expect(instance(fixture).model().clientId).toBe('cl-42');
@@ -309,6 +335,8 @@ describe('SimulationConfig', () => {
     expect(inst.model().balloonPercentage).toBeCloseTo(40, 6);
     expect(inst.model().totalGrace).toBe(3);
     expect(inst.model().partialGrace).toBe(3);
+    // A rate-based cost stored as a fraction is shown back as a percentage.
+    expect((inst.model().costs[0] as {value: number}).value).toBeCloseTo(0.049, 6);
 
     inst.onSubmit(new Event('submit'));
     await flush();

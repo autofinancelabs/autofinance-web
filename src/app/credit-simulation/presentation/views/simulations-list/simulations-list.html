@@ -111,10 +111,20 @@
                 </span>
               </td>
               <td class="font-mono tabular-nums">
-                {{ (row.sim.createdAt | date: 'dd/MM/yyyy') || '—' }}
+                @if (row.sim.createdAt) {
+                  {{ row.sim.createdAt | date: 'dd/MM/yy' }}
+                  <span class="cell-time">{{ row.sim.createdAt | date: 'HH:mm' }}</span>
+                } @else {
+                  —
+                }
               </td>
               <td class="font-mono tabular-nums">
-                {{ (row.sim.updatedAt | date: 'dd/MM/yyyy') || '—' }}
+                @if (row.sim.updatedAt) {
+                  {{ row.sim.updatedAt | date: 'dd/MM/yy' }}
+                  <span class="cell-time">{{ row.sim.updatedAt | date: 'HH:mm' }}</span>
+                } @else {
+                  —
+                }
                 @if (row.sim.edited) {
                   <span class="edited-badge">Editada</span>
                 }

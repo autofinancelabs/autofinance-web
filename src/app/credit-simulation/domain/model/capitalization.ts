@@ -12,19 +12,32 @@ export const capitalizationPresets: readonly CapitalizationPreset[] = [
   {label: 'Diaria', days: 1},
   {label: 'Mensual', days: 30},
   {label: 'Trimestral', days: 90},
+  {label: 'Cuatrimestral', days: 120},
   {label: 'Semestral', days: 180},
   {label: 'Anual', days: 360},
 ];
 
 /**
- * Common presets for the **rate period** (the period a rate value is quoted over). "Annual" is
- * offered separately as the default (empty) choice, so it is not repeated here. Any positive integer
- * is valid via the "Otro (días)" option.
+ * A rate-period preset. Its abbreviation depends on the rate type (nominal vs effective): e.g. a
+ * monthly period is `TNM` for a nominal rate and `TEM` for an effective one. "Annual" (TNA/TEA) is
+ * offered separately as the default (empty) choice, so it is not repeated here.
  */
-export const ratePeriodPresets: readonly CapitalizationPreset[] = [
-  {label: 'Mensual', days: 30},
-  {label: 'Trimestral', days: 90},
-  {label: 'Semestral', days: 180},
+export interface RatePeriodPreset {
+  readonly days: number;
+  readonly name: string;
+  readonly nominalAbbr: string;
+  readonly effectiveAbbr: string;
+}
+
+/**
+ * Common presets for the **rate period** (the period a rate value is quoted over), in ascending
+ * order. Any positive integer is valid via the "Otro (días)" option.
+ */
+export const ratePeriodPresets: readonly RatePeriodPreset[] = [
+  {days: 30, name: 'Mensual', nominalAbbr: 'TNM', effectiveAbbr: 'TEM'},
+  {days: 90, name: 'Trimestral', nominalAbbr: 'TNT', effectiveAbbr: 'TET'},
+  {days: 120, name: 'Cuatrimestral', nominalAbbr: 'TNC', effectiveAbbr: 'TEC'},
+  {days: 180, name: 'Semestral', nominalAbbr: 'TNS', effectiveAbbr: 'TES'},
 ];
 
 /** The preset label for a given day count, or null if it doesn't match a common preset. */

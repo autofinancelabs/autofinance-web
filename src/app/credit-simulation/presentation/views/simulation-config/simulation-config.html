@@ -103,9 +103,14 @@
             <div hlmFormField>
               <label hlmLabel for="ratePeriod">Período de la tasa</label>
               <select hlmInput id="ratePeriod" [formField]="f.ratePeriodChoice">
-                <option value="">Anual</option>
+                <option value="">
+                  Anual ({{ model().rateType === RateType.NOMINAL ? 'TNA' : 'TEA' }})
+                </option>
                 @for (preset of ratePeriodPresets; track preset.days) {
-                  <option [value]="preset.days">{{ preset.label }} ({{ preset.days }}d)</option>
+                  <option [value]="preset.days">
+                    {{ preset.name }}
+                    ({{ model().rateType === RateType.NOMINAL ? preset.nominalAbbr : preset.effectiveAbbr }})
+                  </option>
                 }
                 <option value="OTHER">Otro (días)…</option>
               </select>
@@ -207,7 +212,7 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="balloonPercentage">% Cuota balloon (V. Futuro)</label>
+              <label hlmLabel for="balloonPercentage">% Cuota final (balloon)</label>
               <input
                 hlmInput
                 id="balloonPercentage"
@@ -365,7 +370,34 @@
               </div>
 
               <div hlmFormField class="cost-row__value">
-                <label hlmLabel [for]="'cost-value-' + i">Valor</label>
+                <label hlmLabel [for]="'cost-value-' + i" class="cost-row__value-label">
+                  <span>Valor</span>
+                  @if (isPercentBasis(cost.basis)) {
+                    <span class="cost-row__pct">(%)</span>
+                    <span
+                      class="cost-row__info"
+                      brnTooltip="El valor se considera como porcentaje, no como decimal (ej. 0.049 = 0.049%)."
+                      aria-label="El valor se considera como porcentaje, no como decimal"
+                      tabindex="0"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                      </svg>
+                    </span>
+                  }
+                </label>
                 <input
                   hlmInput
                   [id]="'cost-value-' + i"
@@ -492,7 +524,7 @@
           <dd class="font-mono tabular-nums">{{ model().numberOfInstallments ?? '—' }} cuotas</dd>
         </div>
         <div class="recap__row">
-          <dt>Inicial / Cuota balloon</dt>
+          <dt>Inicial / Cuota final</dt>
           <dd class="font-mono tabular-nums">
             {{ model().initialPercentage ?? '—' }}% / {{ model().balloonPercentage ?? '—' }}%
           </dd>

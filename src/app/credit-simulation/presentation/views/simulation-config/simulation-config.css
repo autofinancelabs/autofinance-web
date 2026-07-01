@@ -113,6 +113,28 @@
   }
 }
 
+.cost-row__value-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cost-row__pct {
+  color: var(--muted-foreground);
+}
+
+.cost-row__info {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted-foreground);
+  cursor: help;
+}
+
+.cost-row__info:hover,
+.cost-row__info:focus-visible {
+  color: var(--primary);
+}
+
 .cost-row__embedded {
   display: inline-flex;
   align-items: center;

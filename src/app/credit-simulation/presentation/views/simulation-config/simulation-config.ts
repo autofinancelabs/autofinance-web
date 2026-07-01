@@ -5,6 +5,7 @@ import {HlmButton} from '@spartan-ng/helm/button';
 import {HlmInput} from '@spartan-ng/helm/input';
 import {HlmLabel} from '@spartan-ng/helm/label';
 import {HlmError, HlmFormField} from '@spartan-ng/helm/form-field';
+import {HlmTooltipImports} from '@spartan-ng/helm/tooltip';
 import {Breadcrumbs} from '../../../../shared/presentation/components/breadcrumbs/breadcrumbs';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
@@ -64,7 +65,7 @@ interface ConfigModel {
  */
 @Component({
   selector: 'app-simulation-config',
-  imports: [FormField, RouterLink, HlmInput, HlmLabel, HlmError, HlmFormField, HlmButton, MoneyPipe, Breadcrumbs],
+  imports: [FormField, RouterLink, HlmInput, HlmLabel, HlmError, HlmFormField, HlmButton, HlmTooltipImports, MoneyPipe, Breadcrumbs],
   templateUrl: './simulation-config.html',
   styleUrl: './simulation-config.css',
 })
@@ -292,7 +293,8 @@ export class SimulationConfig extends BaseForm implements OnInit {
       partialGrace: sim.grace.filter(g => g === GraceType.PARTIAL).length,
       costs: sim.costs.map(c => ({
         name: c.name,
-        value: c.value,
+        // Rate-based costs are stored as fractions; show them back as a percentage.
+        value: this.isPercentBasis(c.basis) ? this.toPercent(c.value) : c.value,
         basis: c.basis,
         timing: c.timing,
         embedded: c.embedded,
@@ -303,6 +305,11 @@ export class SimulationConfig extends BaseForm implements OnInit {
   /** Fraction → percent number (e.g. 0.2 → 20), rounded to avoid float noise in the input. */
   private toPercent(fraction: number): number {
     return Math.round(fraction * 100 * 1e6) / 1e6;
+  }
+
+  /** True for rate-based costs (% over balance / sale price), where the entered value is a percentage. */
+  protected isPercentBasis(basis: CostBasis): boolean {
+    return basis === CostBasis.ON_BALANCE || basis === CostBasis.ON_SALE_PRICE;
   }
 
   /** Maps a period in days back to a select choice: '' (none), the preset's days, or 'OTHER' + days. */
@@ -387,16 +394,18 @@ export class SimulationConfig extends BaseForm implements OnInit {
         frequencyDays: value.frequencyDays ?? 30,
         daysPerYear: value.daysPerYear ?? 360,
         gracePlan,
-        costs: value.costs.map(
-          cost =>
-            new Cost({
-              name: cost.name,
-              value: cost.value ?? 0,
-              basis: cost.basis,
-              timing: cost.timing,
-              embedded: cost.embedded,
-            }),
-        ),
+        costs: value.costs.map(cost => {
+          // Rate-based costs are entered as a percentage (0.049 → 0.049%); convert to a fraction.
+          // Fixed costs are amounts and stay as-is.
+          const raw = cost.value ?? 0;
+          return new Cost({
+            name: cost.name,
+            value: this.isPercentBasis(cost.basis) ? raw / 100 : raw,
+            basis: cost.basis,
+            timing: cost.timing,
+            embedded: cost.embedded,
+          });
+        }),
         costOfCapitalAnnual: (value.costOfCapitalAnnual ?? 0) / 100,
       });
       if (this.id !== null) {
