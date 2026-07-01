@@ -108,6 +108,9 @@ export class SimulationConfig extends BaseForm implements OnInit {
     {label: this.isEdit ? 'Editar cotización' : 'Nueva cotización'},
   ];
 
+  /** Costs list in the summary aside: open by default on desktop, collapsed on mobile. */
+  protected readonly costsOpen = signal(this.isDesktop());
+
   protected readonly model = signal<ConfigModel>({
     clientId: '',
     vehicleOfferId: '',
@@ -358,6 +361,20 @@ export class SimulationConfig extends BaseForm implements OnInit {
       ...model,
       costs: model.costs.filter((_, i) => i !== index),
     }));
+  }
+
+  /** Keeps the aside costs accordion in sync when the user expands/collapses it. */
+  protected onCostsToggle(event: Event): void {
+    this.costsOpen.set((event.target as HTMLDetailsElement).open);
+  }
+
+  /** Viewport ≥ 768px (desktop). Falls back to open when matchMedia is unavailable (tests). */
+  private isDesktop(): boolean {
+    try {
+      return window.matchMedia('(min-width: 768px)').matches;
+    } catch {
+      return true;
+    }
   }
 
   protected onSubmit(event: Event): void {

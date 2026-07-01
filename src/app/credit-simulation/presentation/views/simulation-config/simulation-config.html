@@ -560,6 +560,40 @@
         </div>
       </dl>
 
+      @if (model().costs.length) {
+        <details class="recap-costs" [open]="costsOpen()" (toggle)="onCostsToggle($event)">
+          <summary class="recap-costs__summary">
+            <span>Costos ({{ model().costs.length }})</span>
+            <svg
+              class="recap-costs__chevron"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+          <dl class="recap recap-costs__list">
+            @for (cost of model().costs; track $index) {
+              <div class="recap__row">
+                <dt>{{ cost.name || 'Sin nombre' }}</dt>
+                <dd class="font-mono tabular-nums">
+                  {{ cost.value ?? '—' }}{{ isPercentBasis(cost.basis) ? '%' : '' }}
+                  <span class="recap-costs__basis">{{ costBasisLabels[cost.basis] }}</span>
+                </dd>
+              </div>
+            }
+          </dl>
+        </details>
+      }
+
       <p class="form-aside__note">
         Al generar se calcula el cronograma (método francés + cuota balloon) y los indicadores de
         transparencia: TCEA, VAN y TIR.

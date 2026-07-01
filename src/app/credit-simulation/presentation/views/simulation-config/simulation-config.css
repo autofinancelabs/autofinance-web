@@ -249,6 +249,54 @@
   text-align: right;
 }
 
+/* Collapsible costs list in the aside (open on desktop, collapsed on mobile). */
+.recap-costs__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.recap-costs__summary::-webkit-details-marker {
+  display: none;
+}
+
+.recap-costs__summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.recap-costs__chevron {
+  flex-shrink: 0;
+  opacity: 0.75;
+  transition: transform 150ms ease;
+}
+
+.recap-costs[open] .recap-costs__chevron {
+  transform: rotate(180deg);
+}
+
+.recap-costs__list {
+  margin-top: 0.5rem;
+}
+
+.recap-costs__basis {
+  margin-left: 0.4rem;
+  color: oklch(0.985 0.005 200 / 0.6);
+  font-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recap-costs__chevron {
+    transition: none;
+  }
+}
+
 .form-aside__note {
   margin: 0;
   font-size: 0.75rem;
