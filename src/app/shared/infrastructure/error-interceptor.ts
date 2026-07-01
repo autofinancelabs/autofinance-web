@@ -65,6 +65,8 @@ function messageFor(error: ApiError): string {
       return 'Ya existe un cliente registrado con este documento.';
     case ApiErrorCode.InvalidSimulationConfiguration:
       return 'La configuración de la simulación no es válida.';
+    case ApiErrorCode.InvalidCostConfiguration:
+      return 'La opción "Incluir en la tasa" solo aplica a costos "% sobre saldo".';
     case ApiErrorCode.PercentageOutOfRange:
       return 'Un porcentaje está fuera del rango permitido.';
     case ApiErrorCode.MissingCapitalization:

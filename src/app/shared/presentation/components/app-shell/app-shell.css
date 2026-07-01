@@ -5,7 +5,7 @@
 .shell {
   display: flex;
   flex-direction: column;
-  min-height: 100svh;
+  height: 100svh;
 }
 
 /* Topbar */
@@ -13,6 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 30;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -55,12 +56,13 @@
   flex: 1;
 }
 
-/* Body = sidebar + content */
+/* Body = sidebar + content. Fixed height (viewport − topbar); only the pieces below scroll. */
 .body {
   position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -72,6 +74,7 @@
   border-right: 1px solid var(--border);
   background: var(--sidebar);
   color: var(--sidebar-foreground);
+  overflow-y: auto;
 }
 
 .sidebar__nav {
@@ -138,6 +141,7 @@
 .content {
   flex: 1;
   min-width: 0;
+  overflow-y: auto;
 }
 
 /* Mobile: sidebar becomes a slide-in drawer */

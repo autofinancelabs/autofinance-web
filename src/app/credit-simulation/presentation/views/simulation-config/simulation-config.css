@@ -146,6 +146,8 @@
 
 .cost-row__remove {
   align-self: end;
+  /* Line the trash up with the input box (which sits at the row's bottom edge). */
+  margin-bottom: 0.25rem;
 }
 
 .actions {

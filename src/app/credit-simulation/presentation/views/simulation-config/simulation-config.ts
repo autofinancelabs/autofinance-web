@@ -312,6 +312,11 @@ export class SimulationConfig extends BaseForm implements OnInit {
     return basis === CostBasis.ON_BALANCE || basis === CostBasis.ON_SALE_PRICE;
   }
 
+  /** True only for % over balance costs — the only ones where "incluir en la tasa" (embedded) applies. */
+  protected isOnBalance(basis: CostBasis): boolean {
+    return basis === CostBasis.ON_BALANCE;
+  }
+
   /** Maps a period in days back to a select choice: '' (none), the preset's days, or 'OTHER' + days. */
   private choiceFromDays(
     days: number | null,

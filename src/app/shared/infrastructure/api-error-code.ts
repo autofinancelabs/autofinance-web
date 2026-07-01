@@ -14,6 +14,7 @@ export const ApiErrorCode = {
   InvalidVehicleOffer: 'INVALID_VEHICLE_OFFER',
   DuplicateClientDocument: 'DUPLICATE_CLIENT_DOCUMENT',
   InvalidSimulationConfiguration: 'INVALID_SIMULATION_CONFIGURATION',
+  InvalidCostConfiguration: 'INVALID_COST_CONFIGURATION',
   PercentageOutOfRange: 'PERCENTAGE_OUT_OF_RANGE',
   MissingCapitalization: 'MISSING_CAPITALIZATION',
   CurrencyMismatch: 'CURRENCY_MISMATCH',
