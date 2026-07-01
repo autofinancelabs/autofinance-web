@@ -3,7 +3,6 @@ import {of, throwError} from 'rxjs';
 import {Currency} from '../../shared/domain/model/currency';
 import {Money} from '../../shared/domain/model/money';
 import {ApiError} from '../../shared/infrastructure/api-error';
-import {Capitalization} from '../domain/model/capitalization';
 import {CreditSimulation} from '../domain/model/credit-simulation.entity';
 import {Indicators} from '../domain/model/indicators.value-object';
 import {Percentage} from '../domain/model/percentage.value-object';
@@ -23,7 +22,7 @@ function makeSimulation(id = 's-1'): CreditSimulation {
     clientId: 'cl-1',
     vehicleOfferId: 'vo-1',
     salePrice: pen(16000),
-    rate: new Rate({value: 0.15, type: RateType.NOMINAL, capitalization: Capitalization.DAILY}),
+    rate: new Rate({value: 0.15, type: RateType.NOMINAL, capitalization: 1}),
     initialPercentage: new Percentage({value: 0.2}),
     balloonPercentage: new Percentage({value: 0.4}),
     term: new Term({numberOfInstallments: 36, frequencyDays: 30, installmentsPerYear: 12, daysPerYear: 360}),
@@ -58,7 +57,7 @@ function makeDraft(): SimulationDraft {
     vehicleOfferId: 'vo-1',
     rateValue: 0.15,
     rateType: RateType.NOMINAL,
-    capitalization: Capitalization.DAILY,
+    capitalization: 1,
     initialPercentage: 0.2,
     balloonPercentage: 0.4,
     numberOfInstallments: 36,

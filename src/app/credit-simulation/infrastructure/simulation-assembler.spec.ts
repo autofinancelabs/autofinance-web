@@ -1,4 +1,3 @@
-import {Capitalization} from '../domain/model/capitalization';
 import {Cost} from '../domain/model/cost.value-object';
 import {CostBasis} from '../domain/model/cost-basis';
 import {CostTiming} from '../domain/model/cost-timing';
@@ -9,13 +8,13 @@ import {SimulationState} from '../domain/model/simulation-state';
 import {SimulationAssembler} from './simulation-assembler';
 import {SimulationResource} from './simulation-response';
 
-function makeDraft(overrides: Partial<{rateType: RateType; capitalization: Capitalization | null}> = {}): SimulationDraft {
+function makeDraft(overrides: Partial<{rateType: RateType; capitalization: number | null}> = {}): SimulationDraft {
   return new SimulationDraft({
     clientId: 'cl-1',
     vehicleOfferId: 'vo-1',
     rateValue: 0.15,
     rateType: RateType.NOMINAL,
-    capitalization: Capitalization.DAILY,
+    capitalization: 1,
     initialPercentage: 0.2,
     balloonPercentage: 0.4,
     numberOfInstallments: 36,
@@ -42,7 +41,7 @@ function makeResource(): SimulationResource {
     clientId: 'cl-1',
     vehicleOfferId: 'vo-1',
     salePrice: {amount: 16000, currency: 'PEN'},
-    rate: {value: 0.15, type: 'NOMINAL', capitalization: 'DAILY'},
+    rate: {value: 0.15, type: 'NOMINAL', capitalization: 1},
     initialPercentage: 0.2,
     balloonPercentage: 0.4,
     term: {numberOfInstallments: 36, frequencyDays: 30, installmentsPerYear: 12, daysPerYear: 360},
@@ -93,7 +92,7 @@ describe('SimulationAssembler', () => {
   it('maps a draft to a request including capitalization for a nominal rate', () => {
     const request = assembler.toGenerateRequest(makeDraft());
     expect(request.rateType).toBe('NOMINAL');
-    expect(request.capitalization).toBe('DAILY');
+    expect(request.capitalization).toBe(1);
     expect(request.gracePlan).toEqual(['TOTAL', 'PARTIAL', 'NONE']);
     expect(request.costs).toEqual([
       {name: 'GPS', value: 20, basis: 'FIXED', timing: 'PERIODIC', embedded: false},
@@ -115,7 +114,7 @@ describe('SimulationAssembler', () => {
     expect(sim.salePrice.amount).toBe(16000);
     expect(sim.salePrice.currency).toBe('PEN');
     expect(sim.rate.type).toBe(RateType.NOMINAL);
-    expect(sim.rate.capitalization).toBe(Capitalization.DAILY);
+    expect(sim.rate.capitalization).toBe(1);
     expect(sim.rate.isNominal).toBe(true);
     expect(sim.costOfCapital.capitalization).toBeNull();
     expect(sim.term.installmentsPerYear).toBe(12);

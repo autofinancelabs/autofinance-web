@@ -12,7 +12,7 @@ export interface GenerateSimulationResource {
   vehicleOfferId: string;
   rateValue: number;
   rateType: string;
-  capitalization?: string;
+  capitalization?: number;
   initialPercentage: number;
   balloonPercentage: number;
   numberOfInstallments: number;
@@ -36,7 +36,7 @@ export interface CostResource {
 export interface RateResource {
   value: number;
   type: string;
-  capitalization: string | null;
+  capitalization: number | null;
 }
 
 /** The loan term. */

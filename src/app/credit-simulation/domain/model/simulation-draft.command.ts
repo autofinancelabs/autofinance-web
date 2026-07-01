@@ -1,4 +1,3 @@
-import {Capitalization} from './capitalization';
 import {Cost} from './cost.value-object';
 import {GraceType} from './grace-type';
 import {RateType} from './rate-type';
@@ -15,7 +14,7 @@ export class SimulationDraft {
   private readonly _vehicleOfferId: string;
   private readonly _rateValue: number;
   private readonly _rateType: RateType;
-  private readonly _capitalization: Capitalization | null;
+  private readonly _capitalization: number | null;
   private readonly _initialPercentage: number;
   private readonly _balloonPercentage: number;
   private readonly _numberOfInstallments: number;
@@ -30,7 +29,7 @@ export class SimulationDraft {
     vehicleOfferId: string;
     rateValue: number;
     rateType: RateType;
-    capitalization: Capitalization | null;
+    capitalization: number | null;
     initialPercentage: number;
     balloonPercentage: number;
     numberOfInstallments: number;
@@ -71,7 +70,8 @@ export class SimulationDraft {
     return this._rateType;
   }
 
-  get capitalization(): Capitalization | null {
+  /** Capitalization frequency in days (null for effective rates). */
+  get capitalization(): number | null {
     return this._capitalization;
   }
 

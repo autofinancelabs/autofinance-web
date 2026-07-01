@@ -12,7 +12,7 @@ import {ClientsStore} from '../../../../clients/application/clients.store';
 import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
 import {SimulationDraft} from '../../../domain/model/simulation-draft.command';
-import {Capitalization, capitalizations} from '../../../domain/model/capitalization';
+import {capitalizationPresets} from '../../../domain/model/capitalization';
 import {Cost} from '../../../domain/model/cost.value-object';
 import {CostBasis, costBases} from '../../../domain/model/cost-basis';
 import {CostTiming, costTimings} from '../../../domain/model/cost-timing';
@@ -32,7 +32,10 @@ interface ConfigModel {
   vehicleOfferId: string;
   rateType: RateType;
   rateValue: number | null;
-  capitalization: Capitalization | '';
+  /** Capitalization select: '' (none), a preset's days as string, or 'OTHER'. */
+  capitalizationChoice: string;
+  /** Custom capitalization in days (used only when capitalizationChoice === 'OTHER'). */
+  capitalizationDays: number | null;
   initialPercentage: number | null;
   balloonPercentage: number | null;
   costOfCapitalAnnual: number | null;
@@ -67,19 +70,12 @@ export class SimulationConfig extends BaseForm implements OnInit {
   protected readonly generating = this.store.generating;
 
   protected readonly rateTypes = rateTypes;
-  protected readonly capitalizations = capitalizations;
+  protected readonly capitalizationPresets = capitalizationPresets;
   protected readonly costBases = costBases;
   protected readonly costTimings = costTimings;
   protected readonly RateType = RateType;
   protected readonly CostBasis = CostBasis;
 
-  protected readonly capitalizationLabels: Record<string, string> = {
-    DAILY: 'Diaria',
-    MONTHLY: 'Mensual',
-    QUARTERLY: 'Trimestral',
-    SEMIANNUAL: 'Semestral',
-    ANNUAL: 'Anual',
-  };
   protected readonly costBasisLabels: Record<string, string> = {
     FIXED: 'Monto fijo',
     ON_BALANCE: '% sobre saldo',
@@ -101,7 +97,8 @@ export class SimulationConfig extends BaseForm implements OnInit {
     vehicleOfferId: '',
     rateType: RateType.NOMINAL,
     rateValue: null,
-    capitalization: '',
+    capitalizationChoice: '',
+    capitalizationDays: null,
     initialPercentage: null,
     balloonPercentage: null,
     costOfCapitalAnnual: null,
@@ -135,10 +132,22 @@ export class SimulationConfig extends BaseForm implements OnInit {
     min(path.partialGrace, 0, {message: 'No puede ser negativo.'});
 
     // Capitalization is required only for a nominal rate.
-    validate(path.capitalization, ctx => {
+    validate(path.capitalizationChoice, ctx => {
       const rateType = ctx.valueOf(path.rateType);
       if (rateType === RateType.NOMINAL && ctx.value() === '') {
         return {kind: 'required', message: 'Indica la capitalización para una tasa nominal.'};
+      }
+      return undefined;
+    });
+    // Custom capitalization days are required (and > 0) when "Otro" is chosen for a nominal rate.
+    validate(path.capitalizationDays, ctx => {
+      const rateType = ctx.valueOf(path.rateType);
+      const choice = ctx.valueOf(path.capitalizationChoice);
+      if (rateType === RateType.NOMINAL && choice === 'OTHER') {
+        const days = ctx.value();
+        if (days === null || days <= 0) {
+          return {kind: 'min', message: 'Indica los días de capitalización (mayor que 0).'};
+        }
       }
       return undefined;
     });
@@ -170,6 +179,11 @@ export class SimulationConfig extends BaseForm implements OnInit {
       min(cost.value, 0, {message: 'El valor no puede ser negativo.'});
     });
   });
+
+  /** Whether the custom "días de capitalización" input should be shown. */
+  protected readonly showCustomCapitalization = computed(
+    () => this.model().capitalizationChoice === 'OTHER',
+  );
 
   /** The picked offer (for the summary aside). */
   protected readonly selectedOffer = computed(() =>
@@ -227,15 +241,18 @@ export class SimulationConfig extends BaseForm implements OnInit {
         ...Array<GraceType>(partial).fill(GraceType.PARTIAL),
         ...Array<GraceType>(Math.max(0, installments - total - partial)).fill(GraceType.NONE),
       ];
+      const capitalization =
+        value.rateType === RateType.NOMINAL && value.capitalizationChoice !== ''
+          ? value.capitalizationChoice === 'OTHER'
+            ? value.capitalizationDays
+            : Number(value.capitalizationChoice)
+          : null;
       const draft = new SimulationDraft({
         clientId: value.clientId,
         vehicleOfferId: value.vehicleOfferId,
         rateValue: (value.rateValue ?? 0) / 100,
         rateType: value.rateType,
-        capitalization:
-          value.rateType === RateType.NOMINAL && value.capitalization !== ''
-            ? value.capitalization
-            : null,
+        capitalization,
         initialPercentage: (value.initialPercentage ?? 0) / 100,
         balloonPercentage: (value.balloonPercentage ?? 0) / 100,
         numberOfInstallments: installments,

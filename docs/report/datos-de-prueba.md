@@ -52,6 +52,15 @@ Fuente: `docs/guides/metodo-frances-compra-inteligente-balloon.md`.
 > 4. El **COK anual es 50%** (`cokAnual = 0.50`); el COK del periodo es `(1.5)^(30/360) − 1 =
 >    3.4366083%`, tasa con la que se descuenta el **VAN (+4,436.18)**. (Una versión previa rotulaba
 >    3.44% como "anual"; en realidad ese 3.44% era el COK del **periodo**.)
+> 5. **Intereses totales — convención (importante).** Este `2,264.74` es el del Excel "estilo
+>    Interbank", que calcula el interés como `Σcuota − Σamortización − Σdesgravamen`: durante la
+>    **gracia total** el interés se **capitaliza** y esa fórmula lo reclasifica como amortización, así
+>    que **no** lo cuenta como interés. El **motor** (`SummaryCalculator`) reporta el interés como la
+>    **suma del interés devengado por periodo** (columna de interés, incl. la gracia) → **≈ 2,636.37**;
+>    la diferencia (~372) es justo el interés devengado en los periodos de gracia total. **Es una
+>    diferencia de convención, no un error**: el motor usa la convención estándar (suma de la columna
+>    de interés), que además es la que usa **D3** (`13,025.03` = Σ devengado, validada exactamente por
+>    los tests). Los dos Excel del curso difieren entre sí en este punto; el motor sigue el de D3.
 
 ### 4.1 Entradas
 

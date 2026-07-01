@@ -105,20 +105,49 @@
                 <select
                   hlmInput
                   id="capitalization"
-                  [formField]="f.capitalization"
+                  [formField]="f.capitalizationChoice"
                   [attr.aria-invalid]="
-                    f.capitalization().touched() && f.capitalization().invalid() ? 'true' : null
+                    f.capitalizationChoice().touched() && f.capitalizationChoice().invalid()
+                      ? 'true'
+                      : null
                   "
                 >
                   <option value="" disabled>— Selecciona —</option>
-                  @for (cap of capitalizations; track cap) {
-                    <option [value]="cap">{{ capitalizationLabels[cap] }}</option>
+                  @for (preset of capitalizationPresets; track preset.days) {
+                    <option [value]="preset.days">{{ preset.label }} ({{ preset.days }}d)</option>
                   }
+                  <option value="OTHER">Otro (días)…</option>
                 </select>
-                @if (f.capitalization().touched() && f.capitalization().errors().length) {
-                  <span hlmError>{{ f.capitalization().errors()[0].message }}</span>
+                @if (
+                  f.capitalizationChoice().touched() && f.capitalizationChoice().errors().length
+                ) {
+                  <span hlmError>{{ f.capitalizationChoice().errors()[0].message }}</span>
                 }
               </div>
+
+              @if (showCustomCapitalization()) {
+                <div hlmFormField>
+                  <label hlmLabel for="capitalizationDays">Días de capitalización</label>
+                  <input
+                    hlmInput
+                    id="capitalizationDays"
+                    type="number"
+                    inputmode="numeric"
+                    class="font-mono tabular-nums"
+                    [formField]="f.capitalizationDays"
+                    [attr.aria-invalid]="
+                      f.capitalizationDays().touched() && f.capitalizationDays().invalid()
+                        ? 'true'
+                        : null
+                    "
+                  />
+                  @if (
+                    f.capitalizationDays().touched() && f.capitalizationDays().errors().length
+                  ) {
+                    <span hlmError>{{ f.capitalizationDays().errors()[0].message }}</span>
+                  }
+                </div>
+              }
             }
           </div>
         </fieldset>

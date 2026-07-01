@@ -16,7 +16,8 @@ interface FormModel {
   vehicleOfferId: string;
   rateType: RateType;
   rateValue: number | null;
-  capitalization: string;
+  capitalizationChoice: string;
+  capitalizationDays: number | null;
   initialPercentage: number | null;
   balloonPercentage: number | null;
   costOfCapitalAnnual: number | null;
@@ -33,7 +34,8 @@ const validModel: FormModel = {
   vehicleOfferId: 'vo-1',
   rateType: RateType.EFFECTIVE,
   rateValue: 9,
-  capitalization: '',
+  capitalizationChoice: '',
+  capitalizationDays: null,
   initialPercentage: 20,
   balloonPercentage: 40,
   costOfCapitalAnnual: 50,
@@ -103,6 +105,50 @@ describe('SimulationConfig', () => {
       GraceType.PARTIAL,
     ]);
     expect(draft.gracePlan[6]).toBe(GraceType.NONE);
+  });
+
+  it('sends the chosen capitalization preset (days) for a nominal rate', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      rateType: RateType.NOMINAL,
+      capitalizationChoice: '30',
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    expect(store.generate).toHaveBeenCalledTimes(1);
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.capitalization).toBe(30);
+  });
+
+  it('sends the custom capitalization days when "Otro" is chosen', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      rateType: RateType.NOMINAL,
+      capitalizationChoice: 'OTHER',
+      capitalizationDays: 15,
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    expect(store.generate).toHaveBeenCalledTimes(1);
+    const draft = store.generate.mock.calls[0][0] as SimulationDraft;
+    expect(draft.capitalization).toBe(15);
+  });
+
+  it('blocks submit when a nominal rate has no capitalization', async () => {
+    const fixture = setup();
+    instance(fixture).model.set({
+      ...validModel,
+      rateType: RateType.NOMINAL,
+      capitalizationChoice: '',
+    });
+    instance(fixture).onSubmit(new Event('submit'));
+    await flush();
+
+    expect(store.generate).not.toHaveBeenCalled();
   });
 
   it('blocks submit when initial % + balloon % >= 100', async () => {

@@ -1,17 +1,17 @@
-import {Capitalization} from './capitalization';
 import {RateType} from './rate-type';
 
 /**
  * An interest rate: its value (a fraction, e.g. 0.15 = 15%), its type
- * (nominal/effective) and, for nominal rates, the capitalization frequency.
- * Immutable. Used both for the financing rate and for the cost of capital (COK).
+ * (nominal/effective) and, for nominal rates, the capitalization frequency in
+ * days (e.g. 1=daily, 30=monthly, 360=annual). Immutable. Used both for the
+ * financing rate and for the cost of capital (COK).
  */
 export class Rate {
   private readonly _value: number;
   private readonly _type: RateType;
-  private readonly _capitalization: Capitalization | null;
+  private readonly _capitalization: number | null;
 
-  constructor(options: {value: number; type: RateType; capitalization: Capitalization | null}) {
+  constructor(options: {value: number; type: RateType; capitalization: number | null}) {
     this._value = options.value;
     this._type = options.type;
     this._capitalization = options.capitalization;
@@ -25,7 +25,8 @@ export class Rate {
     return this._type;
   }
 
-  get capitalization(): Capitalization | null {
+  /** Capitalization frequency in days (null for effective rates). */
+  get capitalization(): number | null {
     return this._capitalization;
   }
 

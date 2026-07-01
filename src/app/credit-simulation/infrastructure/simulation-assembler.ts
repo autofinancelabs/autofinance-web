@@ -1,7 +1,6 @@
 import {Currency} from '../../shared/domain/model/currency';
 import {Money} from '../../shared/domain/model/money';
 import {AppliedCost} from '../domain/model/applied-cost.value-object';
-import {Capitalization} from '../domain/model/capitalization';
 import {Cost} from '../domain/model/cost.value-object';
 import {CostBasis} from '../domain/model/cost-basis';
 import {CostTiming} from '../domain/model/cost-timing';
@@ -108,8 +107,7 @@ export class SimulationAssembler {
     return new Rate({
       value: resource.value,
       type: resource.type as RateType,
-      capitalization:
-        resource.capitalization === null ? null : (resource.capitalization as Capitalization),
+      capitalization: resource.capitalization,
     });
   }
 

@@ -33,7 +33,7 @@ function makeSim(id: string, npv: number, clientId = 'cl-1'): CreditSimulation {
     clientId,
     vehicleOfferId: 'vo-1',
     salePrice: {amount: 16000, currency: 'PEN'},
-    rate: {value: 0.15, type: 'NOMINAL', capitalization: 'DAILY'},
+    rate: {value: 0.15, type: 'NOMINAL', capitalization: 1},
     initialPercentage: 0.2,
     balloonPercentage: 0.4,
     term: {numberOfInstallments: 2, frequencyDays: 30, installmentsPerYear: 12, daysPerYear: 360},

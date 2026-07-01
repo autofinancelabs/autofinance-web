@@ -52,7 +52,7 @@ Las divisiones y potencias usan `MathContext` con redondeo `HALF_UP`.
 |------------------|------------------------------------------------|--------------------------|-----------|-----------|---------|-------------------------------------------------------------|
 | `tipoTasa`       | Naturaleza de la tasa ingresada                | enum {NOMINAL, EFECTIVA} | —         | "NOMINAL" | —       | obligatorio                                                 |
 | `valorTasa`      | Valor de la tasa (TNA o TEA), en fracción      | BigDecimal               | scale 10  | 0.1500    | —       | obligatorio; `≥ 0`                                          |
-| `capitalizacion` | Días de capitalización (1=diaria, 30=mensual…) | enum/int                 | —         | 1         | —       | **obligatorio si `tipoTasa=NOMINAL`**; ignorado si EFECTIVA |
+| `capitalizacion` | Días de capitalización (1=diaria, 30=mensual, 90=trimestral, 180=semestral, 360=anual, o cualquier valor) | int (días)               | —         | 1         | —       | **obligatorio si `tipoTasa=NOMINAL`**; ignorado si EFECTIVA; `> 0` |
 | `diasAnio`       | Días por año (convención)                      | int                      | —         | 360       | 360     | fijo 360 en v1                                              |
 
 ### 4.3 Estructura del crédito
@@ -89,8 +89,8 @@ Restricción de cruce: `porcentajeCuotaInicial + porcentajeCuotaFinal < 1`.
 
 | nombre                 | descripción                                                   | tipo       | precisión    | formato  | default | restricciones                        |
 |------------------------|---------------------------------------------------------------|------------|--------------|----------|---------|--------------------------------------|
-| `tsd`                  | Tasa de seguro de desgravamen por periodo (sobre saldo)       | BigDecimal | scale 10     | 0.000490 | 0       | `≥ 0`                                |
-| `tsr` / `seguroRiesgo` | Seguro contra todo riesgo (fijo por periodo, o tasa sobre PV) | BigDecimal | scale 2 / 10 | 4.00     | 0       | `≥ 0`; documentar si fijo o `PV×TSR` |
+| `tsd`                  | Tasa de seguro de desgravamen **mensual** (sobre saldo); por periodo = `tsd × frec/30` | BigDecimal | scale 10     | 0.000490 | 0       | `≥ 0` (ON_BALANCE)                   |
+| `tsr` / `seguroRiesgo` | Seguro contra todo riesgo: tasa **anual** sobre PV (por periodo = `tsr × frec/díasAño`) **o** monto fijo por periodo | BigDecimal | scale 2 / 10 | 0.0010   | 0       | `≥ 0`; `ON_SALE_PRICE` (tasa anual) o `FIXED` (monto) |
 | `gps`                  | Costo de GPS por periodo                                      | BigDecimal | scale 2      | 20.00    | 0       | `≥ 0`                                |
 | `portes`               | Portes por periodo                                            | BigDecimal | scale 2      | 3.50     | 0       | `≥ 0`                                |
 | `gastosAdm`            | Gastos administrativos por periodo                            | BigDecimal | scale 2      | 3.50     | 0       | `≥ 0`                                |

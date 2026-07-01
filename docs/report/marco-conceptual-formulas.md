@@ -160,11 +160,18 @@ material de referencia. Sin gracia, `R` se calcula desde el inicio sobre `C − 
 ## 10. Costos periódicos y flujo de caja del periodo
 
 ```text
-Seguro de desgravamen:   SD_t = SI_t × TSD          (sobre el saldo del periodo)
-Seguro contra todo riesgo: STR = PV × TSR            (o un monto fijo por periodo)
+Seguro de desgravamen:   SD_t = SI_t × TSD_periodo,   TSD_periodo = TSD × (frecuencia / 30)
+Seguro contra todo riesgo: STR = PV × TSR_periodo,     TSR_periodo = TSR × (frecuencia / díasAño)
 Cuota total:             CT_t = R + costos_periódicos
 Flujo del periodo:       Flujo_t = cuota + SD_t + STR + GPS + portes + gastos_adm
 ```
+
+**Convención de las tasas de seguro (importante).** La `TSD` (desgravamen) se cotiza **mensual**
+(base 30 días) y la `TSR` (riesgo) se cotiza **anual** (base `díasAño`); ambas se llevan a la
+frecuencia de pago con el factor `frecuencia/base` (lineal). Con la frecuencia mensual estándar
+(30 días, 30/360) el desgravamen queda ×1 y el riesgo ÷12. Los costos de **monto fijo** (GPS,
+portes, gastos adm.) ya son un importe por periodo y no se escalan. Coincide con los Excel de
+referencia (`compra_inteligente*.xlsx`: `pSegDes×frec/30` y `pSegRie×frec/360`).
 
 Los costos periódicos no amortizan capital y se pagan también durante la gracia.
 
