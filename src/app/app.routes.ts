@@ -2,6 +2,8 @@ import {Routes} from '@angular/router';
 import {authGuard} from './iam/application/auth.guard';
 import {guestGuard} from './iam/application/guest.guard';
 
+const landing = () =>
+  import('./shared/presentation/views/landing/landing').then(m => m.Landing);
 const dashboard = () =>
   import('./shared/presentation/views/dashboard/dashboard').then(m => m.Dashboard);
 const appShell = () =>
@@ -21,13 +23,16 @@ const pageNotFound = () =>
   import('./shared/presentation/views/page-not-found/page-not-found').then(m => m.PageNotFound);
 
 /**
- * Root router with two layout shells:
+ * Root router:
+ *  - the public {@link Landing} at exactly `/` (no guard; authenticated users are
+ *    redirected to the dashboard from within the view);
  *  - the minimal {@link AuthLayout} for the IAM auth screens (guarded by
  *    `guestGuard`);
  *  - the {@link AppShell} (topbar + sidebar), guarded by `authGuard`, for the
  *    authenticated app. Bounded contexts lazy-load their routes here.
  */
 export const routes: Routes = [
+  {path: '', pathMatch: 'full', loadComponent: landing},
   {path: '', loadComponent: authLayout, loadChildren: iamRoutes, canActivate: [guestGuard]},
   {
     path: '',

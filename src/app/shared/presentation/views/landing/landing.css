@@ -1,0 +1,227 @@
+:host {
+  display: block;
+}
+
+.landing {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ---- Animated background lights ------------------------------------------ */
+.lights {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.light {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.light--1 {
+  top: -8rem;
+  left: -6rem;
+  width: 26rem;
+  height: 26rem;
+  background: color-mix(in oklch, var(--primary) 55%, transparent);
+  animation: drift-1 26s ease-in-out infinite;
+}
+
+.light--2 {
+  top: 30%;
+  right: -8rem;
+  width: 30rem;
+  height: 30rem;
+  background: color-mix(in oklch, var(--primary) 40%, transparent);
+  animation: drift-2 32s ease-in-out infinite;
+}
+
+.light--3 {
+  bottom: -10rem;
+  left: 20%;
+  width: 28rem;
+  height: 28rem;
+  background: color-mix(in oklch, var(--success) 38%, transparent);
+  animation: drift-3 30s ease-in-out infinite;
+}
+
+.light--4 {
+  top: 12%;
+  left: 38%;
+  width: 18rem;
+  height: 18rem;
+  background: color-mix(in oklch, var(--primary) 30%, transparent);
+  animation: drift-1 22s ease-in-out infinite reverse;
+}
+
+@keyframes drift-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(6rem, 4rem) scale(1.12);
+  }
+}
+
+@keyframes drift-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-7rem, 5rem) scale(1.15);
+  }
+}
+
+@keyframes drift-3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(5rem, -6rem) scale(1.1);
+  }
+}
+
+/* ---- Layout -------------------------------------------------------------- */
+.landing__header,
+.hero,
+.landing__footer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding-inline: 1.5rem;
+}
+
+.landing__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.25rem;
+}
+
+.landing__brand {
+  display: inline-flex;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.landing__brand:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.landing__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.15rem;
+  padding-block: 4rem;
+}
+
+.hero__eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.hero__title {
+  margin: 0;
+  max-width: 20ch;
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.hero__accent {
+  display: block;
+  color: var(--primary);
+}
+
+.hero__subtitle {
+  margin: 0;
+  max-width: 44rem;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+.hero__chips {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--card) 70%, transparent);
+  backdrop-filter: blur(6px);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* ---- Footer -------------------------------------------------------------- */
+.landing__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.landing__copy {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .light {
+    animation: none;
+  }
+}
