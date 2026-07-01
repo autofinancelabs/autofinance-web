@@ -96,6 +96,7 @@ export class SimulationAssembler {
         ),
       }),
       state: resource.state as SimulationState,
+      createdAt: resource.createdAt ? new Date(resource.createdAt) : null,
     });
   }
 

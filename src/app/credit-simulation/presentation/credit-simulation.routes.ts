@@ -1,5 +1,7 @@
 import {Routes} from '@angular/router';
 
+const list = () =>
+  import('./views/simulations-list/simulations-list').then(m => m.SimulationsList);
 const config = () =>
   import('./views/simulation-config/simulation-config').then(m => m.SimulationConfig);
 const results = () =>
@@ -9,12 +11,12 @@ const history = () =>
 
 /**
  * Credit Simulation routes, mounted under `/credit-simulations` in the main shell.
- * There is no list-all endpoint (history is per client), so the entry point is the
- * configuration form ("new"); a generated/saved simulation is shown by id.
+ * The landing is the tenant-wide list of all the advisor's simulations; "new" is the
+ * configuration form, "by-client/:clientId" a client's history, and ":id" a result.
  */
 export const creditSimulationRoutes: Routes = [
+  {path: '', loadComponent: list},
   {path: 'new', loadComponent: config},
   {path: 'by-client/:clientId', loadComponent: history},
   {path: ':id', loadComponent: results},
-  {path: '', redirectTo: 'new', pathMatch: 'full'},
 ];

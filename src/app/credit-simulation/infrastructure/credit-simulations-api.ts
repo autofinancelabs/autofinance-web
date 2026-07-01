@@ -26,4 +26,8 @@ export class CreditSimulationsApi extends BaseApi {
   listByClient(clientId: string): Observable<CreditSimulation[]> {
     return this.endpoint.listByClient(clientId);
   }
+
+  listAll(): Observable<CreditSimulation[]> {
+    return this.endpoint.listAll();
+  }
 }

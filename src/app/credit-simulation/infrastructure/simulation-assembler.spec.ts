@@ -86,6 +86,7 @@ function makeResource(): SimulationResource {
       totalsPerCost: {GPS: 740, Portes: 129.5},
     },
     state: 'GENERATED',
+    createdAt: '2026-06-01T12:00:00Z',
   };
 }
 

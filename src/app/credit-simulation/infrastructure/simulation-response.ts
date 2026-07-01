@@ -109,4 +109,5 @@ export interface SimulationResource extends BaseResource {
   schedule: ScheduleRowResource[];
   summary: SummaryResource;
   state: string;
+  createdAt: string | null;
 }

@@ -1,0 +1,140 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  <header class="page-header">
+    <div>
+      <h1 class="text-2xl font-medium tracking-tight">Cotizaciones</h1>
+      <p class="text-muted-foreground text-sm">
+        Todas las cotizaciones generadas por el asesor.
+      </p>
+    </div>
+    <a hlmBtn routerLink="/credit-simulations/new">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nueva cotización
+    </a>
+  </header>
+
+  @if (loading()) {
+    <p class="text-muted-foreground text-sm" role="status">Cargando cotizaciones…</p>
+  } @else if (isEmpty()) {
+    <div class="empty">
+      <p class="text-muted-foreground">Aún no se han generado cotizaciones.</p>
+      <a hlmBtn variant="outline" routerLink="/credit-simulations/new">Generar la primera</a>
+    </div>
+  } @else {
+    <div class="filters">
+      <label class="filters__field">
+        <span class="filters__label">Cliente</span>
+        <select hlmInput [value]="clientFilter()" (change)="clientFilter.set(pick($event))">
+          <option value="">Todos</option>
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">
+              {{ client.documentId.type }} {{ client.documentId.number }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="filters__field">
+        <span class="filters__label">Estado</span>
+        <select hlmInput [value]="stateFilter()" (change)="stateFilter.set(pick($event))">
+          <option value="">Todos</option>
+          @for (state of states; track state) {
+            <option [value]="state">{{ state }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="content-grid">
+      <div class="table-wrapper">
+        <table class="sim-table">
+          <thead>
+            <tr>
+              <th scope="col">Cliente</th>
+              <th scope="col">Vehículo</th>
+              <th scope="col" class="num">Precio</th>
+              <th scope="col" class="num">Préstamo</th>
+              <th scope="col" class="num">Total a pagar</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Fecha</th>
+              <th scope="col" class="actions">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredRows(); track row.sim.id) {
+              <tr>
+                <td>
+                  @if (row.client; as c) {
+                    <span class="doc__badge">{{ c.documentId.type }}</span>
+                    <span class="font-mono tabular-nums">{{ c.documentId.number }}</span>
+                  } @else {
+                    <span class="text-muted-foreground">—</span>
+                  }
+                </td>
+                <td>
+                  @if (row.offer; as o) {
+                    <span class="tabular-nums">{{ o.year }}</span> {{ o.make }} {{ o.model }}
+                  } @else {
+                    <span class="text-muted-foreground">—</span>
+                  }
+                </td>
+                <td class="num font-mono tabular-nums">{{ row.sim.salePrice | money }}</td>
+                <td class="num font-mono tabular-nums">{{ row.sim.loanAmount | money }}</td>
+                <td class="num font-mono tabular-nums">
+                  {{ row.sim.salePrice.currency }} {{ row.sim.summary.totalToPay | amount }}
+                </td>
+                <td><span class="state-badge">{{ row.sim.state }}</span></td>
+                <td class="font-mono tabular-nums">
+                  {{ (row.sim.createdAt | date: 'dd/MM/yyyy') || '—' }}
+                </td>
+                <td class="actions">
+                  <a hlmBtn variant="ghost" size="sm" [routerLink]="['/credit-simulations', row.sim.id]">
+                    Ver
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="summary" aria-label="Resumen">
+        <div class="metric">
+          <span class="metric__label">Cotizaciones</span>
+          <span class="metric__value tabular-nums">{{ total() }}</span>
+        </div>
+        <div class="metric metric--list">
+          <span class="metric__label">Monto financiado</span>
+          @for (row of financedByCurrency(); track row.currency) {
+            <div class="metric__row">
+              <span>{{ row.currency }}</span>
+              <span class="font-mono tabular-nums">{{ row.total | amount }}</span>
+            </div>
+          }
+        </div>
+        <div class="metric metric--list">
+          <span class="metric__label">Por estado</span>
+          @for (row of byState(); track row.state) {
+            <div class="metric__row">
+              <span>{{ row.state }}</span>
+              <span class="tabular-nums">{{ row.count }}</span>
+            </div>
+          }
+        </div>
+      </aside>
+    </div>
+  }
+</div>

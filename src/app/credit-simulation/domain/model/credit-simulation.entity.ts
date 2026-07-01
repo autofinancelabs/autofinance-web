@@ -34,6 +34,7 @@ export class CreditSimulation implements BaseEntity {
   private readonly _schedule: ScheduleRow[];
   private readonly _summary: SimulationSummary;
   private readonly _state: SimulationState;
+  private readonly _createdAt: Date | null;
 
   constructor(options: {
     id: string;
@@ -53,6 +54,7 @@ export class CreditSimulation implements BaseEntity {
     schedule: ScheduleRow[];
     summary: SimulationSummary;
     state: SimulationState;
+    createdAt: Date | null;
   }) {
     this._id = options.id;
     this._clientId = options.clientId;
@@ -71,6 +73,7 @@ export class CreditSimulation implements BaseEntity {
     this._schedule = options.schedule;
     this._summary = options.summary;
     this._state = options.state;
+    this._createdAt = options.createdAt;
   }
 
   get id(): string {
@@ -139,5 +142,10 @@ export class CreditSimulation implements BaseEntity {
 
   get state(): SimulationState {
     return this._state;
+  }
+
+  /** Creation timestamp (null if not yet persisted). */
+  get createdAt(): Date | null {
+    return this._createdAt;
   }
 }

@@ -14,7 +14,7 @@ Hoja de ruta del frontend (`autofinance-web`, Angular 22 zoneless, DDD por bound
 
 - [ ] **Actualizar `DESIGN.md`** con los patrones nuevos: shell sidebar+topbar, breadcrumbs, form a dos paneles + preview, toast custom (no sonner), tooltip Spartan (CDK overlay), split-screen auth, política toast vs inline.
 - [ ] **Accesibilidad (AXE / WCAG AA)** sobre lo existente: foco, contraste, labels/aria, navegación por teclado del drawer/sidebar.
-- [ ] **Acceso descubrible a cotizaciones por cliente**: hoy la única entrada por-cliente es el botón de ícono por fila en la lista de Clientes; la sidebar "Cotizaciones" va directo al formulario de nueva cotización (no hay listado global; el backend solo expone `?clientId=`). Mejorar la descubribilidad (p. ej. landing de "Cotizaciones" con selector de cliente → su historial, o que la sidebar lleve a Clientes). Decisión del usuario: **dejarlo así por ahora**.
+- [x] **Acceso descubrible a cotizaciones** — RESUELTO: la sidebar/dashboard "Cotizaciones" abren un **listado global** (todas las del asesor) con filtro por cliente/estado (`GET /credit-simulations` sin `clientId`); "Nueva cotización" es un botón dentro. El historial por-cliente sigue en `by-client/:clientId` y el botón por fila en Clientes.
 - [ ] **Decidir el campo `Plan`** de la oferta: hoy es etiqueta+cuotas opcional, no usado por el cálculo. Opciones: ocultarlo, o que **prellene el plazo** al generar la cotización (decisión natural al llegar al core).
 - [ ] (Opcional) refinar acoplamiento `shared/infrastructure` → `NotificationService` (extraer un puerto si se quiere pureza estricta).
 - [ ] (Opcional) eliminar artefactos de verificación: `.claude/launch.json` (config `dist`) si no se versiona.

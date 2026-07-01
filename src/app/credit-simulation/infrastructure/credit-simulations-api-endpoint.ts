@@ -38,4 +38,11 @@ export class CreditSimulationsApiEndpoint {
       .get<SimulationResource[]>(this.endpointUrl, {params})
       .pipe(map(resources => this.assembler.toEntitiesFromResource(resources)));
   }
+
+  /** All simulations of the current dealership (tenant-scoped server-side). */
+  listAll(): Observable<CreditSimulation[]> {
+    return this.http
+      .get<SimulationResource[]>(this.endpointUrl)
+      .pipe(map(resources => this.assembler.toEntitiesFromResource(resources)));
+  }
 }

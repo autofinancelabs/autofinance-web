@@ -48,6 +48,7 @@ function makeSimulation(id = 's-1'): CreditSimulation {
       totalsPerCost: [],
     }),
     state: SimulationState.GENERATED,
+    createdAt: null,
   });
 }
 
