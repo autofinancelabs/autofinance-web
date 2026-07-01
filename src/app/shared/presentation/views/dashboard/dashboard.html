@@ -1,31 +1,213 @@
 <div class="page">
-  <header class="page-header">
-    <h1 class="text-2xl font-medium tracking-tight">Hola, {{ username() }}</h1>
-    <p class="text-muted-foreground">
-      Gestiona ofertas y cotizaciones de crédito vehicular.
-    </p>
-  </header>
-
-  <div class="cards">
-    <a hlmCard class="card card--link" routerLink="/vehicle-offers">
-      <div hlmCardHeader>
-        <h2 hlmCardTitle>Ofertas vehiculares</h2>
-        <p hlmCardDescription>Registra y administra los vehículos que financias.</p>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__content">
+      <p class="hero__eyebrow">Plataforma de crédito vehicular</p>
+      <h1 class="hero__title">Hola, {{ username() }}</h1>
+      <p class="hero__subtitle">
+        Arma cotizaciones con método francés y Compra Inteligente, aplica gracia y costos, y muestra los
+        indicadores de transparencia SBS: TCEA, VAN y TIR.
+      </p>
+      <div class="hero__actions">
+        <a hlmBtn routerLink="/credit-simulations/new">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Nueva cotización
+        </a>
+        <a hlmBtn variant="outline" routerLink="/credit-simulations">Ver cotizaciones</a>
       </div>
-    </a>
+    </div>
+    <svg
+      class="hero__glyph"
+      viewBox="0 0 100 100"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M20 58 L50 30 L80 58" />
+      <path d="M20 78 L50 50 L80 78" opacity="0.55" />
+    </svg>
+  </section>
 
-    <a hlmCard class="card card--link" routerLink="/clients">
-      <div hlmCardHeader>
-        <h2 hlmCardTitle>Clientes</h2>
-        <p hlmCardDescription>Registra y administra los deudores de tus operaciones.</p>
+  <!-- KPIs -->
+  <section class="stats" aria-label="Resumen">
+    <div class="stat">
+      <span class="stat__icon stat__icon--primary" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </span>
+      <div class="stat__body">
+        <span class="stat__label">Clientes</span>
+        <span class="stat__value tabular-nums">{{ clientsCount() }}</span>
       </div>
-    </a>
+    </div>
 
-    <a hlmCard class="card card--link" routerLink="/credit-simulations">
-      <div hlmCardHeader>
-        <h2 hlmCardTitle>Cotización</h2>
-        <p hlmCardDescription>Genera planes de pago con cronograma e indicadores SBS.</p>
+    <div class="stat">
+      <span class="stat__icon stat__icon--primary" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z" />
+          <circle cx="7.5" cy="16" r="0.5" />
+          <circle cx="16.5" cy="16" r="0.5" />
+        </svg>
+      </span>
+      <div class="stat__body">
+        <span class="stat__label">Vehículos</span>
+        <span class="stat__value tabular-nums">{{ offersCount() }}</span>
       </div>
-    </a>
+    </div>
+
+    <div class="stat">
+      <span class="stat__icon stat__icon--primary" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="2" />
+          <line x1="8" y1="7" x2="16" y2="7" />
+          <line x1="8" y1="11" x2="16" y2="11" />
+          <line x1="8" y1="15" x2="13" y2="15" />
+        </svg>
+      </span>
+      <div class="stat__body">
+        <span class="stat__label">Cotizaciones</span>
+        <span class="stat__value tabular-nums">{{ simsCount() }}</span>
+      </div>
+    </div>
+
+    <div class="stat">
+      <span class="stat__icon stat__icon--success" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 17l6-6 4 4 7-7" />
+          <path d="M17 8h4v4" />
+        </svg>
+      </span>
+      <div class="stat__body">
+        <span class="stat__label">Monto financiado</span>
+        <span class="stat__value stat__value--money font-mono tabular-nums">
+          @if (financed(); as amount) {
+            {{ amount | money }}
+          } @else {
+            —
+          }
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick access + recent -->
+  <div class="grid">
+    <section class="panel">
+      <h2 class="panel__title">Accesos rápidos</h2>
+      <div class="quick">
+        <a class="quick__card" routerLink="/vehicle-offers">
+          <span class="quick__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z" />
+              <circle cx="7.5" cy="16" r="0.5" />
+              <circle cx="16.5" cy="16" r="0.5" />
+            </svg>
+          </span>
+          <span class="quick__text">
+            <span class="quick__name">Ofertas vehiculares</span>
+            <span class="quick__desc">Registra y administra los vehículos que financias.</span>
+          </span>
+          <svg class="quick__arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+
+        <a class="quick__card" routerLink="/clients">
+          <span class="quick__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </span>
+          <span class="quick__text">
+            <span class="quick__name">Clientes</span>
+            <span class="quick__desc">Registra y administra los deudores de tus operaciones.</span>
+          </span>
+          <svg class="quick__arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+
+        <a class="quick__card" routerLink="/credit-simulations">
+          <span class="quick__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2" />
+              <line x1="8" y1="7" x2="16" y2="7" />
+              <line x1="8" y1="11" x2="16" y2="11" />
+              <line x1="8" y1="15" x2="13" y2="15" />
+            </svg>
+          </span>
+          <span class="quick__text">
+            <span class="quick__name">Cotizaciones</span>
+            <span class="quick__desc">Genera planes de pago con cronograma e indicadores SBS.</span>
+          </span>
+          <svg class="quick__arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel__head">
+        <h2 class="panel__title">Últimas cotizaciones</h2>
+        <a class="panel__link" routerLink="/credit-simulations">Ver todas</a>
+      </div>
+
+      @if (recent().length) {
+        <ul class="recent">
+          @for (row of recent(); track row.sim.id) {
+            <li>
+              <a class="recent__item" [routerLink]="['/credit-simulations', row.sim.id]">
+                <span class="recent__main">
+                  <span class="recent__client">{{ row.client?.displayName ?? '—' }}</span>
+                  <span class="recent__vehicle">{{ vehicleLabel(row.offer) }}</span>
+                </span>
+                <span class="recent__figures">
+                  <span class="recent__total font-mono tabular-nums">{{ row.sim.loanAmount | money }}</span>
+                  <span
+                    class="chip"
+                    [class.chip--positive]="row.sim.indicators.npv >= 0"
+                    [class.chip--negative]="row.sim.indicators.npv < 0"
+                  >
+                    <span aria-hidden="true">{{ row.sim.indicators.npv >= 0 ? '↑' : '↓' }}</span>
+                    <span class="font-mono tabular-nums">
+                      {{ row.sim.salePrice.currency }} {{ row.sim.indicators.npv | amount }}
+                    </span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty">
+          <p class="text-muted-foreground">Aún no hay cotizaciones generadas.</p>
+          <a hlmBtn variant="outline" routerLink="/credit-simulations/new">Generar la primera</a>
+        </div>
+      }
+    </section>
   </div>
 </div>
