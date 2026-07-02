@@ -47,6 +47,19 @@ export class SimulationResults implements OnInit {
   /** Costs breakdown accordion: open by default on desktop, collapsed on mobile. */
   protected readonly costsOpen = signal(this.isDesktop());
 
+  /** Per-cost schedule columns: the distinct applied-cost names, in first-seen order. */
+  protected readonly costColumns = computed<string[]>(() => {
+    const names: string[] = [];
+    for (const row of this.simulation()?.schedule ?? []) {
+      for (const cost of row.appliedCosts) {
+        if (!names.includes(cost.name)) {
+          names.push(cost.name);
+        }
+      }
+    }
+    return names;
+  });
+
   /** VAN as Money (in the operation's currency) for the indicator chip. */
   protected readonly van = computed(() => {
     const sim = this.simulation();

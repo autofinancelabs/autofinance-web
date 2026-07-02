@@ -9,7 +9,12 @@ import {SimulationResults} from './simulation-results';
 
 const assembler = new SimulationAssembler();
 
-function scheduleRow(period: number, graceType: string, settlement = false): SimulationResource['schedule'][number] {
+function scheduleRow(
+  period: number,
+  graceType: string,
+  settlement = false,
+  appliedCosts: SimulationResource['schedule'][number]['appliedCosts'] = [],
+): SimulationResource['schedule'][number] {
   return {
     period,
     graceType,
@@ -23,11 +28,20 @@ function scheduleRow(period: number, graceType: string, settlement = false): Sim
     amortization: settlement ? 0 : 350,
     closingBalance: settlement ? 0 : 650,
     cashFlow: settlement ? 6400 : 410,
-    appliedCosts: [],
+    appliedCosts,
   };
 }
 
-function makeSim(id: string, npv: number, clientId = 'cl-1'): CreditSimulation {
+function makeSim(
+  id: string,
+  npv: number,
+  clientId = 'cl-1',
+  schedule: SimulationResource['schedule'] = [
+    scheduleRow(1, 'NONE'),
+    scheduleRow(2, 'NONE'),
+    scheduleRow(3, 'NONE', true),
+  ],
+): CreditSimulation {
   const resource: SimulationResource = {
     id,
     clientId,
@@ -50,7 +64,7 @@ function makeSim(id: string, npv: number, clientId = 'cl-1'): CreditSimulation {
       periodicRate: 0.0126,
       periodicCostOfCapital: 0.0344,
     },
-    schedule: [scheduleRow(1, 'NONE'), scheduleRow(2, 'NONE'), scheduleRow(3, 'NONE', true)],
+    schedule,
     summary: {
       totalInterest: 2264.74,
       totalAmortization: 12975,
@@ -114,6 +128,26 @@ describe('SimulationResults', () => {
     // settlement row (period 3 > 2 installments) is flagged
     expect(el.querySelector('.row--settlement')).not.toBeNull();
     expect(el.textContent).toContain('Cuotón');
+  });
+
+  it('renders a schedule column per applied cost (before the closing balance)', () => {
+    const sim = makeSim('s-1', 4436.18, 'cl-1', [
+      scheduleRow(1, 'NONE', false, [
+        {name: 'desgravamen', amount: 6.09},
+        {name: 'riesgo', amount: 56.25},
+      ]),
+    ]);
+    const fixture = setup('s-1', sim);
+    const el = fixture.nativeElement as HTMLElement;
+
+    const headers = [...el.querySelectorAll('.schedule-table thead th')].map(h =>
+      h.textContent?.trim(),
+    );
+    expect(headers).toContain('desgravamen');
+    expect(headers).toContain('riesgo');
+    // cost columns sit before "Saldo fin."
+    expect(headers.indexOf('desgravamen')).toBeLessThan(headers.indexOf('Saldo fin.'));
+    expect(el.textContent).toContain('56.25');
   });
 
   it('renders a negative VAN chip when npv < 0', () => {

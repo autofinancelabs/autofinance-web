@@ -84,6 +84,9 @@
               <th scope="col" class="num">Interés</th>
               <th scope="col" class="num">Cuota</th>
               <th scope="col" class="num">Amort.</th>
+              @for (name of costColumns(); track name) {
+                <th scope="col" class="num">{{ name }}</th>
+              }
               <th scope="col" class="num">Saldo fin.</th>
               <th scope="col" class="num">Flujo</th>
             </tr>
@@ -103,6 +106,9 @@
                 <td class="num font-mono tabular-nums">{{ row.interest | amount }}</td>
                 <td class="num font-mono tabular-nums">{{ row.installment | amount }}</td>
                 <td class="num font-mono tabular-nums">{{ row.amortization | amount }}</td>
+                @for (name of costColumns(); track name) {
+                  <td class="num font-mono tabular-nums">{{ row.costNamed(name) | amount }}</td>
+                }
                 <td class="num font-mono tabular-nums">{{ row.closingBalance | amount }}</td>
                 <td class="num font-mono tabular-nums">{{ row.cashFlow | amount }}</td>
               </tr>
