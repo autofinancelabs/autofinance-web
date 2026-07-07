@@ -1,0 +1,335 @@
+:host {
+  display: block;
+}
+
+.page {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Indicator chips */
+.indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  min-width: 9rem;
+}
+
+.chip__label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.chip__value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.chip__glyph {
+  font-size: 0.9rem;
+}
+
+.chip--positive {
+  background: color-mix(in oklch, var(--success) 12%, transparent);
+  color: var(--success);
+}
+
+.chip--negative {
+  background: color-mix(in oklch, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+.chip--primary {
+  background: color-mix(in oklch, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+/* Rate echo */
+.echo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.echo__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.echo__label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+
+/* Totals strip */
+.totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+}
+
+.total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  background: var(--muted);
+  border-radius: var(--radius);
+}
+
+.total__label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.total__value {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+/* Schedule table */
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 32rem;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.schedule-table th,
+.schedule-table td {
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.schedule-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  background: var(--muted);
+}
+
+.schedule-table .num {
+  text-align: right;
+}
+
+.schedule-table tbody tr:hover {
+  background: color-mix(in oklch, var(--muted) 60%, transparent);
+}
+
+.schedule-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.row--settlement td {
+  background: color-mix(in oklch, var(--warning) 14%, transparent);
+  font-weight: 500;
+}
+
+.grace-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.grace-badge--warning {
+  background: color-mix(in oklch, var(--warning) 22%, transparent);
+  color: var(--warning-foreground);
+}
+
+/* Bottom: recap + history */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recap-card,
+.history-card {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recap-card__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.recap-card__subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+
+.recap-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.recap-list__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.recap-list__row dt {
+  color: var(--muted-foreground);
+}
+
+.recap-list__row dd {
+  margin: 0;
+  text-align: right;
+}
+
+/* Collapsible costs breakdown (open on desktop, collapsed on mobile). */
+.costs-accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.costs-accordion__summary::-webkit-details-marker {
+  display: none;
+}
+
+.costs-accordion__summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.costs-accordion__summary .recap-card__subtitle {
+  margin: 0;
+}
+
+.costs-accordion__chevron {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: transform 150ms ease;
+}
+
+.costs-accordion[open] .costs-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.costs-accordion__list {
+  margin-top: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .costs-accordion__chevron {
+    transition: none;
+  }
+}
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 120ms ease;
+}
+
+.history-item:hover {
+  background: var(--muted);
+}
+
+.history-item__state {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+
+.history-item__amount {
+  font-weight: 500;
+}

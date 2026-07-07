@@ -1,0 +1,59 @@
+<div class="flex justify-center mb-4">
+  <app-brand />
+</div>
+<h1 class="text-xl font-medium tracking-tight text-center">Iniciar sesión</h1>
+<p class="text-muted-foreground text-sm text-center mt-1">
+  Accede para generar cotizaciones de crédito vehicular.
+</p>
+
+@if (justRegistered) {
+  <p class="text-success text-sm text-center mt-4" role="status">
+    Registro exitoso. Inicia sesión con tus credenciales.
+  </p>
+}
+
+<form class="auth-form" (submit)="onSubmit($event)" novalidate>
+  <div hlmFormField>
+    <label hlmLabel for="identifier">Usuario o correo</label>
+    <input
+      hlmInput
+      id="identifier"
+      autocomplete="username"
+      [formField]="f.identifier"
+      [attr.aria-invalid]="f.identifier().touched() && f.identifier().invalid() ? 'true' : null"
+      [attr.aria-describedby]="
+        f.identifier().touched() && f.identifier().errors().length ? 'identifier-error' : null
+      "
+    />
+    @if (f.identifier().touched() && f.identifier().errors().length) {
+      <span hlmError id="identifier-error">{{ f.identifier().errors()[0].message }}</span>
+    }
+  </div>
+
+  <div hlmFormField>
+    <label hlmLabel for="password">Contraseña</label>
+    <input
+      hlmInput
+      id="password"
+      type="password"
+      autocomplete="current-password"
+      [formField]="f.password"
+      [attr.aria-invalid]="f.password().touched() && f.password().invalid() ? 'true' : null"
+      [attr.aria-describedby]="
+        f.password().touched() && f.password().errors().length ? 'password-error' : null
+      "
+    />
+    @if (f.password().touched() && f.password().errors().length) {
+      <span hlmError id="password-error">{{ f.password().errors()[0].message }}</span>
+    }
+  </div>
+
+  <button hlmBtn type="submit" [disabled]="loading()">
+    {{ loading() ? 'Ingresando…' : 'Iniciar sesión' }}
+  </button>
+</form>
+
+<p class="text-sm text-center mt-4">
+  ¿No tienes cuenta?
+  <a routerLink="/sign-up" class="text-primary underline-offset-4 hover:underline">Regístrate</a>
+</p>

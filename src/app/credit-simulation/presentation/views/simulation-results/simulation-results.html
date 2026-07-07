@@ -1,0 +1,208 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  @if (loading() && !simulation()) {
+    <p class="text-muted-foreground text-sm" role="status">Cargando cotización…</p>
+  } @else if (simulation(); as sim) {
+    <header class="page-header">
+      <div>
+        <h1 class="text-2xl font-medium tracking-tight">Cotización</h1>
+        <p class="text-muted-foreground text-sm">
+          Cronograma e indicadores de transparencia (óptica del deudor).
+        </p>
+      </div>
+      <div class="header-actions">
+        <a hlmBtn variant="outline" [routerLink]="['/credit-simulations', sim.id, 'edit']">Editar</a>
+        <a hlmBtn variant="outline" routerLink="/credit-simulations/new">Nueva cotización</a>
+      </div>
+    </header>
+
+    <!-- SBS transparency indicators -->
+    <section class="indicators" aria-label="Indicadores de transparencia">
+      <div class="chip" [class.chip--positive]="vanPositive()" [class.chip--negative]="!vanPositive()">
+        <span class="chip__label">VAN</span>
+        <span class="chip__value font-mono tabular-nums">
+          <span class="chip__glyph" aria-hidden="true">{{ vanPositive() ? '↑' : '↓' }}</span>
+          {{ van() | money }}
+        </span>
+      </div>
+      <div class="chip chip--primary">
+        <span class="chip__label">TCEA</span>
+        <span class="chip__value font-mono tabular-nums">{{ sim.indicators.tcea | rate }}</span>
+      </div>
+      <div class="chip chip--primary">
+        <span class="chip__label">TIR periódica</span>
+        <span class="chip__value font-mono tabular-nums">{{ sim.indicators.periodicIrr | rate }}</span>
+      </div>
+    </section>
+
+    <!-- Rate echo -->
+    <section class="echo" aria-label="Eco de tasas">
+      <div class="echo__item">
+        <span class="echo__label">TEA</span>
+        <span class="font-mono tabular-nums">{{ sim.indicators.effectiveAnnualRate | rate }}</span>
+      </div>
+      <div class="echo__item">
+        <span class="echo__label">TEM (periodo)</span>
+        <span class="font-mono tabular-nums">{{ sim.indicators.periodicRate | rate }}</span>
+      </div>
+      <div class="echo__item">
+        <span class="echo__label">COK (periodo)</span>
+        <span class="font-mono tabular-nums">{{ sim.indicators.periodicCostOfCapital | rate }}</span>
+      </div>
+    </section>
+
+    <!-- Totals -->
+    <section class="totals" aria-label="Totales">
+      <div class="total">
+        <span class="total__label">Préstamo</span>
+        <span class="total__value font-mono tabular-nums">{{ sim.loanAmount | money }}</span>
+      </div>
+      <div class="total">
+        <span class="total__label">Saldo a financiar</span>
+        <span class="total__value font-mono tabular-nums">{{ sim.financedBalance | money }}</span>
+      </div>
+      <div class="total">
+        <span class="total__label">Total a pagar</span>
+        <span class="total__value font-mono tabular-nums">{{ totalToPay() | money }}</span>
+      </div>
+      <div class="total">
+        <span class="total__label">Intereses totales</span>
+        <span class="total__value font-mono tabular-nums">{{ totalInterest() | money }}</span>
+      </div>
+    </section>
+
+    <!-- Schedule -->
+    <section class="schedule" aria-label="Cronograma de pagos">
+      <div class="table-wrapper">
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th scope="col" class="num">#</th>
+              <th scope="col">P.G.</th>
+              <th scope="col" class="num">Saldo ini.</th>
+              <th scope="col" class="num">Interés</th>
+              <th scope="col" class="num">Cuota</th>
+              <th scope="col" class="num">Amort.</th>
+              @for (name of costColumns(); track name) {
+                <th scope="col" class="num">{{ name }}</th>
+              }
+              <th scope="col" class="num">Saldo fin.</th>
+              <th scope="col" class="num">Flujo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of sim.schedule; track row.period) {
+              <tr [class.row--settlement]="isSettlement(row.period)">
+                <td class="num font-mono tabular-nums">{{ row.period }}</td>
+                <td>
+                  @if (isSettlement(row.period)) {
+                    <span class="grace-badge grace-badge--warning">Cuotón</span>
+                  } @else {
+                    <span class="grace-badge">{{ graceLabels[row.graceType] }}</span>
+                  }
+                </td>
+                <td class="num font-mono tabular-nums">{{ row.openingBalance | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ row.interest | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ row.installment | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ row.amortization | amount }}</td>
+                @for (name of costColumns(); track name) {
+                  <td class="num font-mono tabular-nums">{{ row.costNamed(name) | amount }}</td>
+                }
+                <td class="num font-mono tabular-nums">{{ row.closingBalance | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ row.cashFlow | amount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="bottom-grid">
+      <!-- Configuration recap -->
+      <section class="recap-card" aria-label="Configuración aplicada">
+        <h2 class="recap-card__title">Configuración</h2>
+        <dl class="recap-list">
+          <div class="recap-list__row">
+            <dt>Tasa</dt>
+            <dd class="font-mono tabular-nums">
+              {{ sim.rate.value | rate }} {{ sim.rate.type === 'NOMINAL' ? 'TNA' : 'TEA' }}
+            </dd>
+          </div>
+          <div class="recap-list__row">
+            <dt>Plazo</dt>
+            <dd class="font-mono tabular-nums">
+              {{ sim.term.numberOfInstallments }} cuotas · {{ sim.term.frequencyDays }}d
+            </dd>
+          </div>
+          <div class="recap-list__row">
+            <dt>% Inicial / Cuotón</dt>
+            <dd class="font-mono tabular-nums">
+              {{ sim.initialPercentage.value | rate }} / {{ sim.balloonPercentage.value | rate }}
+            </dd>
+          </div>
+          <div class="recap-list__row">
+            <dt>COK</dt>
+            <dd class="font-mono tabular-nums">{{ sim.costOfCapital.value | rate }}</dd>
+          </div>
+        </dl>
+
+        @if (sim.summary.totalsPerCost.length) {
+          <details class="costs-accordion" [open]="costsOpen()" (toggle)="onCostsToggle($event)">
+            <summary class="costs-accordion__summary">
+              <span class="recap-card__subtitle">
+                Costos acumulados ({{ sim.summary.totalsPerCost.length }})
+              </span>
+              <svg
+                class="costs-accordion__chevron"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <dl class="recap-list costs-accordion__list">
+              @for (cost of sim.summary.totalsPerCost; track cost.name) {
+                <div class="recap-list__row">
+                  <dt>{{ cost.name }}</dt>
+                  <dd class="font-mono tabular-nums">{{ cost.total | amount }}</dd>
+                </div>
+              }
+            </dl>
+          </details>
+        }
+      </section>
+
+      <!-- Client history -->
+      <section class="history-card" aria-label="Historial del cliente">
+        <h2 class="recap-card__title">Historial del cliente</h2>
+        @if (clientHistory().length === 0) {
+          <p class="text-muted-foreground text-sm">No hay otras cotizaciones para este cliente.</p>
+        } @else {
+          <ul class="history-list">
+            @for (item of clientHistory(); track item.id) {
+              <li>
+                <a class="history-item" [routerLink]="['/credit-simulations', item.id]">
+                  <span class="history-item__state">{{ item.state }}</span>
+                  <span class="history-item__amount font-mono tabular-nums">
+                    {{ item.salePrice.currency }} {{ item.summary.totalToPay | amount }}
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  } @else {
+    <p class="text-muted-foreground text-sm">No se encontró la cotización.</p>
+  }
+</div>

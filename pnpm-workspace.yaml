@@ -1,0 +1,12 @@
+minimumReleaseAge: 4320
+engineStrict: true
+ignoreScripts: true
+minimumReleaseAgeExclude:
+  - '@angular-devkit/architect@0.2200.4'
+  - '@angular-devkit/core@22.0.4'
+  - '@angular-devkit/schematics@22.0.4'
+  - '@angular/build@22.0.4'
+  - '@angular/cli@22.0.4'
+  - '@schematics/angular@22.0.4'
+  - '@spartan-ng/brain@1.0.1'
+  - '@spartan-ng/cli@1.0.1'

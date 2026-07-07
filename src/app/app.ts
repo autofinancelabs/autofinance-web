@@ -1,12 +1,15 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {Toaster} from './shared/presentation/components/toaster/toaster';
+import {ThemeStore} from './shared/presentation/theme/theme.store';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Toaster],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('autofinance-web');
+  // Instantiate the theme store eagerly so the persisted/system theme is applied.
+  private readonly theme = inject(ThemeStore);
 }

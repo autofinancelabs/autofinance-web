@@ -1,0 +1,156 @@
+:host {
+  display: block;
+}
+
+.page {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 12rem;
+}
+
+.filters__label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.doc__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.45rem;
+  margin-right: 0.4rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.sim-table th,
+.sim-table td {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sim-table thead th {
+  font-weight: 500;
+  color: var(--muted-foreground);
+  background: var(--muted);
+}
+
+.sim-table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.sim-table tbody tr:hover {
+  background: var(--muted);
+}
+
+.sim-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sim-table .num {
+  text-align: right;
+}
+
+.sim-table .actions {
+  text-align: right;
+}
+
+/* Compact indicator chips for table cells (VAN sign-colored; TCEA/TIR primary). */
+.cell-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.cell-chip--positive {
+  background: color-mix(in oklch, var(--success) 12%, transparent);
+  color: var(--success);
+}
+
+.cell-chip--negative {
+  background: color-mix(in oklch, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+.cell-chip--primary {
+  background: color-mix(in oklch, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.cell-chip__glyph {
+  font-size: 0.8rem;
+}
+
+.edited-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Time part of a date cell: a softer tone than the date, without going full muted. */
+.cell-time {
+  margin-left: 0.35rem;
+  color: color-mix(in oklch, var(--foreground) 60%, var(--muted-foreground));
+}

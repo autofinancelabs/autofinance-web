@@ -1,0 +1,603 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  <div class="form-card">
+    <div class="form-main">
+      <header class="form-head">
+        <h1 class="text-2xl font-medium tracking-tight">
+          {{ isEdit ? 'Editar cotización' : 'Nueva cotización' }}
+        </h1>
+        <p class="text-muted-foreground text-sm">
+          Configura el financiamiento; el cronograma y los indicadores se recalculan al guardar.
+        </p>
+      </header>
+
+      <form class="config-form" (submit)="onSubmit($event)" novalidate>
+        <!-- Cliente y oferta -->
+        <fieldset class="section">
+          <legend class="section__title">Cliente y oferta</legend>
+          <div class="grid">
+            <div hlmFormField>
+              <label hlmLabel for="clientId">Cliente</label>
+              <select
+                hlmInput
+                id="clientId"
+                [formField]="f.clientId"
+                [attr.aria-invalid]="f.clientId().touched() && f.clientId().invalid() ? 'true' : null"
+              >
+                <option value="" disabled>— Selecciona un cliente —</option>
+                @for (client of clients(); track client.id) {
+                  <option [value]="client.id">{{ client.displayName }}</option>
+                }
+              </select>
+              @if (clients().length === 0) {
+                <span class="hint">
+                  No hay clientes. <a routerLink="/clients/new">Registra uno</a>.
+                </span>
+              }
+              @if (f.clientId().touched() && f.clientId().errors().length) {
+                <span hlmError>{{ f.clientId().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="vehicleOfferId">Oferta vehicular</label>
+              <select
+                hlmInput
+                id="vehicleOfferId"
+                [formField]="f.vehicleOfferId"
+                [attr.aria-invalid]="
+                  f.vehicleOfferId().touched() && f.vehicleOfferId().invalid() ? 'true' : null
+                "
+              >
+                <option value="" disabled>— Selecciona una oferta —</option>
+                @for (offer of offers(); track offer.id) {
+                  <option [value]="offer.id">
+                    {{ offer.year }} {{ offer.make }} {{ offer.model }}
+                  </option>
+                }
+              </select>
+              @if (offers().length === 0) {
+                <span class="hint">
+                  No hay ofertas. <a routerLink="/vehicle-offers/new">Registra una</a>.
+                </span>
+              }
+              @if (f.vehicleOfferId().touched() && f.vehicleOfferId().errors().length) {
+                <span hlmError>{{ f.vehicleOfferId().errors()[0].message }}</span>
+              }
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Tasa -->
+        <fieldset class="section">
+          <legend class="section__title">Tasa de interés</legend>
+          <div class="grid">
+            <div hlmFormField>
+              <label hlmLabel for="rateType">Tipo de tasa</label>
+              <select hlmInput id="rateType" [formField]="f.rateType">
+                @for (type of rateTypes; track type) {
+                  <option [value]="type">{{ type === 'NOMINAL' ? 'Tasa Nominal' : 'Tasa Efectiva' }}</option>
+                }
+              </select>
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="rateValue">Valor de la tasa (%)</label>
+              <input
+                hlmInput
+                id="rateValue"
+                type="number"
+                inputmode="decimal"
+                step="0.0001"
+                class="font-mono tabular-nums"
+                [formField]="f.rateValue"
+                [attr.aria-invalid]="f.rateValue().touched() && f.rateValue().invalid() ? 'true' : null"
+              />
+              @if (f.rateValue().touched() && f.rateValue().errors().length) {
+                <span hlmError>{{ f.rateValue().errors()[0].message }}</span>
+              }
+            </div>
+
+            <!-- Período de la tasa: aplica a ambos tipos (ausente = anual). -->
+            <div hlmFormField>
+              <label hlmLabel for="ratePeriod">Período de la tasa</label>
+              <select hlmInput id="ratePeriod" [formField]="f.ratePeriodChoice">
+                <option value="">
+                  Anual ({{ model().rateType === RateType.NOMINAL ? 'TNA' : 'TEA' }})
+                </option>
+                @for (preset of ratePeriodPresets; track preset.days) {
+                  <option [value]="preset.days">
+                    {{ preset.name }}
+                    ({{ model().rateType === RateType.NOMINAL ? preset.nominalAbbr : preset.effectiveAbbr }})
+                  </option>
+                }
+                <option value="OTHER">Otro (días)…</option>
+              </select>
+            </div>
+
+            @if (showCustomRatePeriod()) {
+              <div hlmFormField>
+                <label hlmLabel for="ratePeriodDays">Días del período</label>
+                <input
+                  hlmInput
+                  id="ratePeriodDays"
+                  type="number"
+                  inputmode="numeric"
+                  class="font-mono tabular-nums"
+                  [formField]="f.ratePeriodDays"
+                  [attr.aria-invalid]="
+                    f.ratePeriodDays().touched() && f.ratePeriodDays().invalid() ? 'true' : null
+                  "
+                />
+                @if (f.ratePeriodDays().touched() && f.ratePeriodDays().errors().length) {
+                  <span hlmError>{{ f.ratePeriodDays().errors()[0].message }}</span>
+                }
+              </div>
+            }
+
+            <!-- Capitalización: solo para tasa nominal (obligatoria). -->
+            @if (model().rateType === RateType.NOMINAL) {
+              <div hlmFormField>
+                <label hlmLabel for="capitalization">Capitalización</label>
+                <select
+                  hlmInput
+                  id="capitalization"
+                  [formField]="f.capitalizationChoice"
+                  [attr.aria-invalid]="
+                    f.capitalizationChoice().touched() && f.capitalizationChoice().invalid()
+                      ? 'true'
+                      : null
+                  "
+                >
+                  <option value="" disabled>— Selecciona —</option>
+                  @for (preset of capitalizationPresets; track preset.days) {
+                    <option [value]="preset.days">{{ preset.label }} ({{ preset.days }}d)</option>
+                  }
+                  <option value="OTHER">Otro (días)…</option>
+                </select>
+                @if (
+                  f.capitalizationChoice().touched() && f.capitalizationChoice().errors().length
+                ) {
+                  <span hlmError>{{ f.capitalizationChoice().errors()[0].message }}</span>
+                }
+              </div>
+
+              @if (showCustomCapitalization()) {
+                <div hlmFormField>
+                  <label hlmLabel for="capitalizationDays">Días de capitalización</label>
+                  <input
+                    hlmInput
+                    id="capitalizationDays"
+                    type="number"
+                    inputmode="numeric"
+                    class="font-mono tabular-nums"
+                    [formField]="f.capitalizationDays"
+                    [attr.aria-invalid]="
+                      f.capitalizationDays().touched() && f.capitalizationDays().invalid()
+                        ? 'true'
+                        : null
+                    "
+                  />
+                  @if (f.capitalizationDays().touched() && f.capitalizationDays().errors().length) {
+                    <span hlmError>{{ f.capitalizationDays().errors()[0].message }}</span>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </fieldset>
+
+        <!-- Estructura -->
+        <fieldset class="section">
+          <legend class="section__title">Estructura del crédito</legend>
+          <div class="grid">
+            <div hlmFormField>
+              <label hlmLabel for="initialPercentage">% Cuota inicial</label>
+              <input
+                hlmInput
+                id="initialPercentage"
+                type="number"
+                inputmode="decimal"
+                step="0.01"
+                class="font-mono tabular-nums"
+                [formField]="f.initialPercentage"
+                [attr.aria-invalid]="
+                  f.initialPercentage().touched() && f.initialPercentage().invalid() ? 'true' : null
+                "
+              />
+              @if (f.initialPercentage().touched() && f.initialPercentage().errors().length) {
+                <span hlmError>{{ f.initialPercentage().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="balloonPercentage">% Cuota final (balloon)</label>
+              <input
+                hlmInput
+                id="balloonPercentage"
+                type="number"
+                inputmode="decimal"
+                step="0.01"
+                class="font-mono tabular-nums"
+                [formField]="f.balloonPercentage"
+                [attr.aria-invalid]="
+                  f.balloonPercentage().touched() && f.balloonPercentage().invalid() ? 'true' : null
+                "
+              />
+              @if (f.balloonPercentage().touched() && f.balloonPercentage().errors().length) {
+                <span hlmError>{{ f.balloonPercentage().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="numberOfInstallments">Plazo (cuotas)</label>
+              <input
+                hlmInput
+                id="numberOfInstallments"
+                type="number"
+                inputmode="numeric"
+                class="font-mono tabular-nums"
+                [formField]="f.numberOfInstallments"
+                [attr.aria-invalid]="
+                  f.numberOfInstallments().touched() && f.numberOfInstallments().invalid() ? 'true' : null
+                "
+              />
+              @if (f.numberOfInstallments().touched() && f.numberOfInstallments().errors().length) {
+                <span hlmError>{{ f.numberOfInstallments().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="frequencyDays">Frecuencia (días)</label>
+              <input
+                hlmInput
+                id="frequencyDays"
+                type="number"
+                inputmode="numeric"
+                class="font-mono tabular-nums"
+                [formField]="f.frequencyDays"
+                [attr.aria-invalid]="
+                  f.frequencyDays().touched() && f.frequencyDays().invalid() ? 'true' : null
+                "
+              />
+              @if (f.frequencyDays().touched() && f.frequencyDays().errors().length) {
+                <span hlmError>{{ f.frequencyDays().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="daysPerYear">Días por año</label>
+              <input
+                hlmInput
+                id="daysPerYear"
+                type="number"
+                inputmode="numeric"
+                class="font-mono tabular-nums"
+                [formField]="f.daysPerYear"
+                [attr.aria-invalid]="
+                  f.daysPerYear().touched() && f.daysPerYear().invalid() ? 'true' : null
+                "
+              />
+              @if (f.daysPerYear().touched() && f.daysPerYear().errors().length) {
+                <span hlmError>{{ f.daysPerYear().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="costOfCapitalAnnual">COK anual (%)</label>
+              <input
+                hlmInput
+                id="costOfCapitalAnnual"
+                type="number"
+                inputmode="decimal"
+                step="0.01"
+                class="font-mono tabular-nums"
+                [formField]="f.costOfCapitalAnnual"
+                [attr.aria-invalid]="
+                  f.costOfCapitalAnnual().touched() && f.costOfCapitalAnnual().invalid() ? 'true' : null
+                "
+              />
+              @if (f.costOfCapitalAnnual().touched() && f.costOfCapitalAnnual().errors().length) {
+                <span hlmError>{{ f.costOfCapitalAnnual().errors()[0].message }}</span>
+              }
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Gracia -->
+        <fieldset class="section">
+          <legend class="section__title">Periodos de gracia</legend>
+          <p class="section__hint">
+            Se aplican al inicio del cronograma: primero las totales (T), luego las parciales (P).
+          </p>
+          <div class="grid">
+            <div hlmFormField>
+              <label hlmLabel for="totalGrace">Gracia total (T)</label>
+              <input
+                hlmInput
+                id="totalGrace"
+                type="number"
+                inputmode="numeric"
+                class="font-mono tabular-nums"
+                [formField]="f.totalGrace"
+                [attr.aria-invalid]="f.totalGrace().touched() && f.totalGrace().invalid() ? 'true' : null"
+              />
+              @if (f.totalGrace().touched() && f.totalGrace().errors().length) {
+                <span hlmError>{{ f.totalGrace().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="partialGrace">Gracia parcial (P)</label>
+              <input
+                hlmInput
+                id="partialGrace"
+                type="number"
+                inputmode="numeric"
+                class="font-mono tabular-nums"
+                [formField]="f.partialGrace"
+                [attr.aria-invalid]="
+                  f.partialGrace().touched() && f.partialGrace().invalid() ? 'true' : null
+                "
+              />
+              @if (f.partialGrace().touched() && f.partialGrace().errors().length) {
+                <span hlmError>{{ f.partialGrace().errors()[0].message }}</span>
+              }
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Costos -->
+        <fieldset class="section">
+          <div class="section__head">
+            <legend class="section__title">Costos</legend>
+            <button hlmBtn type="button" variant="outline" size="sm" (click)="addCost()">
+              + Agregar costo
+            </button>
+          </div>
+          @if (model().costs.length === 0) {
+            <p class="section__hint">Sin costos. Agrega seguros, GPS, portes, gastos administrativos…</p>
+          }
+          @for (cost of model().costs; track $index; let i = $index) {
+            <div class="cost-row">
+              <div hlmFormField class="cost-row__name">
+                <label hlmLabel [for]="'cost-name-' + i">Nombre</label>
+                <input hlmInput [id]="'cost-name-' + i" [formField]="f.costs[i].name" />
+                @if (f.costs[i].name().touched() && f.costs[i].name().errors().length) {
+                  <span hlmError>{{ f.costs[i].name().errors()[0].message }}</span>
+                }
+              </div>
+
+              <div hlmFormField class="cost-row__value">
+                <label hlmLabel [for]="'cost-value-' + i" class="cost-row__value-label">
+                  <span>Valor</span>
+                  @if (isPercentBasis(cost.basis)) {
+                    <span class="cost-row__pct">(%)</span>
+                    <span
+                      class="cost-row__info"
+                      brnTooltip="El valor se considera como porcentaje, no como decimal (ej. 0.049 = 0.049%)."
+                      aria-label="El valor se considera como porcentaje, no como decimal"
+                      tabindex="0"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                      </svg>
+                    </span>
+                  }
+                </label>
+                <input
+                  hlmInput
+                  [id]="'cost-value-' + i"
+                  type="number"
+                  inputmode="decimal"
+                  step="0.0001"
+                  class="font-mono tabular-nums"
+                  [formField]="f.costs[i].value"
+                />
+                @if (f.costs[i].value().touched() && f.costs[i].value().errors().length) {
+                  <span hlmError>{{ f.costs[i].value().errors()[0].message }}</span>
+                }
+              </div>
+
+              <div hlmFormField class="cost-row__basis">
+                <label hlmLabel [for]="'cost-basis-' + i">Base</label>
+                <select hlmInput [id]="'cost-basis-' + i" [formField]="f.costs[i].basis">
+                  @for (basis of costBases; track basis) {
+                    <option [value]="basis">{{ costBasisLabels[basis] }}</option>
+                  }
+                </select>
+              </div>
+
+              <div hlmFormField class="cost-row__timing">
+                <label hlmLabel [for]="'cost-timing-' + i">Momento</label>
+                <select hlmInput [id]="'cost-timing-' + i" [formField]="f.costs[i].timing">
+                  @for (timing of costTimings; track timing) {
+                    <option [value]="timing">{{ costTimingLabels[timing] }}</option>
+                  }
+                </select>
+              </div>
+
+              <label class="cost-row__embedded" [for]="'cost-embedded-' + i">
+                @if (isOnBalance(cost.basis)) {
+                  <input
+                    [id]="'cost-embedded-' + i"
+                    type="checkbox"
+                    [formField]="f.costs[i].embedded"
+                  />
+                  <span>Incluir en la tasa</span>
+                  <span
+                    class="cost-row__info"
+                    brnTooltip="Incluye este costo dentro de la tasa (j = interés + costo) en vez de cobrarlo como una línea aparte. Normalmente se usa para el desgravamen."
+                    aria-label="Incluye este costo dentro de la tasa en vez de cobrarlo aparte; normalmente el desgravamen"
+                    tabindex="0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4M12 8h.01" />
+                    </svg>
+                  </span>
+                }
+              </label>
+
+              <button
+                hlmBtn
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                class="cost-row__remove"
+                (click)="removeCost(i)"
+                brnTooltip="Eliminar"
+                aria-label="Eliminar costo"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6" />
+                </svg>
+              </button>
+            </div>
+          }
+        </fieldset>
+
+        <div class="actions">
+          <a hlmBtn variant="outline" routerLink="/dashboard">Cancelar</a>
+          <button hlmBtn type="submit" [disabled]="generating()">
+            {{ generating() ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Generar cotización' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <aside class="form-aside" aria-label="Resumen de la configuración">
+      <p class="form-aside__title">Resumen</p>
+
+      <div class="summary-card">
+        <p class="summary-card__label">Oferta</p>
+        @if (selectedOffer(); as offer) {
+          <p class="summary-card__value">{{ offer.year }} {{ offer.make }} {{ offer.model }}</p>
+          <p class="summary-card__price font-mono tabular-nums">{{ offer.salePrice | money }}</p>
+        } @else {
+          <p class="summary-card__value summary-card__value--empty">Sin seleccionar</p>
+        }
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-card__label">Cliente</p>
+        @if (selectedClient(); as client) {
+          <p class="summary-card__value">{{ client.displayName }}</p>
+          <p class="summary-card__hint">
+            <span class="summary-badge">{{ client.documentId.type }}</span>
+            <span class="font-mono tabular-nums">{{ client.documentId.number }}</span>
+          </p>
+        } @else {
+          <p class="summary-card__value summary-card__value--empty">Sin seleccionar</p>
+        }
+      </div>
+
+      <dl class="recap">
+        <div class="recap__row">
+          <dt>Tasa</dt>
+          <dd class="font-mono tabular-nums">
+            {{ model().rateValue ?? '—' }}% {{ model().rateType === 'NOMINAL' ? 'nominal' : 'efectiva' }}
+          </dd>
+        </div>
+        <div class="recap__row">
+          <dt>Período de la tasa</dt>
+          <dd class="font-mono tabular-nums">{{ ratePeriodSummary() }}</dd>
+        </div>
+        @if (model().rateType === RateType.NOMINAL) {
+          <div class="recap__row">
+            <dt>Capitalización</dt>
+            <dd class="font-mono tabular-nums">{{ capitalizationSummary() }}</dd>
+          </div>
+        }
+        <div class="recap__row">
+          <dt>Plazo</dt>
+          <dd class="font-mono tabular-nums">{{ model().numberOfInstallments ?? '—' }} cuotas</dd>
+        </div>
+        <div class="recap__row">
+          <dt>Inicial / Cuota final</dt>
+          <dd class="font-mono tabular-nums">
+            {{ model().initialPercentage ?? '—' }}% / {{ model().balloonPercentage ?? '—' }}%
+          </dd>
+        </div>
+        <div class="recap__row">
+          <dt>Gracia T / P</dt>
+          <dd class="font-mono tabular-nums">{{ model().totalGrace }} / {{ model().partialGrace }}</dd>
+        </div>
+      </dl>
+
+      @if (model().costs.length) {
+        <details class="recap-costs" [open]="costsOpen()" (toggle)="onCostsToggle($event)">
+          <summary class="recap-costs__summary">
+            <span>Costos ({{ model().costs.length }})</span>
+            <svg
+              class="recap-costs__chevron"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+          <dl class="recap recap-costs__list">
+            @for (cost of model().costs; track $index) {
+              <div class="recap__row">
+                <dt>{{ cost.name || 'Sin nombre' }}</dt>
+                <dd class="font-mono tabular-nums">
+                  {{ cost.value ?? '—' }}{{ isPercentBasis(cost.basis) ? '%' : '' }}
+                  <span class="recap-costs__basis">{{ costBasisLabels[cost.basis] }}</span>
+                </dd>
+              </div>
+            }
+          </dl>
+        </details>
+      }
+
+      <p class="form-aside__note">
+        Al generar se calcula el cronograma (método francés + cuota balloon) y los indicadores de
+        transparencia: TCEA, VAN y TIR.
+      </p>
+    </aside>
+  </div>
+</div>

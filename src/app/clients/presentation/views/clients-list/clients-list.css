@@ -1,0 +1,142 @@
+:host {
+  display: block;
+}
+
+.page {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.clients-table th,
+.clients-table td {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.clients-table thead th {
+  font-weight: 500;
+  color: var(--muted-foreground);
+  background: var(--muted);
+}
+
+.clients-table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.clients-table tbody tr:hover {
+  background: var(--muted);
+}
+
+.clients-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.clients-table .actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.doc__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.doc__number {
+  font-size: 0.875rem;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  background: var(--muted);
+  border-radius: var(--radius);
+}
+
+.metric__label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.metric__value {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.metric--list {
+  gap: 0.5rem;
+}
+
+.metric__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}

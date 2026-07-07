@@ -1,0 +1,30 @@
+<div class="auth-shell">
+  <aside class="brand-panel">
+    <div class="brand-content">
+      <img
+        [ngSrc]="logoSrc()"
+        width="104"
+        height="97"
+        alt="AutoFinance"
+        class="brand-logo"
+        priority
+      />
+      <p class="brand-name">AutoFinance</p>
+      <h2 class="brand-tagline">Planes de pago de crédito vehicular, exactos y transparentes.</h2>
+      <ul class="brand-points">
+        <li>Método francés vencido + Compra Inteligente</li>
+        <li>Transparencia SBS: TCEA, VAN y TIR</li>
+        <li>Cronograma exacto y reproducible</li>
+      </ul>
+    </div>
+  </aside>
+
+  <section class="form-panel">
+    <div class="form-toggle">
+      <app-theme-toggle/>
+    </div>
+    <div class="form-content">
+      <router-outlet/>
+    </div>
+  </section>
+</div>

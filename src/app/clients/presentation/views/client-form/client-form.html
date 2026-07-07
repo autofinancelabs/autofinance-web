@@ -1,0 +1,200 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  <div class="form-card">
+    <div class="form-main">
+      <header class="form-head">
+        <h1 class="text-2xl font-medium tracking-tight">
+          {{ isEdit ? 'Editar cliente' : 'Nuevo cliente' }}
+        </h1>
+        <p class="text-muted-foreground text-sm">Identidad y datos de contacto del cliente.</p>
+      </header>
+
+      <form class="client-form" (submit)="onSubmit($event)" novalidate>
+        <div class="grid">
+          @if (isEdit) {
+            <div class="readonly-doc col-span-full" aria-label="Documento de identidad">
+              <span class="readonly-doc__field">
+                <span class="readonly-doc__label">Tipo de documento</span>
+                <span class="readonly-doc__value">{{ documentTypeLabels[model().documentType] }}</span>
+              </span>
+              <span class="readonly-doc__field">
+                <span class="readonly-doc__label">Número de documento</span>
+                <span class="readonly-doc__value font-mono tabular-nums">
+                  {{ model().documentNumber }}
+                </span>
+              </span>
+              <p class="readonly-doc__note">El documento de identidad no se puede modificar.</p>
+            </div>
+          } @else {
+            <div hlmFormField>
+              <label hlmLabel for="documentType">Tipo de documento</label>
+              <select
+                hlmInput
+                id="documentType"
+                [formField]="f.documentType"
+                [attr.aria-invalid]="
+                  f.documentType().touched() && f.documentType().invalid() ? 'true' : null
+                "
+              >
+                <option value="" disabled>— Selecciona un tipo —</option>
+                @for (type of documentTypes; track type) {
+                  <option [value]="type">{{ documentTypeLabels[type] }}</option>
+                }
+              </select>
+              @if (f.documentType().touched() && f.documentType().errors().length) {
+                <span hlmError>{{ f.documentType().errors()[0].message }}</span>
+              }
+            </div>
+
+            <div hlmFormField>
+              <label hlmLabel for="documentNumber">Número de documento</label>
+              <input
+                hlmInput
+                id="documentNumber"
+                class="font-mono tabular-nums"
+                [formField]="f.documentNumber"
+                [attr.aria-invalid]="
+                  f.documentNumber().touched() && f.documentNumber().invalid() ? 'true' : null
+                "
+              />
+              @if (f.documentNumber().touched() && f.documentNumber().errors().length) {
+                <span hlmError>{{ f.documentNumber().errors()[0].message }}</span>
+              }
+            </div>
+          }
+
+          <div hlmFormField>
+            <label hlmLabel for="firstName">Nombres</label>
+            <input
+              hlmInput
+              id="firstName"
+              autocomplete="given-name"
+              [formField]="f.firstName"
+              [attr.aria-invalid]="f.firstName().touched() && f.firstName().invalid() ? 'true' : null"
+            />
+            @if (f.firstName().touched() && f.firstName().errors().length) {
+              <span hlmError>{{ f.firstName().errors()[0].message }}</span>
+            }
+          </div>
+
+          <div hlmFormField>
+            <label hlmLabel for="lastName">Apellidos</label>
+            <input
+              hlmInput
+              id="lastName"
+              autocomplete="family-name"
+              [formField]="f.lastName"
+              [attr.aria-invalid]="f.lastName().touched() && f.lastName().invalid() ? 'true' : null"
+            />
+            @if (f.lastName().touched() && f.lastName().errors().length) {
+              <span hlmError>{{ f.lastName().errors()[0].message }}</span>
+            }
+          </div>
+
+          <div hlmFormField class="col-span-full">
+            <label hlmLabel for="email">Correo electrónico</label>
+            <input
+              hlmInput
+              id="email"
+              type="email"
+              autocomplete="email"
+              [formField]="f.email"
+              [attr.aria-invalid]="f.email().touched() && f.email().invalid() ? 'true' : null"
+            />
+            @if (f.email().touched() && f.email().errors().length) {
+              <span hlmError>{{ f.email().errors()[0].message }}</span>
+            }
+          </div>
+
+          <div hlmFormField>
+            <label hlmLabel for="phone">Teléfono</label>
+            <input
+              hlmInput
+              id="phone"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="tel"
+              class="font-mono tabular-nums"
+              [formField]="f.phone"
+              [attr.aria-invalid]="f.phone().touched() && f.phone().invalid() ? 'true' : null"
+            />
+            @if (f.phone().touched() && f.phone().errors().length) {
+              <span hlmError>{{ f.phone().errors()[0].message }}</span>
+            }
+          </div>
+
+          <div hlmFormField>
+            <label hlmLabel for="address">Dirección</label>
+            <input hlmInput id="address" autocomplete="street-address" [formField]="f.address" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <a hlmBtn variant="outline" routerLink="/clients">Cancelar</a>
+          <button hlmBtn type="submit" [disabled]="saving()">
+            {{ saving() ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear cliente' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <aside class="form-aside" aria-label="Vista previa del cliente">
+      <p class="form-aside__title">Vista previa</p>
+      <div class="card">
+        <div class="card__top">
+          <span class="card__monogram" aria-hidden="true">
+            @if (preview().monogram; as monogram) {
+              {{ monogram }}
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            }
+          </span>
+          @if (preview().type; as type) {
+            <span class="card__badge">{{ type }}</span>
+          }
+        </div>
+        @if (preview().name; as name) {
+          <p class="card__name">{{ name }}</p>
+        } @else {
+          <p class="card__name card__name--empty">Sin nombre</p>
+        }
+        @if (preview().number; as number) {
+          <p class="card__number">{{ preview().type }} {{ number }}</p>
+        } @else {
+          <p class="card__number card__number--empty">Sin documento</p>
+        }
+        <dl class="card__contact">
+          <div class="card__row">
+            <dt>Correo</dt>
+            <dd>{{ preview().email ?? '—' }}</dd>
+          </div>
+          <div class="card__row">
+            <dt>Teléfono</dt>
+            <dd class="font-mono tabular-nums">{{ preview().phone ?? '—' }}</dd>
+          </div>
+          <div class="card__row">
+            <dt>Dirección</dt>
+            <dd>{{ preview().address ?? '—' }}</dd>
+          </div>
+        </dl>
+      </div>
+      <p class="form-aside__note">
+        El cliente se identifica por su documento; el contacto es opcional y se puede editar luego.
+      </p>
+    </aside>
+  </div>
+</div>
