@@ -8,6 +8,7 @@ import {AmountPipe} from '../../../../shared/presentation/amount.pipe';
 import {RatePipe} from '../../../../shared/presentation/rate.pipe';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
 import {GraceType} from '../../../domain/model/grace-type';
+import {ScheduleRow} from '../../../domain/model/schedule-row.value-object';
 
 /**
  * Renders a generated/loaded simulation: the SBS transparency indicators (VAN,
@@ -109,9 +110,48 @@ export class SimulationResults implements OnInit {
     return period > installments;
   }
 
+  protected displayOpeningBalance(row: ScheduleRow): number {
+    return this.isSettlement(row.period) ? row.openingBalanceBalloon : row.openingBalance;
+  }
+
+  protected displayInterest(row: ScheduleRow): number {
+    return this.isSettlement(row.period) ? row.interestBalloon : row.interest;
+  }
+
+  protected displayInstallment(row: ScheduleRow): number {
+    return this.isSettlement(row.period) ? this.balloonSettlementAmount(row) : row.installment;
+  }
+
+  protected displayAmortization(row: ScheduleRow): number {
+    return this.isSettlement(row.period) ? this.balloonSettlementAmount(row) : row.amortization;
+  }
+
+  protected displayCost(row: ScheduleRow, name: string): number {
+    if (this.isSettlement(row.period) && this.isCreditLifeInsuranceCost(name)) {
+      return row.balloonCreditLifeInsurance;
+    }
+    return row.costNamed(name);
+  }
+
+  protected displayClosingBalance(row: ScheduleRow): number {
+    return this.isSettlement(row.period) ? row.closingBalanceBalloon : row.closingBalance;
+  }
+
   /** Keeps the accordion signal in sync when the user expands/collapses it. */
   protected onCostsToggle(event: Event): void {
     this.costsOpen.set((event.target as HTMLDetailsElement).open);
+  }
+
+  private balloonSettlementAmount(row: ScheduleRow): number {
+    return row.openingBalanceBalloon + row.interestBalloon + row.balloonCreditLifeInsurance;
+  }
+
+  private isCreditLifeInsuranceCost(name: string): boolean {
+    const normalized = name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    return normalized.includes('desgrav') || normalized.includes('segdes');
   }
 
   /** Viewport ≥ 768px (desktop). Falls back to open when matchMedia is unavailable (tests). */
