@@ -18,16 +18,16 @@ function scheduleRow(
   return {
     period,
     graceType,
-    openingBalanceBalloon: 0,
-    interestBalloon: 0,
-    balloonCreditLifeInsurance: 0,
+    openingBalanceBalloon: settlement ? 6317.457269810485 : 0,
+    interestBalloon: settlement ? 79.4471761272819 : 0,
+    balloonCreditLifeInsurance: settlement ? 3.0955540622071376 : 0,
     closingBalanceBalloon: 0,
     openingBalance: settlement ? 0 : 1000,
     interest: settlement ? 0 : 50,
     installment: settlement ? 0 : 400,
     amortization: settlement ? 0 : 350,
     closingBalance: settlement ? 0 : 650,
-    cashFlow: settlement ? 6400 : 410,
+    cashFlow: settlement ? 6431 : 410,
     appliedCosts,
   };
 }
@@ -148,6 +148,56 @@ describe('SimulationResults', () => {
     // cost columns sit before "Saldo fin."
     expect(headers.indexOf('desgravamen')).toBeLessThan(headers.indexOf('Saldo fin.'));
     expect(el.textContent).toContain('56.25');
+  });
+
+  it('renders the settlement row with the final balloon schedule values', () => {
+    const sim = makeSim('s-1', 4436.18, 'cl-1', [
+      scheduleRow(1, 'NONE', false, [
+        {name: 'desgravamen', amount: 6.09},
+        {name: 'riesgo', amount: 4},
+      ]),
+      scheduleRow(2, 'NONE', false, [
+        {name: 'desgravamen', amount: 5.14},
+        {name: 'riesgo', amount: 4},
+      ]),
+      scheduleRow(3, 'NONE', true, [
+        {name: 'desgravamen', amount: 0},
+        {name: 'riesgo', amount: 4},
+      ]),
+    ]);
+    const fixture = setup('s-1', sim);
+    const rows = [
+      ...(fixture.nativeElement as HTMLElement).querySelectorAll('.schedule-table tbody tr'),
+    ];
+    const regularCells = [...rows[0].querySelectorAll('td')].map(cell => cell.textContent?.trim());
+    const settlementCells = [...rows[2].querySelectorAll('td')].map(cell =>
+      cell.textContent?.trim(),
+    );
+
+    expect(regularCells).toEqual([
+      '1',
+      'S',
+      '1,000.00',
+      '50.00',
+      '400.00',
+      '350.00',
+      '6.09',
+      '4.00',
+      '650.00',
+      '410.00',
+    ]);
+    expect(settlementCells).toEqual([
+      '3',
+      'Cuotón',
+      '6,317.46',
+      '79.45',
+      '6,400.00',
+      '6,400.00',
+      '3.10',
+      '4.00',
+      '0.00',
+      '6,431.00',
+    ]);
   });
 
   it('renders a negative VAN chip when npv < 0', () => {

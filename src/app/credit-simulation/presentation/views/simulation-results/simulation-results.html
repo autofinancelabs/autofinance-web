@@ -102,14 +102,14 @@
                     <span class="grace-badge">{{ graceLabels[row.graceType] }}</span>
                   }
                 </td>
-                <td class="num font-mono tabular-nums">{{ row.openingBalance | amount }}</td>
-                <td class="num font-mono tabular-nums">{{ row.interest | amount }}</td>
-                <td class="num font-mono tabular-nums">{{ row.installment | amount }}</td>
-                <td class="num font-mono tabular-nums">{{ row.amortization | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ displayOpeningBalance(row) | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ displayInterest(row) | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ displayInstallment(row) | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ displayAmortization(row) | amount }}</td>
                 @for (name of costColumns(); track name) {
-                  <td class="num font-mono tabular-nums">{{ row.costNamed(name) | amount }}</td>
+                  <td class="num font-mono tabular-nums">{{ displayCost(row, name) | amount }}</td>
                 }
-                <td class="num font-mono tabular-nums">{{ row.closingBalance | amount }}</td>
+                <td class="num font-mono tabular-nums">{{ displayClosingBalance(row) | amount }}</td>
                 <td class="num font-mono tabular-nums">{{ row.cashFlow | amount }}</td>
               </tr>
             }
