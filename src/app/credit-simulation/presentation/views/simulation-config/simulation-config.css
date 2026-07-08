@@ -70,6 +70,22 @@
   color: var(--muted-foreground);
 }
 
+.field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.field-info {
+  color: var(--muted-foreground);
+  font-weight: 700;
+  cursor: help;
+}
+
+.field-info:hover {
+  color: var(--primary);
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;

@@ -1,0 +1,192 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  <header class="hero">
+    <div class="hero__copy">
+      <p class="eyebrow">Centro de ayuda</p>
+      <h1 class="title">Guia para el asesor de ventas</h1>
+      <p class="subtitle">
+        Usa esta pantalla como referencia rapida para crear cotizaciones, configurar Compra
+        Inteligente y explicar los resultados financieros al cliente.
+      </p>
+    </div>
+    <div class="hero__actions">
+      <a hlmBtn routerLink="/credit-simulations/new">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Nueva cotizacion
+      </a>
+    </div>
+  </header>
+
+  <section class="workflow" aria-labelledby="workflow-title">
+    <div class="section-head">
+      <p class="section-kicker">Flujo recomendado</p>
+      <h2 id="workflow-title">De datos maestros a propuesta final</h2>
+      <p>Completa el proceso en este orden para evitar cotizaciones incompletas.</p>
+    </div>
+
+    <ol class="steps">
+      @for (step of steps; track step.title; let i = $index) {
+        <li class="step">
+          <span class="step__number font-mono tabular-nums">{{ i + 1 }}</span>
+          <div class="step__body">
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.text }}</p>
+            <a [routerLink]="step.link">{{ step.action }}</a>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <div class="content-grid">
+    <section class="panel panel--main" aria-labelledby="fields-title">
+      <div class="section-head">
+        <p class="section-kicker">Campos criticos</p>
+        <h2 id="fields-title">Que debe revisar el vendedor</h2>
+        <p>
+          Estos son los datos que mas afectan el cronograma, la cuota y los indicadores de
+          transparencia.
+        </p>
+      </div>
+
+      <div class="field-groups">
+        @for (group of fieldGroups; track group.title) {
+          <article class="field-group">
+            <div class="field-group__head">
+              <span class="field-group__icon" aria-hidden="true">{{ group.icon }}</span>
+              <h3>{{ group.title }}</h3>
+            </div>
+            <dl class="definition-list">
+              @for (item of group.items; track item.label) {
+                <div class="definition-list__row">
+                  <dt>{{ item.label }}</dt>
+                  <dd>{{ item.text }}</dd>
+                </div>
+              }
+            </dl>
+          </article>
+        }
+      </div>
+    </section>
+
+    <aside class="panel panel--checklist" aria-labelledby="checklist-title">
+      <div class="section-head">
+        <p class="section-kicker">Antes de guardar</p>
+        <h2 id="checklist-title">Checklist operativo</h2>
+      </div>
+
+      <ul class="checklist">
+        @for (item of checklist; track item) {
+          <li>
+            <span aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </span>
+            <p>{{ item }}</p>
+          </li>
+        }
+      </ul>
+    </aside>
+  </div>
+
+  <section class="panel" aria-labelledby="costs-title">
+    <div class="section-head">
+      <p class="section-kicker">Costos del credito</p>
+      <h2 id="costs-title">Como cargar los gastos del credito</h2>
+      <p>
+        La base define como se calcula el gasto; el momento define si se cobra al inicio o en cada
+        cuota.
+      </p>
+    </div>
+
+    <div class="cost-table" role="table" aria-label="Guia de costos">
+      <div class="cost-table__head" role="row">
+        <span role="columnheader">Costo</span>
+        <span role="columnheader">Valor</span>
+        <span role="columnheader">Base</span>
+        <span role="columnheader">Momento</span>
+        <span role="columnheader">Nota</span>
+      </div>
+      @for (cost of costRows; track cost.name) {
+        <div class="cost-table__row" role="row">
+          <span role="cell" data-label="Costo">{{ cost.name }}</span>
+          <span role="cell" data-label="Valor" class="font-mono tabular-nums">{{ cost.value }}</span>
+          <span role="cell" data-label="Base">{{ cost.basis }}</span>
+          <span role="cell" data-label="Momento">{{ cost.timing }}</span>
+          <span role="cell" data-label="Nota">{{ cost.note }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="results-title">
+    <div class="section-head">
+      <p class="section-kicker">Resultados</p>
+      <h2 id="results-title">Como explicar los indicadores</h2>
+    </div>
+
+    <div class="indicator-grid">
+      @for (indicator of indicators; track indicator.label) {
+        <article class="indicator">
+          <h3>{{ indicator.label }}</h3>
+          <p>{{ indicator.text }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="example" aria-labelledby="example-title">
+    <div>
+      <p class="section-kicker">Revision final</p>
+      <h2 id="example-title">Antes de presentar la propuesta</h2>
+      <p>
+        Confirma que las condiciones ingresadas coincidan con la oferta comercial y que el cliente
+        entienda que la cuota regular, el cuoton final, los seguros y los gastos pueden afectar el
+        costo total del financiamiento.
+      </p>
+    </div>
+    <dl class="expected">
+      <div>
+        <dt>Datos</dt>
+        <dd>Cliente, vehiculo y moneda</dd>
+      </div>
+      <div>
+        <dt>Condiciones</dt>
+        <dd>Tasa, plazo, inicial y cuoton</dd>
+      </div>
+      <div>
+        <dt>Costos</dt>
+        <dd>Iniciales y periodicos</dd>
+      </div>
+      <div>
+        <dt>Indicadores</dt>
+        <dd>TCEA, VAN y TIR</dd>
+      </div>
+    </dl>
+  </section>
+</div>
