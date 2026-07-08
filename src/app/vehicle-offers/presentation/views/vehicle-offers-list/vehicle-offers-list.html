@@ -40,6 +40,7 @@
         <table class="offers-table">
           <thead>
             <tr>
+              <th scope="col" class="thumb-col"><span class="sr-only">Modelo 3D</span></th>
               <th scope="col">Vehículo</th>
               <th scope="col">Año</th>
               <th scope="col" class="num">Precio de venta</th>
@@ -49,7 +50,30 @@
           <tbody>
             @for (offer of offers(); track offer.id) {
               <tr>
-                <td>{{ offer.make }} {{ offer.model }}</td>
+                <td class="thumb-col">
+                  @if (offer.model3d) {
+                    @if (thumb(offer.id); as src) {
+                      <img class="thumb" [src]="src" width="56" height="56" alt="" />
+                    } @else {
+                      <span
+                        class="thumb thumb--placeholder"
+                        [style.background]="offer.model3d.bodyColor"
+                        aria-hidden="true"
+                      ></span>
+                    }
+                  }
+                </td>
+                <td>
+                  <a class="offer-link" [routerLink]="['/vehicle-offers', offer.id]">
+                    {{ offer.make }} {{ offer.model }}
+                  </a>
+                  @if (offer.model3d; as m) {
+                    <span class="model-chip">
+                      <span class="model-chip__dot" [style.background]="m.bodyColor"></span>
+                      {{ presetLabel[m.preset] }} 3D
+                    </span>
+                  }
+                </td>
                 <td class="num">{{ offer.year }}</td>
                 <td class="num font-mono tabular-nums">{{ offer.salePrice | money }}</td>
                 <td class="actions">

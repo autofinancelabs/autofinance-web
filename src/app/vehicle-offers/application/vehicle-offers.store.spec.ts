@@ -15,6 +15,7 @@ function makeOffer(id = 'o-1'): VehicleOffer {
     model: 'Accord',
     year: 2022,
     salePrice: new Money({amount: 30000, currency: Currency.PEN}),
+    model3d: null,
   });
 }
 
@@ -25,6 +26,7 @@ function makeDraft(): VehicleOfferDraft {
     year: 2022,
     salePrice: 30000,
     currency: Currency.PEN,
+    model3d: null,
   });
 }
 

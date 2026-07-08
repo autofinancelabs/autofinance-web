@@ -61,6 +61,180 @@
   gap: 0.75rem;
 }
 
+/* 3D model section */
+.model3d {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--muted);
+}
+
+.model3d__toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  cursor: pointer;
+}
+
+.model3d__toggle input {
+  margin-top: 0.15rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+}
+
+.model3d__toggle-title {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.model3d__toggle-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.model3d__pickers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.picker__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.picker__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.swatch--custom {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border-style: dashed;
+  background:
+    conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.swatch--custom input[type='color'] {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.option input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+}
+
+.picker--plate {
+  max-width: 12rem;
+}
+
+.preset {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--background);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.preset:hover {
+  border-color: var(--primary);
+}
+
+.preset--active {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 14%, transparent);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.swatch:hover {
+  transform: scale(1.08);
+}
+
+.swatch--active {
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 2px var(--background);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preset,
+  .swatch {
+    transition: none;
+  }
+}
+
+/* 3D viewer surface inside the teal aside */
+.viewer-shell {
+  height: 12rem;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  background: oklch(1 0 0 / 0.06);
+}
+
+.viewer-shell--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: oklch(0.985 0.005 200 / 0.75);
+}
+
 /* Context / live-preview panel */
 .form-aside {
   display: flex;
