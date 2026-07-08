@@ -27,6 +27,7 @@ describe('AppShell', () => {
     const text = (setup().nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('Dashboard');
     expect(text).toContain('Vehículos');
+    expect(text).toContain('Ayuda');
     expect(text).toContain('ana');
   });
 
