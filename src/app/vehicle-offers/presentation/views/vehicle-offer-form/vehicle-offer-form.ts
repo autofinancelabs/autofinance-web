@@ -12,6 +12,19 @@ import {BaseForm} from '../../../../shared/presentation/components/base-form/bas
 import {MoneyPipe} from '../../../../shared/presentation/money.pipe';
 import {VehicleOffersStore} from '../../../application/vehicle-offers.store';
 import {VehicleOfferDraft} from '../../../domain/model/vehicle-offer-draft.command';
+import {Model3dPreset} from '../../../domain/model/model-3d-preset';
+import {Vehicle3dModel} from '../../../domain/model/vehicle-3d-model';
+import {
+  BODY_COLOR_SWATCHES,
+  DEFAULT_BODY_COLOR,
+  DEFAULT_WINDOW_COLOR,
+  MODEL_PRESET_LABEL,
+  MODEL_PRESETS,
+  PRESET_SUPPORTS,
+  randomPlate,
+  WINDOW_COLOR_SWATCHES,
+} from '../../../domain/model/vehicle-3d-palette';
+import {Vehicle3dViewer} from '../../components/vehicle-3d-viewer/vehicle-3d-viewer';
 
 interface VehicleOfferModel {
   make: string;
@@ -19,6 +32,23 @@ interface VehicleOfferModel {
   year: number | null;
   salePrice: number | null;
   currency: Currency;
+  create3d: boolean;
+  model3d: Vehicle3dModel;
+}
+
+/** Cosmetic boolean options of the 3D model that the form can toggle. */
+type ModelOption = 'sportWheels' | 'spoiler' | 'panoRoof';
+
+function defaultModel3d(): Vehicle3dModel {
+  return {
+    preset: Model3dPreset.SEDAN,
+    bodyColor: DEFAULT_BODY_COLOR,
+    windowColor: DEFAULT_WINDOW_COLOR,
+    sportWheels: false,
+    spoiler: false,
+    panoRoof: false,
+    plateText: randomPlate(),
+  };
 }
 
 /**
@@ -38,6 +68,7 @@ interface VehicleOfferModel {
     HlmButton,
     MoneyPipe,
     Breadcrumbs,
+    Vehicle3dViewer,
   ],
   templateUrl: './vehicle-offer-form.html',
   styleUrl: './vehicle-offer-form.css',
@@ -49,6 +80,42 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
 
   protected readonly currencies = [Currency.PEN, Currency.USD];
   protected readonly saving = this.store.saving;
+
+  protected readonly presets = MODEL_PRESETS;
+  protected readonly bodySwatches = BODY_COLOR_SWATCHES;
+  protected readonly windowSwatches = WINDOW_COLOR_SWATCHES;
+  protected readonly presetLabel = MODEL_PRESET_LABEL;
+
+  /** Which cosmetic options apply to the currently selected preset. */
+  protected readonly support = computed(() => PRESET_SUPPORTS[this.model().model3d.preset]);
+
+  protected toggle3d(enabled: boolean): void {
+    this.model.update(value => ({...value, create3d: enabled}));
+  }
+
+  protected selectPreset(preset: Model3dPreset): void {
+    this.patch3d({preset});
+  }
+
+  protected setBodyColor(bodyColor: string): void {
+    this.patch3d({bodyColor});
+  }
+
+  protected setWindowColor(windowColor: string): void {
+    this.patch3d({windowColor});
+  }
+
+  protected toggleOption(option: ModelOption, enabled: boolean): void {
+    this.patch3d({[option]: enabled});
+  }
+
+  protected setPlate(plateText: string): void {
+    this.patch3d({plateText});
+  }
+
+  private patch3d(patch: Partial<Vehicle3dModel>): void {
+    this.model.update(value => ({...value, model3d: {...value.model3d, ...patch}}));
+  }
 
   protected readonly id = this.route.snapshot.paramMap.get('id');
   protected readonly isEdit = this.id !== null;
@@ -79,6 +146,8 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
     year: null,
     salePrice: null,
     currency: Currency.PEN,
+    create3d: false,
+    model3d: defaultModel3d(),
   });
 
   protected readonly f = form(this.model, path => {
@@ -102,6 +171,8 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
           year: offer.year,
           salePrice: offer.salePrice.amount,
           currency: offer.salePrice.currency,
+          create3d: offer.model3d !== null,
+          model3d: offer.model3d ?? defaultModel3d(),
         });
       }
     });
@@ -129,6 +200,7 @@ export class VehicleOfferForm extends BaseForm implements OnInit {
         year: value.year ?? 0,
         salePrice: value.salePrice ?? 0,
         currency: value.currency,
+        model3d: value.create3d ? value.model3d : null,
       });
       if (this.id !== null) {
         this.store.update(this.id, draft);

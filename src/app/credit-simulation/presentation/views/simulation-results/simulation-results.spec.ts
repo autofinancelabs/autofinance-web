@@ -5,6 +5,7 @@ import {CreditSimulation} from '../../../domain/model/credit-simulation.entity';
 import {SimulationAssembler} from '../../../infrastructure/simulation-assembler';
 import {SimulationResource} from '../../../infrastructure/simulation-response';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
+import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
 import {SimulationResults} from './simulation-results';
 
 const assembler = new SimulationAssembler();
@@ -90,12 +91,14 @@ describe('SimulationResults', () => {
     loading = signal(false);
     history = signal<CreditSimulation[]>([]);
     store = {loadOne: vi.fn(), loadHistory: vi.fn(), selected, loading, history} as never;
+    const offersStore = {selected: signal(null), loadOne: vi.fn()};
 
     TestBed.configureTestingModule({
       imports: [SimulationResults],
       providers: [
         provideRouter([]),
         {provide: CreditSimulationStore, useValue: store},
+        {provide: VehicleOffersStore, useValue: offersStore},
         {provide: ActivatedRoute, useValue: {snapshot: {paramMap: convertToParamMap({id: routeId})}}},
       ],
     });

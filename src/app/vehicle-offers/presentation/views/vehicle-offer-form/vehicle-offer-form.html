@@ -82,6 +82,139 @@
           </div>
         </div>
 
+        <section class="model3d" aria-label="Modelo 3D del vehículo">
+          <label class="model3d__toggle">
+            <input
+              type="checkbox"
+              [checked]="model().create3d"
+              (change)="toggle3d($any($event.target).checked)"
+            />
+            <span>
+              <span class="model3d__toggle-title">Crear modelo 3D</span>
+              <span class="model3d__toggle-sub">
+                Un modelo low-poly que representa el vehículo. Opcional.
+              </span>
+            </span>
+          </label>
+
+          @if (model().create3d) {
+            <div class="model3d__pickers">
+              <div class="picker">
+                <span class="picker__label">Modelo</span>
+                <div class="picker__options picker__options--wrap" role="group" aria-label="Preset del modelo 3D">
+                  @for (preset of presets; track preset) {
+                    <button
+                      type="button"
+                      class="preset"
+                      [class.preset--active]="model().model3d.preset === preset"
+                      [attr.aria-pressed]="model().model3d.preset === preset"
+                      (click)="selectPreset(preset)"
+                    >
+                      {{ presetLabel[preset] }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="picker">
+                <span class="picker__label">Color de carrocería</span>
+                <div class="picker__options" role="group" aria-label="Color de carrocería">
+                  @for (color of bodySwatches; track color) {
+                    <button
+                      type="button"
+                      class="swatch"
+                      [class.swatch--active]="model().model3d.bodyColor === color"
+                      [style.background]="color"
+                      [attr.aria-label]="'Color ' + color"
+                      [attr.aria-pressed]="model().model3d.bodyColor === color"
+                      (click)="setBodyColor(color)"
+                    ></button>
+                  }
+                  <label class="swatch swatch--custom" aria-label="Color personalizado de carrocería">
+                    <input
+                      type="color"
+                      [value]="model().model3d.bodyColor"
+                      (input)="setBodyColor($any($event.target).value)"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              @if (support().windows) {
+                <div class="picker">
+                  <span class="picker__label">Color de ventanas</span>
+                  <div class="picker__options" role="group" aria-label="Color de ventanas">
+                    @for (color of windowSwatches; track color) {
+                      <button
+                        type="button"
+                        class="swatch"
+                        [class.swatch--active]="model().model3d.windowColor === color"
+                        [style.background]="color"
+                        [attr.aria-label]="'Ventanas ' + color"
+                        [attr.aria-pressed]="model().model3d.windowColor === color"
+                        (click)="setWindowColor(color)"
+                      ></button>
+                    }
+                    <label class="swatch swatch--custom" aria-label="Color personalizado de ventanas">
+                      <input
+                        type="color"
+                        [value]="model().model3d.windowColor"
+                        (input)="setWindowColor($any($event.target).value)"
+                      />
+                    </label>
+                  </div>
+                </div>
+              }
+
+              <div class="picker picker--options">
+                <span class="picker__label">Detalles</span>
+                <div class="options">
+                  <label class="option">
+                    <input
+                      type="checkbox"
+                      [checked]="model().model3d.sportWheels"
+                      (change)="toggleOption('sportWheels', $any($event.target).checked)"
+                    />
+                    Llantas deportivas
+                  </label>
+                  @if (support().spoiler) {
+                    <label class="option">
+                      <input
+                        type="checkbox"
+                        [checked]="model().model3d.spoiler"
+                        (change)="toggleOption('spoiler', $any($event.target).checked)"
+                      />
+                      Spoiler
+                    </label>
+                  }
+                  @if (support().panoRoof) {
+                    <label class="option">
+                      <input
+                        type="checkbox"
+                        [checked]="model().model3d.panoRoof"
+                        (change)="toggleOption('panoRoof', $any($event.target).checked)"
+                      />
+                      Techo panorámico
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <div hlmFormField class="picker picker--plate">
+                <label hlmLabel for="plate">Placa</label>
+                <input
+                  hlmInput
+                  id="plate"
+                  maxlength="8"
+                  class="font-mono"
+                  [value]="model().model3d.plateText"
+                  (input)="setPlate($any($event.target).value)"
+                />
+              </div>
+            </div>
+          }
+        </section>
+
         <div class="actions">
           <a hlmBtn variant="outline" routerLink="/vehicle-offers">Cancelar</a>
           <button hlmBtn type="submit" [disabled]="saving()">
@@ -93,6 +226,19 @@
 
     <aside class="form-aside" aria-label="Vista previa de la oferta">
       <p class="form-aside__title">Vista previa</p>
+
+      @defer (when model().create3d) {
+        @if (model().create3d) {
+          <div class="viewer-shell">
+            <app-vehicle-3d-viewer [model]="model().model3d" />
+          </div>
+        }
+      } @placeholder {
+        @if (model().create3d) {
+          <div class="viewer-shell viewer-shell--loading">Cargando modelo 3D…</div>
+        }
+      }
+
       <div class="preview">
         <p class="preview__title">{{ preview().title }}</p>
         @if (preview().year) {

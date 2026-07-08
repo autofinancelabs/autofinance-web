@@ -9,6 +9,8 @@ import {RatePipe} from '../../../../shared/presentation/rate.pipe';
 import {CreditSimulationStore} from '../../../application/credit-simulation.store';
 import {GraceType} from '../../../domain/model/grace-type';
 import {ScheduleRow} from '../../../domain/model/schedule-row.value-object';
+import {VehicleOffersStore} from '../../../../vehicle-offers/application/vehicle-offers.store';
+import {Vehicle3dViewer} from '../../../../vehicle-offers/presentation/components/vehicle-3d-viewer/vehicle-3d-viewer';
 
 /**
  * Renders a generated/loaded simulation: the SBS transparency indicators (VAN,
@@ -18,20 +20,25 @@ import {ScheduleRow} from '../../../domain/model/schedule-row.value-object';
  */
 @Component({
   selector: 'app-simulation-results',
-  imports: [RouterLink, HlmButton, Breadcrumbs, MoneyPipe, AmountPipe, RatePipe],
+  imports: [RouterLink, HlmButton, Breadcrumbs, MoneyPipe, AmountPipe, RatePipe, Vehicle3dViewer],
   templateUrl: './simulation-results.html',
   styleUrl: './simulation-results.css',
 })
 export class SimulationResults implements OnInit {
   private readonly store = inject(CreditSimulationStore);
+  private readonly offersStore = inject(VehicleOffersStore);
   private readonly route = inject(ActivatedRoute);
 
   private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   private loadedHistoryFor: string | null = null;
+  private loadedOfferFor: string | null = null;
 
   protected readonly simulation = this.store.selected;
   protected readonly loading = this.store.loading;
   protected readonly history = this.store.history;
+
+  /** The financed vehicle's 3D model (loaded from its offer), or null. */
+  protected readonly vehicle3d = computed(() => this.offersStore.selected()?.model3d ?? null);
 
   protected readonly graceLabels: Record<GraceType, string> = {
     [GraceType.NONE]: 'S',
@@ -94,6 +101,15 @@ export class SimulationResults implements OnInit {
       if (sim && this.loadedHistoryFor !== sim.clientId) {
         this.loadedHistoryFor = sim.clientId;
         this.store.loadHistory(sim.clientId);
+      }
+    });
+
+    // Load the financed vehicle offer (once per offer) so its 3D model can be shown.
+    effect(() => {
+      const sim = this.simulation();
+      if (sim && this.loadedOfferFor !== sim.vehicleOfferId) {
+        this.loadedOfferFor = sim.vehicleOfferId;
+        this.offersStore.loadOne(sim.vehicleOfferId);
       }
     });
   }

@@ -1,10 +1,11 @@
 import {BaseEntity} from '../../../shared/domain/model/base-entity';
 import {Money} from '../../../shared/domain/model/money';
+import {Vehicle3dModel} from './vehicle-3d-model';
 
 /**
  * A vehicle offer: the vehicle and its sale price. Serves as the basis for a
  * credit simulation. Scoped to the dealership (tenant) server-side; the frontend
- * only references it by `id`.
+ * only references it by `id`. `model3d` is `null` when the offer has no 3D model.
  */
 export class VehicleOffer implements BaseEntity {
   private readonly _id: string;
@@ -12,13 +13,22 @@ export class VehicleOffer implements BaseEntity {
   private readonly _model: string;
   private readonly _year: number;
   private readonly _salePrice: Money;
+  private readonly _model3d: Vehicle3dModel | null;
 
-  constructor(options: {id: string; make: string; model: string; year: number; salePrice: Money}) {
+  constructor(options: {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+    salePrice: Money;
+    model3d: Vehicle3dModel | null;
+  }) {
     this._id = options.id;
     this._make = options.make;
     this._model = options.model;
     this._year = options.year;
     this._salePrice = options.salePrice;
+    this._model3d = options.model3d;
   }
 
   get id(): string {
@@ -39,5 +49,9 @@ export class VehicleOffer implements BaseEntity {
 
   get salePrice(): Money {
     return this._salePrice;
+  }
+
+  get model3d(): Vehicle3dModel | null {
+    return this._model3d;
   }
 }

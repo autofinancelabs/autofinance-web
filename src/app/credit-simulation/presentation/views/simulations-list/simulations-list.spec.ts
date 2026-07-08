@@ -115,6 +115,7 @@ describe('SimulationsList', () => {
         model: 'Corolla',
         year: 2024,
         salePrice: new Money({amount: 16000, currency: Currency.PEN}),
+        model3d: null,
       }),
     ]);
     simulations.set([makeSim('s-1', 'cl-1')]);

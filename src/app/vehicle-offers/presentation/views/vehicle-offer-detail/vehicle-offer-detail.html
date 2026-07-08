@@ -1,0 +1,74 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs()" />
+
+  @if (loading() && !offer()) {
+    <p class="text-muted-foreground text-sm" role="status">Cargando oferta…</p>
+  } @else if (offer(); as o) {
+    <div class="detail-card">
+      <div class="detail-main">
+        <header class="detail-head">
+          <div>
+            <h1 class="text-2xl font-medium tracking-tight">{{ o.make }} {{ o.model }}</h1>
+            <p class="text-muted-foreground text-sm">Año {{ o.year }}</p>
+          </div>
+          <a hlmBtn variant="outline" [routerLink]="['/vehicle-offers', o.id, 'edit']">Editar</a>
+        </header>
+
+        <dl class="facts">
+          <div class="fact">
+            <dt>Precio de venta</dt>
+            <dd class="font-mono tabular-nums">{{ o.salePrice | money }}</dd>
+          </div>
+          @if (o.model3d; as m) {
+            <div class="fact">
+              <dt>Modelo 3D</dt>
+              <dd>{{ presetLabel[m.preset] }}</dd>
+            </div>
+            <div class="fact">
+              <dt>Colores</dt>
+              <dd class="colors">
+                <span class="dot" [style.background]="m.bodyColor"></span>{{ m.bodyColor }}
+                <span class="dot" [style.background]="m.windowColor"></span>{{ m.windowColor }}
+              </dd>
+            </div>
+            @if (m.plateText) {
+              <div class="fact">
+                <dt>Placa</dt>
+                <dd class="font-mono">{{ m.plateText }}</dd>
+              </div>
+            }
+            @if (options().length) {
+              <div class="fact">
+                <dt>Detalles</dt>
+                <dd class="chips">
+                  @for (option of options(); track option) {
+                    <span class="chip">{{ option }}</span>
+                  }
+                </dd>
+              </div>
+            }
+          }
+        </dl>
+      </div>
+
+      <aside class="detail-aside" aria-label="Modelo 3D del vehículo">
+        @if (o.model3d; as m) {
+          @defer (on viewport) {
+            <div class="viewer-shell">
+              <app-vehicle-3d-viewer [model]="m" />
+            </div>
+          } @placeholder {
+            <div class="viewer-shell viewer-shell--loading">Cargando modelo 3D…</div>
+          }
+        } @else {
+          <div class="no-model">Esta oferta no tiene modelo 3D.</div>
+        }
+      </aside>
+    </div>
+  } @else {
+    <div class="empty">
+      <p class="text-muted-foreground">No se encontró la oferta.</p>
+      <a hlmBtn variant="outline" routerLink="/vehicle-offers">Volver a la lista</a>
+    </div>
+  }
+</div>
