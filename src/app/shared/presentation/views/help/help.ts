@@ -22,68 +22,100 @@ export class Help {
 
   protected readonly steps = [
     {
-      title: 'Registra el vehículo',
-      text: 'Crea una oferta con marca, modelo, año, precio y moneda. La moneda de la oferta define la moneda de la cotización.',
+      title: 'Registrar oferta',
+      text: 'Crea el vehiculo con marca, modelo, anio, precio y moneda. El precio sera la base de inicial, cuoton y seguros.',
+      action: 'Ir a vehiculos',
+      link: '/vehicle-offers',
     },
     {
-      title: 'Registra el cliente',
-      text: 'Guarda documento, nombres y datos de contacto. Luego podrás consultar su historial de cotizaciones.',
+      title: 'Registrar cliente',
+      text: 'Guarda documento, nombres y datos de contacto para asociar la cotizacion y consultar su historial.',
+      action: 'Ir a clientes',
+      link: '/clients',
     },
     {
-      title: 'Configura el crédito',
-      text: 'Selecciona cliente y oferta, completa tasa, plazo, gracia, cuotón, COK y costos aplicables.',
+      title: 'Configurar credito',
+      text: 'Selecciona cliente y oferta; completa tasa, plazo, frecuencia, gracia, COK, cuoton y costos.',
+      action: 'Nueva cotizacion',
+      link: '/credit-simulations/new',
     },
     {
-      title: 'Revisa el cronograma',
-      text: 'Valida saldos, flujos, VAN, TIR y TCEA. Si cambia una condición, edita la cotización y vuelve a guardar.',
+      title: 'Visualizar cronograma',
+      text: 'Revisa el detalle por cuota: saldo, interes, amortizacion, seguros, gastos y flujo del periodo.',
+      action: 'Ver cotizaciones',
+      link: '/credit-simulations',
+    },
+    {
+      title: 'Validar resultados',
+      text: 'Confirma cuota, cuoton, TCEA, VAN y TIR antes de presentar la propuesta al cliente.',
+      action: 'Ver cotizaciones',
+      link: '/credit-simulations',
     },
   ];
 
   protected readonly fieldGroups = [
     {
-      title: 'Cliente',
+      title: 'Tasa',
+      icon: '%',
       items: [
-        ['Tipo y número de documento', 'Identifican al deudor. El documento queda como referencia principal del cliente.'],
-        ['Nombres y apellidos', 'Usalos como figuran en el documento para evitar duplicidades.'],
-        ['Correo, teléfono y dirección', 'Son opcionales, pero ayudan al asesor a completar la oferta comercial.'],
+        {label: 'Tipo de tasa', text: 'Nominal necesita capitalizacion; efectiva ya viene convertida al periodo declarado.'},
+        {label: 'Valor (%)', text: 'Ingresa el porcentaje visible. Para 15% escribe 15, no 0.15.'},
+        {label: 'Periodo y capitalizacion', text: 'Verifica si la tasa se declara anual, mensual u otro periodo, y si corresponde capitalizacion.'},
       ],
     },
     {
-      title: 'Oferta vehicular',
+      title: 'Credito',
+      icon: 'S/',
       items: [
-        ['Marca, modelo y año', 'Describen el vehículo que se cotiza.'],
-        ['Precio de venta', 'Base para cuota inicial, cuotón, seguros sobre precio y monto del préstamo.'],
-        ['Moneda', 'La operación trabaja en una sola moneda: PEN o USD.'],
+        {label: 'Cuota inicial', text: 'Porcentaje del precio pagado al inicio por el cliente.'},
+        {label: 'Cuota final', text: 'Cuoton balloon de Compra Inteligente, calculado sobre el precio del vehiculo.'},
+        {label: 'Plazo', text: 'Cantidad de cuotas regulares. Con frecuencia 30, plazo 36 equivale a 36 meses.'},
       ],
     },
     {
-      title: 'Simulacion',
+      title: 'Gracia',
+      icon: 'G',
       items: [
-        ['Tipo de tasa', 'Nominal requiere capitalización; efectiva puede declararse anual o por período.'],
-        ['Período de tasa', 'Indica si el valor ingresado es anual, mensual u otro período en días.'],
-        ['Cuota inicial y cuotón', 'Se ingresan como porcentaje del precio. La suma debe ser menor a 100%.'],
-        ['Gracia total y parcial', 'Se aplican al inicio: total capitaliza intereses; parcial paga solo intereses.'],
-        ['Costos', 'Fijos, sobre saldo o sobre precio. El desgravamen puede incluirse en la tasa ajustada.'],
-        ['COK anual', 'Tasa de descuento del deudor usada para calcular el VAN.'],
+        {label: 'Gracia total', text: 'Periodo inicial sin pago; el interes se acumula en el saldo.'},
+        {label: 'Gracia parcial', text: 'Periodo inicial donde se paga interes, pero no se amortiza capital.'},
+        {label: 'Orden', text: 'Primero se aplican las cuotas de gracia total y luego las parciales.'},
       ],
     },
+    {
+      title: 'Costos',
+      icon: '+',
+      items: [
+        {label: 'Monto fijo', text: 'Importe directo. Ejemplo: GPS 20 o gastos notariales 100.'},
+        {label: '% sobre saldo', text: 'Depende del saldo pendiente; se usa para desgravamen.'},
+        {label: '% sobre precio', text: 'Depende del valor del vehiculo; se usa para seguro de riesgo.'},
+      ],
+    },
+  ];
+
+  protected readonly checklist = [
+    'Cliente y oferta vehicular seleccionados.',
+    'Tasa, periodo y capitalizacion coinciden con la propuesta comercial.',
+    'Inicial + cuoton es menor que 100%.',
+    'Plazo, frecuencia y dias por anio coinciden con la propuesta financiera.',
+    'Los costos iniciales y periodicos estan cargados con la base correcta.',
+    'El desgravamen esta marcado como incluido en la tasa si la politica de la operacion lo requiere.',
+  ];
+
+  protected readonly costRows = [
+    {name: 'Gasto notarial', value: 'Importe', basis: 'Monto fijo', timing: 'Inicial', note: 'Se considera al inicio de la operacion.'},
+    {name: 'Gasto registral', value: 'Importe', basis: 'Monto fijo', timing: 'Inicial', note: 'Se considera al inicio de la operacion.'},
+    {name: 'GPS', value: 'Importe', basis: 'Monto fijo', timing: 'Periodico', note: 'Se cobra junto con cada cuota.'},
+    {name: 'Portes', value: 'Importe', basis: 'Monto fijo', timing: 'Periodico', note: 'Se cobra junto con cada cuota.'},
+    {name: 'Gastos administrativos', value: 'Importe', basis: 'Monto fijo', timing: 'Periodico', note: 'Se cobra junto con cada cuota.'},
+    {name: 'Desgravamen', value: 'Porcentaje', basis: '% sobre saldo', timing: 'Periodico', note: 'Puede incluirse en la tasa segun la politica comercial.'},
+    {name: 'Seguro de riesgo', value: 'Porcentaje', basis: '% sobre precio', timing: 'Periodico', note: 'Se calcula sobre el valor del vehiculo.'},
   ];
 
   protected readonly indicators = [
-    ['VAN', 'Valor actual neto desde la óptica del deudor. Positivo indica que el financiamiento supera el COK ingresado.'],
-    ['TIR periódica', 'Tasa que hace cero el VAN usando los flujos del cronograma.'],
-    ['TCEA', 'Costo efectivo anual; anualiza la TIR periódica e incorpora cuotas, seguros y costos.'],
-    ['TEA/TEM', 'Conversiones de tasa usadas por el motor para calcular intereses por periodo.'],
-    ['Saldo a financiar', 'Parte del préstamo que se amortiza con cuotas regulares, descontando el valor presente del cuotón.'],
-  ];
-
-  protected readonly exampleRows = [
-    ['Precio', '16,000 PEN'],
-    ['Tasa', '15% TNA con capitalización diaria'],
-    ['Cuota inicial / cuotón', '20% / 40%'],
-    ['Plazo', '36 cuotas mensuales, 30/360'],
-    ['Gracia', '3 totales y 3 parciales'],
-    ['COK anual', '50%'],
-    ['Costos', 'Notario 100, registral 75, desgravamen 0.049%, riesgo 4, GPS 20, portes 3.5, gastos adm. 3.5'],
+    {label: 'Cuota', text: 'Pago regular calculado con metodo frances. En Compra Inteligente no incluye el cuoton final.'},
+    {label: 'Saldo', text: 'Capital pendiente despues de cada periodo. Debe evolucionar segun gracia y amortizacion.'},
+    {label: 'TCEA', text: 'Costo efectivo anual para el cliente, incorporando tasa, seguros y costos.'},
+    {label: 'VAN', text: 'Valor actual neto usando el COK anual ingresado por el asesor.'},
+    {label: 'TIR', text: 'Tasa que resume la rentabilidad o costo de los flujos del cronograma.'},
   ];
 }

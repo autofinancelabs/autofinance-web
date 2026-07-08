@@ -13,8 +13,9 @@ describe('Help', () => {
     fixture.detectChanges();
 
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Ayuda de uso');
+    expect(el.textContent).toContain('Guia para el asesor de ventas');
     expect(el.textContent).toContain('Flujo recomendado');
+    expect(el.textContent).toContain('Checklist operativo');
     expect(el.textContent).toContain('VAN');
     expect(el.querySelector('a[href="/credit-simulations/new"]')).not.toBeNull();
   });
