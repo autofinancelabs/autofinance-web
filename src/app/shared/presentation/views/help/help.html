@@ -1,0 +1,126 @@
+<div class="page">
+  <app-breadcrumbs [items]="breadcrumbs" />
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Asistencia técnica</p>
+      <h1 class="title">Ayuda de uso</h1>
+      <p class="subtitle">
+        Guía rápida para registrar datos, configurar una cotización y leer los indicadores financieros.
+      </p>
+    </div>
+    <a hlmBtn routerLink="/credit-simulations/new">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nueva cotización
+    </a>
+  </header>
+
+  <section class="flow" aria-labelledby="flow-title">
+    <div class="section-head">
+      <h2 id="flow-title">Flujo recomendado</h2>
+      <p>Completa los módulos en este orden para que la cotización tenga cliente, vehículo y condiciones financieras.</p>
+    </div>
+
+    <ol class="steps">
+      @for (step of steps; track step.title; let i = $index) {
+        <li class="step">
+          <span class="step__number font-mono tabular-nums">{{ i + 1 }}</span>
+          <span class="step__body">
+            <span class="step__title">{{ step.title }}</span>
+            <span class="step__text">{{ step.text }}</span>
+          </span>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <div class="guide-grid">
+    <section class="panel panel--wide" aria-labelledby="fields-title">
+      <div class="section-head">
+        <h2 id="fields-title">Ayuda por campos</h2>
+        <p>Usa estas reglas al completar los formularios principales.</p>
+      </div>
+
+      <div class="field-groups">
+        @for (group of fieldGroups; track group.title) {
+          <article class="field-group">
+            <h3>{{ group.title }}</h3>
+            <dl class="definition-list">
+              @for (item of group.items; track item[0]) {
+                <div class="definition-list__row">
+                  <dt>{{ item[0] }}</dt>
+                  <dd>{{ item[1] }}</dd>
+                </div>
+              }
+            </dl>
+          </article>
+        }
+      </div>
+    </section>
+
+    <aside class="panel" aria-labelledby="example-title">
+      <div class="section-head">
+        <h2 id="example-title">Caso de prueba</h2>
+        <p>Referencia para replicar el modelo de Compra Inteligente tipo Interbank.</p>
+      </div>
+
+      <dl class="example-list">
+        @for (row of exampleRows; track row[0]) {
+          <div class="example-list__row">
+            <dt>{{ row[0] }}</dt>
+            <dd>{{ row[1] }}</dd>
+          </div>
+        }
+      </dl>
+
+      <div class="expected">
+        <p class="expected__title">Resultados esperados</p>
+        <p>Cuota cercana a <strong>379.16</strong>, TCEA cercana a <strong>20.7856%</strong> y VAN cercano a <strong>4,436.18</strong>.</p>
+      </div>
+    </aside>
+  </div>
+
+  <section class="panel" aria-labelledby="indicators-title">
+    <div class="section-head">
+      <h2 id="indicators-title">Lectura de resultados</h2>
+      <p>Estos indicadores resumen la operación desde la óptica del deudor.</p>
+    </div>
+
+    <div class="indicator-grid">
+      @for (indicator of indicators; track indicator[0]) {
+        <article class="indicator">
+          <h3>{{ indicator[0] }}</h3>
+          <p>{{ indicator[1] }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="closing" aria-label="Validación antes de guardar">
+    <div>
+      <h2>Antes de presentar una cotización</h2>
+      <p>
+        Verifica que el saldo final de la cuota regular sea cero, que el cuotón aparezca como fila final
+        cuando corresponde, y que las tasas coincidan con el tipo de tasa elegido.
+      </p>
+    </div>
+    <div class="closing__actions">
+      <a hlmBtn variant="outline" routerLink="/vehicle-offers">Vehículos</a>
+      <a hlmBtn variant="outline" routerLink="/clients">Clientes</a>
+      <a hlmBtn routerLink="/credit-simulations">Cotizaciones</a>
+    </div>
+  </section>
+</div>
