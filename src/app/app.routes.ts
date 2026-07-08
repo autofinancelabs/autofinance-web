@@ -6,6 +6,8 @@ const landing = () =>
   import('./shared/presentation/views/landing/landing').then(m => m.Landing);
 const dashboard = () =>
   import('./shared/presentation/views/dashboard/dashboard').then(m => m.Dashboard);
+const help = () =>
+  import('./shared/presentation/views/help/help').then(m => m.Help);
 const appShell = () =>
   import('./shared/presentation/components/app-shell/app-shell').then(m => m.AppShell);
 const authLayout = () =>
@@ -43,6 +45,7 @@ export const routes: Routes = [
       {path: 'vehicle-offers', loadChildren: vehicleOffersRoutes},
       {path: 'clients', loadChildren: clientsRoutes},
       {path: 'credit-simulations', loadChildren: creditSimulationRoutes},
+      {path: 'help', loadComponent: help},
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
     ],
   },

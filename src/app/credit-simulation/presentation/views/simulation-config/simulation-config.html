@@ -74,7 +74,10 @@
           <legend class="section__title">Tasa de interés</legend>
           <div class="grid">
             <div hlmFormField>
-              <label hlmLabel for="rateType">Tipo de tasa</label>
+              <label hlmLabel for="rateType" class="field-label">
+                <span>Tipo de tasa</span>
+                <span class="field-info" brnTooltip="Nominal requiere capitalizacion; efectiva ya representa el rendimiento del periodo elegido." aria-label="Ayuda sobre tipo de tasa" tabindex="0">?</span>
+              </label>
               <select hlmInput id="rateType" [formField]="f.rateType">
                 @for (type of rateTypes; track type) {
                   <option [value]="type">{{ type === 'NOMINAL' ? 'Tasa Nominal' : 'Tasa Efectiva' }}</option>
@@ -83,13 +86,17 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="rateValue">Valor de la tasa (%)</label>
+              <label hlmLabel for="rateValue" class="field-label">
+                <span>Valor de la tasa (%)</span>
+                <span class="field-info" brnTooltip="Ingresa el porcentaje visible, por ejemplo 15 para 15%; no ingreses 0.15." aria-label="Ayuda sobre valor de tasa" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="rateValue"
                 type="number"
                 inputmode="decimal"
                 step="0.0001"
+                placeholder="15"
                 class="font-mono tabular-nums"
                 [formField]="f.rateValue"
                 [attr.aria-invalid]="f.rateValue().touched() && f.rateValue().invalid() ? 'true' : null"
@@ -193,13 +200,17 @@
           <legend class="section__title">Estructura del crédito</legend>
           <div class="grid">
             <div hlmFormField>
-              <label hlmLabel for="initialPercentage">% Cuota inicial</label>
+              <label hlmLabel for="initialPercentage" class="field-label">
+                <span>% Cuota inicial</span>
+                <span class="field-info" brnTooltip="Porcentaje del precio que el cliente paga al inicio. Ejemplo: 20 significa 20%." aria-label="Ayuda sobre cuota inicial" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="initialPercentage"
                 type="number"
                 inputmode="decimal"
                 step="0.01"
+                placeholder="20"
                 class="font-mono tabular-nums"
                 [formField]="f.initialPercentage"
                 [attr.aria-invalid]="
@@ -212,13 +223,17 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="balloonPercentage">% Cuota final (balloon)</label>
+              <label hlmLabel for="balloonPercentage" class="field-label">
+                <span>% Cuota final (balloon)</span>
+                <span class="field-info" brnTooltip="Cuoton final de Compra Inteligente, calculado como porcentaje del precio del vehiculo." aria-label="Ayuda sobre cuota final balloon" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="balloonPercentage"
                 type="number"
                 inputmode="decimal"
                 step="0.01"
+                placeholder="40"
                 class="font-mono tabular-nums"
                 [formField]="f.balloonPercentage"
                 [attr.aria-invalid]="
@@ -231,12 +246,16 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="numberOfInstallments">Plazo (cuotas)</label>
+              <label hlmLabel for="numberOfInstallments" class="field-label">
+                <span>Plazo (cuotas)</span>
+                <span class="field-info" brnTooltip="Cantidad de cuotas regulares del credito. Con frecuencia 30, 36 equivale a 36 meses." aria-label="Ayuda sobre plazo en cuotas" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="numberOfInstallments"
                 type="number"
                 inputmode="numeric"
+                placeholder="36"
                 class="font-mono tabular-nums"
                 [formField]="f.numberOfInstallments"
                 [attr.aria-invalid]="
@@ -285,13 +304,17 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="costOfCapitalAnnual">COK anual (%)</label>
+              <label hlmLabel for="costOfCapitalAnnual" class="field-label">
+                <span>COK anual (%)</span>
+                <span class="field-info" brnTooltip="Costo de oportunidad usado para descontar los flujos y calcular el VAN." aria-label="Ayuda sobre COK anual" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="costOfCapitalAnnual"
                 type="number"
                 inputmode="decimal"
                 step="0.01"
+                placeholder="50"
                 class="font-mono tabular-nums"
                 [formField]="f.costOfCapitalAnnual"
                 [attr.aria-invalid]="
@@ -313,12 +336,16 @@
           </p>
           <div class="grid">
             <div hlmFormField>
-              <label hlmLabel for="totalGrace">Gracia total (T)</label>
+              <label hlmLabel for="totalGrace" class="field-label">
+                <span>Gracia total (T)</span>
+                <span class="field-info" brnTooltip="Numero de cuotas iniciales donde no se paga; el interes se capitaliza." aria-label="Ayuda sobre gracia total" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="totalGrace"
                 type="number"
                 inputmode="numeric"
+                placeholder="3"
                 class="font-mono tabular-nums"
                 [formField]="f.totalGrace"
                 [attr.aria-invalid]="f.totalGrace().touched() && f.totalGrace().invalid() ? 'true' : null"
@@ -329,12 +356,16 @@
             </div>
 
             <div hlmFormField>
-              <label hlmLabel for="partialGrace">Gracia parcial (P)</label>
+              <label hlmLabel for="partialGrace" class="field-label">
+                <span>Gracia parcial (P)</span>
+                <span class="field-info" brnTooltip="Numero de cuotas iniciales donde se paga interes, pero no se amortiza capital." aria-label="Ayuda sobre gracia parcial" tabindex="0">?</span>
+              </label>
               <input
                 hlmInput
                 id="partialGrace"
                 type="number"
                 inputmode="numeric"
+                placeholder="3"
                 class="font-mono tabular-nums"
                 [formField]="f.partialGrace"
                 [attr.aria-invalid]="
@@ -413,7 +444,10 @@
               </div>
 
               <div hlmFormField class="cost-row__basis">
-                <label hlmLabel [for]="'cost-basis-' + i">Base</label>
+                <label hlmLabel [for]="'cost-basis-' + i" class="field-label">
+                  <span>Base</span>
+                  <span class="field-info" brnTooltip="Monto fijo se cobra como importe; % sobre saldo depende de la deuda; % sobre precio depende del valor del vehiculo." aria-label="Ayuda sobre base del costo" tabindex="0">?</span>
+                </label>
                 <select hlmInput [id]="'cost-basis-' + i" [formField]="f.costs[i].basis">
                   @for (basis of costBases; track basis) {
                     <option [value]="basis">{{ costBasisLabels[basis] }}</option>
@@ -422,7 +456,10 @@
               </div>
 
               <div hlmFormField class="cost-row__timing">
-                <label hlmLabel [for]="'cost-timing-' + i">Momento</label>
+                <label hlmLabel [for]="'cost-timing-' + i" class="field-label">
+                  <span>Momento</span>
+                  <span class="field-info" brnTooltip="Inicial se suma al desembolso al inicio; periodico se cobra en cada cuota." aria-label="Ayuda sobre momento del costo" tabindex="0">?</span>
+                </label>
                 <select hlmInput [id]="'cost-timing-' + i" [formField]="f.costs[i].timing">
                   @for (timing of costTimings; track timing) {
                     <option [value]="timing">{{ costTimingLabels[timing] }}</option>
